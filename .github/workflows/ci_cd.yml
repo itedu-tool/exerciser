@@ -1,10 +1,10 @@
-name: Build and Push Docker Image (with Compose)
+name: Build and Push Docker Image on Tag
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    tags:
+      - 'v*'               # теги вида v1.0.0, v2.1.0-beta
+  workflow_dispatch:       # (опционально) ручной запуск для отладки
 
 jobs:
   build-and-push:
@@ -13,6 +13,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
@@ -23,10 +32,27 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push using docker compose
-        run: |
-          docker compose build webapi
-          docker tag exerciser-webapi:latest ${{ vars.DOCKER_USERNAME }}/exerciser-webapi:latest
-          docker push ${{ vars.DOCKER_USERNAME }}/exerciser-webapi:latest
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Exerciser.WebApi/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/exerciser-webapi:latest
+            ${{ vars.DOCKER_USERNAME }}/exerciser-webapi:${{ steps.version.outputs.version }}
+            ${{ vars.DOCKER_USERNAME }}/exerciser-webapi:${{ steps.version.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Exerciser ${{ steps.version.outputs.version }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-beta') || contains(steps.version.outputs.version, '-rc') }}
         env:
-          BUILD_CONFIGURATION: Release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

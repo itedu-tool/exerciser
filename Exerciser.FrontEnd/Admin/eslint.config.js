@@ -7,7 +7,7 @@ export default [
     js.configs.recommended,
     eslintConfigPrettier,
     {
-        files: ["scripts/**/*.js"],
+        files: ['scripts/**/*.js'],
         plugins: {
             prettier: eslintPluginPrettier,
         },
@@ -15,7 +15,7 @@ export default [
             globals: {
                 ...globals.browser,
                 ...globals.es2021,
-                bootstrap: "readonly",
+                bootstrap: 'readonly',
             },
             ecmaVersion: 'latest',
             sourceType: 'script',

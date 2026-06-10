@@ -86,6 +86,7 @@ function renderExamsList(exams) {
                 </div>
                 <div>
                     <button class="btn btn-sm btn-info view-btn" data-id="${exam.id}">👁️ Просмотр</button>
+                    <button class="btn btn-sm btn-warning edit-btn" data-id="${exam.id}">✏️ Редактировать</button>
                     <button class="btn btn-sm btn-danger delete-btn" data-id="${exam.id}">🗑️ Удалить</button>
                 </div>
             </div>
@@ -98,6 +99,12 @@ function renderExamsList(exams) {
             e.stopPropagation();
             const id = btn.dataset.id;
             await showExamDetails(id);
+        });
+    });
+    document.querySelectorAll('.edit-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            window.location.href = `edit.html?id=${id}`;
         });
     });
     document.querySelectorAll('.delete-btn').forEach((btn) => {

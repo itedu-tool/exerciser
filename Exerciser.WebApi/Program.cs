@@ -393,22 +393,67 @@ try
         .Produces<ExamDetailsDto>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);
+    
+    //PUT /api/v1/exams/:id
+    examsGroup.MapPut("/{id:guid}", async (
+            Guid id,
+            ImportExamDto updatedExam,
+            IExamRepository repo,
+            IExamImportValidator validator,
+            ILogger<Program> logger) =>
+        {
+            var existing = await repo.GetByIdAsync(id);
+            if (existing == null)
+                return Results.NotFound(new { error = "Экзамен не найден" });
+            
+            try
+            {
+                await validator.ValidateAsync(updatedExam);
+            }
+            catch (ImportValidationException ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+            
+            var exam = new Exam
+            {
+                Id = id,
+                Title = updatedExam.Title,
+                Description = updatedExam.Description,
+                CreatedAt = existing.CreatedAt,
+                Questions = updatedExam.Questions.Select(q => new Question
+                {
+                    Text = q.Text,
+                    Type = q.Type,
+                    Options = q.Options ?? [],
+                    CorrectAnswers = q.CorrectAnswers
+                }).ToList()
+            };
+
+            await repo.UpdateAsync(exam);
+            logger.LogInformation("Экзамен {ExamId} обновлён", id);
+
+            return Results.Ok(new ExamImportResponseDto
+            {
+                Id = exam.Id.ToString(),
+                Title = exam.Title,
+                QuestionsCount = exam.Questions.Count
+            });
+        })
+        .RequireRateLimiting("fixed")   // или отдельный лимит
+        .WithName("UpdateExam")
+        .WithSummary("Полное обновление экзамена");
 
     // DELETE /api/v1/exams/{id} - удаление экзамена
-    examsGroup.MapDelete("/{id}", async (string id, IExamRepository repo, ILogger<Program> logger) =>
+    examsGroup.MapDelete("/{id:guid}", async (Guid id, IExamRepository repo, ILogger<Program> logger) =>
         {
-            if (!Guid.TryParse(id, out Guid examId))
-            {
-                return Results.BadRequest(new { error = "Неверный формат идентификатора экзамена" });
-            }
-
-            bool deleted = await repo.DeleteAsync(examId);
+            bool deleted = await repo.DeleteAsync(id);
             if (!deleted)
             {
                 return Results.NotFound(new { error = "Экзамен не найден" });
             }
 
-            logger.LogInformation("Экзамен {ExamId} удалён", examId);
+            logger.LogInformation("Экзамен {ExamId} удалён", id);
             return Results.NoContent();
         })
         .WithName("DeleteExam")

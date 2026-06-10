@@ -1,0 +1,41 @@
+extends layout
+
+block vars
+    - var title = "Редактирование экзамена"
+    - var currentPage = "edit"
+
+block content
+    .card
+        .card-header
+            h5.mb-0 ✏️ Редактирование экзамена
+        .card-body
+            form#examForm
+                .mb-3
+                    label.form-label(for="title") Название экзамена *
+                    input#title.form-control(type="text", required)
+                .mb-3
+                    label.form-label(for="description") Описание
+                    textarea#description.form-control(rows="2")
+                hr
+                h4 Вопросы
+                #questionsContainer
+                .mt-3
+                    button#addQuestionBtn.btn.btn-outline-primary(type="button") + Добавить вопрос
+                hr
+                .d-flex.justify-content-between
+                    button.btn.btn-secondary(type="button", onclick="history.back()") Отмена
+                    button#saveBtn.btn.btn-primary(type="submit") Сохранить изменения
+
+    .modal.fade#previewModal(tabindex="-1")
+        .modal-dialog.modal-lg
+            .modal-content
+                .modal-header
+                    h5.modal-title Предпросмотр экзамена
+                    button.btn-close(type="button", data-bs-dismiss="modal")
+                .modal-body#previewContent
+                .modal-footer
+                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Закрыть
+
+block scripts
+    script(src="scripts/utils.js")
+    script(src="scripts/edit.js")
