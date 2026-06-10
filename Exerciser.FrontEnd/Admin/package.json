@@ -5,8 +5,8 @@
     "description": "Административная панель для Exerciser WebApi (Pug, Bootstrap 5 + Bootswatch)",
     "scripts": {
         "prebuild": "rimraf public && mkdirp public",
-        "build": "pug views/layout.pug views/index.pug views/teacher.pug views/health.pug --out public --pretty",
-        "postbuild": "copyfiles scripts/*.js public/scripts",
+        "build": "pug views/layout.pug views/index.pug views/teacher.pug views/health.pug views/edit.pug --out public --pretty",
+        "postbuild": "copyfiles scripts/*.js public",
         "start": "npm run build && live-server public --port=3000 --open",
         "lint": "eslint scripts/*.js",
         "lint:fix": "eslint --fix scripts/*.js",

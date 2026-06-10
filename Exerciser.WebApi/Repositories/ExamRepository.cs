@@ -26,6 +26,10 @@ public interface IExamRepository
     /// <returns>Объект экзамена или <c>null</c>, если экзамен с указанным ID не найден.</returns>
     Task<Exam?> GetByIdAsync(Guid id);
 
+    /// <summary>Обновить существующий экзамен в базе данных.</summary>
+    /// <param name="exam">Объект экзамена с обновлёнными данными. Экзамен с таким же идентификатором должен существовать.</param>
+    Task UpdateAsync(Exam exam);
+
     /// <summary>Удалить экзамен из базы данных по его идентификатору.</summary>
     /// <param name="id">GUID экзамена.</param>
     /// <returns><c>true</c>, если экзамен был удалён; <c>false</c>, если экзамен с таким ID не найден.</returns>
@@ -70,6 +74,14 @@ public class ExamRepository : IExamRepository
     {
         FilterDefinition<Exam>? filter = Builders<Exam>.Filter.Eq(e => e.Id, id);
         return await _exams.Find(filter).FirstOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
+    /// <exception cref="MongoConnectionException">Выбрасывается при проблемах с подключением к серверу MongoDB.</exception>
+    public async Task UpdateAsync(Exam exam)
+    {
+        var filter = Builders<Exam>.Filter.Eq(e => e.Id, exam.Id);
+        await _exams.ReplaceOneAsync(filter, exam);
     }
 
     /// <inheritdoc />
