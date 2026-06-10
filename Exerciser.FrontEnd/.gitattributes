@@ -1,0 +1,22 @@
+# Автоопределение текстовых файлов с LF
+* text=auto eol=lf
+
+# JS-файлы
+*.js text diff=javascript
+
+# JSON
+*.json text
+
+# Pug
+*.pug text
+
+# Конфиги
+*.json text
+*.yml text
+*.yaml text
+
+# Двоичные файлы
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary

@@ -1,0 +1,30 @@
+$kind: http-request
+description: Проверка здоровья API (legacy endpoint без версии)
+url: "{{base_url}}/health"
+method: GET
+headers:
+  Accept: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function() {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test('Response time < 500ms', function() {
+          pm.expect(pm.response.responseTime).to.be.below(500);
+      });
+
+      pm.test('Response has healthy status', function() {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.status).to.equal('healthy');
+      });
+
+      pm.test('Response has timestamp', function() {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData).to.have.property('timestamp');
+          pm.expect(jsonData).to.have.property('timestampUtc');
+          pm.expect(jsonData).to.have.property('timeZone');
+      });
+    language: text/javascript
+order: 1000

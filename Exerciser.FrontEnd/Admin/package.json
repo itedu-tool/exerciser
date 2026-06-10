@@ -1,0 +1,29 @@
+{
+    "name": "exerciser-frontend-admin",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Административная панель для Exerciser WebApi (Pug, Bootstrap 5 + Bootswatch)",
+    "scripts": {
+        "prebuild": "rimraf public && mkdirp public",
+        "build": "pug views/layout.pug views/index.pug views/teacher.pug views/health.pug --out public --pretty",
+        "postbuild": "copyfiles scripts/*.js public/scripts",
+        "start": "npm run build && live-server public --port=3000 --open",
+        "lint": "eslint scripts/*.js",
+        "lint:fix": "eslint --fix scripts/*.js",
+        "format": "prettier --write \"**/*.{js,html,json}\""
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "copyfiles": "^2.4.1",
+        "eslint": "^10.4.1",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.6",
+        "globals": "^15.0.0",
+        "live-server": "^1.2.2",
+        "mkdirp": "^3.0.1",
+        "prettier": "^3.8.3",
+        "pug": "^3.0.3",
+        "pug-cli": "^1.0.0-alpha6",
+        "rimraf": "^5.0.10"
+    }
+}

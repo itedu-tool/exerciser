@@ -1,0 +1,28 @@
+$kind: http-request
+description: Проверка здоровья API (v1 endpoint)
+url: "{{base_url}}/api/{{api_version}}/health"
+method: GET
+headers:
+  Accept: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function() {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test('Response has healthy status', function() {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.status).to.equal('healthy');
+      });
+
+      pm.test('Health check response format', function() {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData).to.have.property('status');
+          pm.expect(jsonData).to.have.property('timestamp');
+          pm.expect(jsonData).to.have.property('timestampUtc');
+          pm.expect(jsonData).to.have.property('timeZone');
+          pm.expect(jsonData).to.have.property('offset');
+      });
+    language: text/javascript
+order: 2000

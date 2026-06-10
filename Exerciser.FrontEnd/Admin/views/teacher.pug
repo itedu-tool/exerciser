@@ -1,0 +1,37 @@
+extends layout
+
+block vars
+    - var title = "Управление экзаменами"
+    - var currentPage = "teacher"
+
+block content
+    .row
+        .col-md-6
+            .card.mb-4
+                .card-header
+                    h5.mb-0 📥 Импорт экзамена (JSON)
+                .card-body
+                    .mb-3
+                        label.form-label Выберите JSON-файл
+                        input#examFile.form-control(type="file", accept=".json")
+                    button#uploadBtn.btn.btn-primary Загрузить
+                    #importResult.mt-3
+        .col-md-6
+            .card.mb-4
+                .card-header
+                    h5.mb-0 📋 Список экзаменов
+                .card-body
+                    #examsList
+                        .text-muted Загрузка...
+    .modal.fade#examDetailsModal(tabindex="-1")
+        .modal-dialog.modal-lg
+            .modal-content
+                .modal-header
+                    h5.modal-title Детали экзамена
+                    button.btn-close(type="button", data-bs-dismiss="modal")
+                .modal-body#examDetailsContent
+                .modal-footer
+                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Закрыть
+
+block scripts
+    script(src="scripts/teacher.js")

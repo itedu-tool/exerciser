@@ -1,0 +1,7 @@
+$kind: http-request
+description: Корневой endpoint API - возвращает информационное сообщение
+url: "{{base_url}}/"
+method: GET
+headers:
+  Accept: text/plain
+order: 3000

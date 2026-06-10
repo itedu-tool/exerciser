@@ -1,0 +1,53 @@
+{
+  "success_import": {
+    "status": 201,
+    "body": {
+      "id": "507f1f77bcf86cd799439011",
+      "title": "Основы C#",
+      "questionsCount": 3
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Location": "/api/v1/exams/507f1f77bcf86cd799439011"
+    }
+  },
+  "error_empty_file": {
+    "status": 400,
+    "body": {
+      "error": "Файл не загружен"
+    }
+  },
+  "error_invalid_format": {
+    "status": 400,
+    "body": {
+      "error": "Файл должен быть в формате JSON"
+    }
+  },
+  "error_invalid_json": {
+    "status": 400,
+    "body": {
+      "error": "Неверный формат JSON: Unexpected token } in JSON at position 145"
+    }
+  },
+  "error_validation": {
+    "status": 400,
+    "body": {
+      "error": "Вопрос #1: текст вопроса не может быть пустым"
+    }
+  },
+  "error_rate_limited": {
+    "status": 429,
+    "body": {
+      "error": "Too many requests"
+    },
+    "headers": {
+      "Retry-After": "3600"
+    }
+  },
+  "error_server": {
+    "status": 500,
+    "body": {
+      "error": "Внутренняя ошибка сервера. Попробуйте позже."
+    }
+  }
+}

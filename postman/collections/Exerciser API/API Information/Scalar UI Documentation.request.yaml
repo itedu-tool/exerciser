@@ -1,0 +1,7 @@
+$kind: http-request
+description: Открыть интерактивную документацию API в браузере (Scalar UI)
+url: "{{base_url}}/scalar/v1"
+method: GET
+headers:
+  Accept: text/html
+order: 2000

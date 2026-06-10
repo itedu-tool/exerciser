@@ -5,6 +5,8 @@
 
 # dotenv files
 .env
+.env.local
+.env.*.local
 
 # User-specific files
 *.rsuser
@@ -309,10 +311,6 @@ node_modules/
 *.dsw
 *.dsp
 
-# Visual Studio 6 technical files
-*.ncb
-*.aps
-
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
 **/*.DesktopClient/GeneratedArtifacts
@@ -413,7 +411,6 @@ FodyWeavers.xsd
 
 # globs
 Makefile.in
-*.userprefs
 *.usertasks
 config.make
 config.status
@@ -468,15 +465,32 @@ ehthumbs_vista.db
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
-# Windows Installer files
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-
 # Windows shortcuts
 *.lnk
 
 # Vim temporary swap files
 *.swp
+
+# Runtime
+logs/
+
+# OS
+*.swo
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# NLog
+internal-nlog-trace.log
+
+# Postman local files
+.postman/environments/local.json
+.postman/environments/*.local.json
+.postman/globals.json
+.postman/*-backup.json
+.postman/workspaces/
+.postman/tmp/
+.postman/**/*.local.json
+.postman/logs/
+.postman/results/

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Получить OpenAPI спецификацию API в формате JSON
+url: "{{base_url}}/openapi/v1.json"
+method: GET
+headers:
+  Accept: application/json
+order: 1000

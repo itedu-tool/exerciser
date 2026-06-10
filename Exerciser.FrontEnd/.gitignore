@@ -1,0 +1,26 @@
+# Локальные зависимости и сборка
+node_modules/
+public/
+.DS_Store
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+
+# Среда
+.env
+.env.local
+.env.*.local
+
+# Сборка и кеш
+dist/
+build/
+*.cache
+
+tree.txt

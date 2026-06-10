@@ -1,0 +1,24 @@
+$kind: http-request
+description: Попытка импорта с неверным форматом файла - должна вернуть 400
+url: "{{base_url}}/api/{{api_version}}/exams/import"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: file
+      src:
+        - invalid.txt
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 400 (Bad Request)', function() {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test('Response has error message about JSON format', function() {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.error.toLowerCase()).to.include('json');
+      });
+    language: text/javascript
+order: 3000

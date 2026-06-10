@@ -1,0 +1,7 @@
+name: Exerciser - Development
+values:
+  - key: base_url
+    value: 'http://localhost:8080'
+  - key: api_version
+    value: v1
+color: 180

@@ -1,0 +1,42 @@
+{
+  "title": "Основы C#",
+  "description": "Проверка знаний по основам языка C#",
+  "questions": [
+    {
+      "text": "Что такое CLR?",
+      "type": "TextInput",
+      "correctAnswers": [
+        "Common Language Runtime"
+      ]
+    },
+    {
+      "text": "Какой модификатор доступа является самым закрытым?",
+      "type": "SingleChoice",
+      "options": [
+        "public",
+        "private",
+        "protected",
+        "internal"
+      ],
+      "correctAnswers": [
+        "private"
+      ]
+    },
+    {
+      "text": "Какие из типов являются значимыми (value types)?",
+      "type": "MultipleChoice",
+      "options": [
+        "int",
+        "string",
+        "bool",
+        "object",
+        "struct"
+      ],
+      "correctAnswers": [
+        "int",
+        "bool",
+        "struct"
+      ]
+    }
+  ]
+}

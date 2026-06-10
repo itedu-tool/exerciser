@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:8080
+@baseUrlWithVersion = {{baseUrl}}/api/v1
+@examsUrl = {{baseUrlWithVersion}}/exams
+
+### Проверка корневого эндпоинта
+GET {{baseUrl}}/
+Accept: application/json
+
+### Health check (legacy, без версии)
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Health check (v1)
+GET {{baseUrlWithVersion}}/health
+Accept: application/json
+
+### Получение OpenAPI спецификации (JSON)
+GET {{baseUrl}}/openapi/v1.json
+Accept: application/json
+
+### Доступ к Scalar UI (проверка, что UI загружается)
+GET {{baseUrl}}/scalar/v1
+Accept: text/html
+
+### Импорт экзамена (пример: загружаем файл exam.json)
+POST {{examsUrl}}/import
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="exam.json"
+Content-Type: application/json
+
+< ./exam.json
+------WebKitFormBoundary--
+
+### Получить список всех экзаменов (только метаданные)
+GET {{examsUrl}}
+Accept: application/json
+
+### Получить детали экзамена по ID (замените {id} на реальный GUID)
+@examId = 019eabf3-12fe-7542-8285-ccc4d5a260eb
+GET {{examsUrl}}/{{examId}}
+Accept: application/json
+
+### Удалить экзамен по ID (замените {id} на реальный GUID)
+DELETE {{examsUrl}}/{{examId}}

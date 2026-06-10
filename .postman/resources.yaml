@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: 81da0c97-d158-4b72-b93f-a5cce51737dc
+
+localResources:
+  specs:
+    - ..\Exerciser.WebApi\obj\Exerciser.WebApi.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ..\postman\collections\Exerciser API: a4c01abd-17c6-47e0-9501-5938bee9120c
