@@ -5,6 +5,18 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 и этот проект придерживается [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-06-11
+
+### Изменено
+
+- **Обновление GitHub Actions для совместимости с Node.js 24**
+    - `actions/checkout` обновлён с v4 до v6.
+    - `docker/build-push-action` обновлён с v6 до v7.
+    - `softprops/action-gh-release` обновлён с v2 до v3.
+    - Все шаги workflow теперь используют Node.js 24 (в соответствии с требованием GitHub).
+
+---
+
 ## [1.1.0] - 2026-06-10
 
 ### Добавлено
@@ -131,5 +143,6 @@
 - **Аутентификация MongoDB:** В `docker-compose.yml` отключена (для простоты разработки). Для production рекомендуется включить и задать пароль через переменные окружения.
 - **HTTPS:** Не настроен (требуется настройка сертификатов или использование обратного прокси).
 
+[1.1.1]: https://github.com/itedu-tool/exerciser/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/itedu-tool/exerciser/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/itedu-tool/exerciser/compare/initial...v1.0.0

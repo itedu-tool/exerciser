@@ -381,7 +381,14 @@ docker build -f Exerciser.WebApi/Dockerfile -t exerciser-webapi:latest .
 
 ## 🧪 CI/CD (GitHub Actions)
 
-Файл `.github/workflows/ci_cd.yml` автоматически собирает и публикует Docker‑образ при пуше в ветку `master` (или по требованию `workflow_dispatch`).
+Файл `.github/workflows/ci_cd.yml` автоматически собирает и публикует Docker‑образ `anstfoto/exerciser-webapi:latest` при пуше в ветку `master` нового тега (новой версии) (или по требованию `workflow_dispatch`).
+
+**Используемые actions (обновлены для Node.js 24):**
+- `actions/checkout@v6`
+- `docker/login-action@v4`
+- `docker/setup-buildx-action@v4`
+- `docker/build-push-action@v7`
+- `softprops/action-gh-release@v3`
 
 **Что происходит:**
 
@@ -559,7 +566,7 @@ Email: starinin-andrey@ya.ru
 
 ---
 
-**Последнее обновление:** 2026-06-10  
-**Версия API:** 1.1.0
+**Последнее обновление:** 2026-06-11
+**Версия API:** 1.1.1
 **.NET версия:** 10.0  
 **MongoDB версия:** 8.3
