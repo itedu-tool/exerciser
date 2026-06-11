@@ -139,8 +139,8 @@ function renderOptions(q, qIdx) {
         <label class="form-label">Варианты ответов</label>
         <div class="options-list">
             ${options
-        .map(
-            (opt, optIdx) => `
+                .map(
+                    (opt, optIdx) => `
                 <div class="input-group mb-1">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 correct-checkbox"
@@ -156,8 +156,8 @@ function renderOptions(q, qIdx) {
                     </button>
                 </div>
             `
-        )
-        .join('')}
+                )
+                .join('')}
         </div>
         <button type="button" class="btn btn-sm btn-secondary add-option-btn mt-1" data-qidx="${qIdx}">+ Добавить вариант</button>
     `;
@@ -174,7 +174,9 @@ function attachOptionHandlers() {
                 const correctAnswers = questions[qIdx].correctAnswers;
                 const removedOption = questions[qIdx].options[oIdx];
                 if (removedOption && correctAnswers.includes(removedOption)) {
-                    questions[qIdx].correctAnswers = correctAnswers.filter(a => a !== removedOption);
+                    questions[qIdx].correctAnswers = correctAnswers.filter(
+                        (a) => a !== removedOption
+                    );
                 }
                 renderQuestions(questions);
             }
@@ -275,29 +277,31 @@ function previewExam() {
         <h4>Вопросы (${questions.length})</h4>
         <div class="accordion" id="previewAccordion">
             ${questions
-        .map((q, idx) => {
-            const typeLabel = getTypeLabel(q.type);
-            let optionsHtml = '';
-            if (q.type !== 'TextInput' && q.options && q.options.length) {
-                optionsHtml = `
+                .map((q, idx) => {
+                    const typeLabel = getTypeLabel(q.type);
+                    let optionsHtml = '';
+                    if (q.type !== 'TextInput' && q.options && q.options.length) {
+                        optionsHtml = `
                         <div class="mt-2"><strong>Варианты ответов:</strong></div>
                         <ul class="list-group mt-1">
-                            ${q.options.map((opt) => {
-                    const isCorrect = q.correctAnswers.includes(opt);
-                    return `<li class="list-group-item">${isCorrect ? '✅ ' : ''}${escapeHtml(opt)}</li>`;
-                }).join('')}
+                            ${q.options
+                                .map((opt) => {
+                                    const isCorrect = q.correctAnswers.includes(opt);
+                                    return `<li class="list-group-item">${isCorrect ? '✅ ' : ''}${escapeHtml(opt)}</li>`;
+                                })
+                                .join('')}
                         </ul>
                     `;
-            }
-            let correctHtml = '';
-            if (q.correctAnswers && q.correctAnswers.length) {
-                if (q.type === 'TextInput') {
-                    correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильный ответ:</strong> ${escapeHtml(q.correctAnswers[0])}</div>`;
-                } else {
-                    correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильные ответы:</strong> ${q.correctAnswers.map(c => escapeHtml(c)).join(', ')}</div>`;
-                }
-            }
-            return `
+                    }
+                    let correctHtml = '';
+                    if (q.correctAnswers && q.correctAnswers.length) {
+                        if (q.type === 'TextInput') {
+                            correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильный ответ:</strong> ${escapeHtml(q.correctAnswers[0])}</div>`;
+                        } else {
+                            correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильные ответы:</strong> ${q.correctAnswers.map((c) => escapeHtml(c)).join(', ')}</div>`;
+                        }
+                    }
+                    return `
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="previewHeading${idx}">
                             <button class="accordion-button ${idx !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#previewCollapse${idx}" aria-expanded="${idx === 0 ? 'true' : 'false'}">
@@ -312,8 +316,8 @@ function previewExam() {
                         </div>
                     </div>
                 `;
-        })
-        .join('')}
+                })
+                .join('')}
         </div>
     `;
     document.getElementById('previewContent').innerHTML = previewHtml;
@@ -323,19 +327,27 @@ function previewExam() {
 
 function getTypeIcon(type) {
     switch (type) {
-        case 'SingleChoice': return '🔘';
-        case 'MultipleChoice': return '☑️';
-        case 'TextInput': return '✏️';
-        default: return '❓';
+        case 'SingleChoice':
+            return '🔘';
+        case 'MultipleChoice':
+            return '☑️';
+        case 'TextInput':
+            return '✏️';
+        default:
+            return '❓';
     }
 }
 
 function getTypeLabel(type) {
     switch (type) {
-        case 'SingleChoice': return 'Один вариант';
-        case 'MultipleChoice': return 'Несколько вариантов';
-        case 'TextInput': return 'Ввод текста';
-        default: return 'Неизвестный тип';
+        case 'SingleChoice':
+            return 'Один вариант';
+        case 'MultipleChoice':
+            return 'Несколько вариантов';
+        case 'TextInput':
+            return 'Ввод текста';
+        default:
+            return 'Неизвестный тип';
     }
 }
 
