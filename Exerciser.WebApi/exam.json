@@ -5,38 +5,87 @@
     {
       "text": "Что такое CLR?",
       "type": "TextInput",
-      "correctAnswers": [
-        "Common Language Runtime"
-      ]
+      "correctAnswers": ["Common Language Runtime"]
+    },
+    {
+      "text": "Какой метод используется для запуска приложения C#?",
+      "type": "TextInput",
+      "correctAnswers": ["Main", "Main()"]
+    },
+    {
+      "text": "Ключевое слово для объявления класса, который не может быть унаследован?",
+      "type": "TextInput",
+      "correctAnswers": ["sealed"]
+    },
+    {
+      "text": "Какое пространство имён содержит класс Console?",
+      "type": "TextInput",
+      "correctAnswers": ["System"]
+    },
+    {
+      "text": "Тип данных, используемый для хранения целых чисел со знаком?",
+      "type": "TextInput",
+      "correctAnswers": ["int", "Int32"]
     },
     {
       "text": "Какой модификатор доступа является самым закрытым?",
       "type": "SingleChoice",
-      "options": [
-        "public",
-        "private",
-        "protected",
-        "internal"
-      ],
-      "correctAnswers": [
-        "private"
-      ]
+      "options": ["public", "private", "protected", "internal"],
+      "correctAnswers": ["private"]
+    },
+    {
+      "text": "Что выведет на экран Console.WriteLine(5 / 2)?",
+      "type": "SingleChoice",
+      "options": ["2.5", "2", "2.0", "Ошибка"],
+      "correctAnswers": ["2"]
+    },
+    {
+      "text": "Какое ключевое слово используется для обработки исключений?",
+      "type": "SingleChoice",
+      "options": ["try", "catch", "finally", "Все вышеперечисленные"],
+      "correctAnswers": ["Все вышеперечисленные"]
+    },
+    {
+      "text": "Какой оператор используется для приведения типов в C#?",
+      "type": "SingleChoice",
+      "options": ["(тип)", "as", "is", "typeof"],
+      "correctAnswers": ["(тип)"]
+    },
+    {
+      "text": "Что из перечисленного является ссылочным типом?",
+      "type": "SingleChoice",
+      "options": ["int", "bool", "string", "struct"],
+      "correctAnswers": ["string"]
     },
     {
       "text": "Какие из типов являются значимыми (value types)?",
       "type": "MultipleChoice",
-      "options": [
-        "int",
-        "string",
-        "bool",
-        "object",
-        "struct"
-      ],
-      "correctAnswers": [
-        "int",
-        "bool",
-        "struct"
-      ]
+      "options": ["int", "string", "bool", "object", "struct"],
+      "correctAnswers": ["int", "bool", "struct"]
+    },
+    {
+      "text": "Какие ключевые слова используются для наследования?",
+      "type": "MultipleChoice",
+      "options": ["extends", "inherits", ":", "base"],
+      "correctAnswers": [":", "base"]
+    },
+    {
+      "text": "Какие модификаторы доступа существуют в C#?",
+      "type": "MultipleChoice",
+      "options": ["public", "private", "protected", "internal", "friend"],
+      "correctAnswers": ["public", "private", "protected", "internal"]
+    },
+    {
+      "text": "Выберите правильные способы объявления массива:",
+      "type": "MultipleChoice",
+      "options": ["int[] arr = new int[5];", "int arr[] = new int[5];", "int[] arr = {1,2,3};", "int arr = new int[5];"],
+      "correctAnswers": ["int[] arr = new int[5];", "int[] arr = {1,2,3};"]
+    },
+    {
+      "text": "Какие из следующих операторов являются операторами сравнения?",
+      "type": "MultipleChoice",
+      "options": ["==", "=", "!=", "<=", "&&"],
+      "correctAnswers": ["==", "!=", "<="]
     }
   ]
 }

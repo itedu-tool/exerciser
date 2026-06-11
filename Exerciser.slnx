@@ -22,9 +22,6 @@
   </Folder>
   <Folder Name="/postman/">
     <File Path=".postman/environments/development.json" />
-    <File Path=".postman/environments/production.json" />
-    <File Path=".postman/environments/staging.json" />
-    <File Path=".postman/examples/exam-import-responses.json" />
     <File Path=".postman/Exerciser.postman_collection.json" />
   </Folder>
   <Folder Name="/scripts/">

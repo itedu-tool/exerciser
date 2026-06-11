@@ -1,11 +1,11 @@
 {
     "name": "exerciser-frontend-admin",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "type": "module",
     "description": "Административная панель для Exerciser WebApi (Pug, Bootstrap 5 + Bootswatch)",
     "scripts": {
         "prebuild": "rimraf public && mkdirp public",
-        "build": "pug views/layout.pug views/index.pug views/teacher.pug views/health.pug views/edit.pug --out public --pretty",
+        "build": "pug views/layout.pug views/index.pug views/teacher.pug views/health.pug views/groups.pug --out public --pretty",
         "postbuild": "copyfiles scripts/*.js public",
         "start": "npm run build && live-server public --port=3000 --open",
         "lint": "eslint scripts/*.js",
