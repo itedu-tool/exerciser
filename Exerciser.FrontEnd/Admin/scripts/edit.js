@@ -1,11 +1,16 @@
 /* global showMessage, clearMessage, apiRequest, escapeHtml */
 
+console.log('[edit.js] Скрипт загружен');
+
 let examId = null;
 
 async function loadExam() {
+    console.log('[edit.js] loadExam() начат');
     const urlParams = new URLSearchParams(window.location.search);
     examId = urlParams.get('id');
+    console.log('[edit.js] examId из URL:', examId);
     if (!examId) {
+        console.error('[edit.js] ID экзамена не указан');
         showMessage(
             document.getElementById('questionsContainer'),
             '❌ ID экзамена не указан',
@@ -14,11 +19,14 @@ async function loadExam() {
         return;
     }
     try {
+        console.log('[edit.js] Вызов apiRequest GET /api/v1/exams/${examId}');
         const exam = await apiRequest(`/api/v1/exams/${examId}`);
+        console.log('[edit.js] Получен экзамен:', exam);
         document.getElementById('title').value = exam.title;
         document.getElementById('description').value = exam.description || '';
         renderQuestions(exam.questions || []);
     } catch (err) {
+        console.error('[edit.js] Ошибка загрузки экзамена:', err);
         showMessage(
             document.getElementById('questionsContainer'),
             `Ошибка загрузки: ${err.message}`,
@@ -28,6 +36,7 @@ async function loadExam() {
 }
 
 function renderQuestions(questions) {
+    console.log('[edit.js] renderQuestions(), количество вопросов:', questions.length);
     const container = document.getElementById('questionsContainer');
     container.innerHTML = '';
     if (questions.length === 0) {
@@ -73,29 +82,34 @@ function renderQuestions(questions) {
     document.querySelectorAll('.move-up-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.index);
+            console.log('[edit.js] Переместить вопрос вверх, индекс:', idx);
             moveQuestionUp(idx);
         });
     });
     document.querySelectorAll('.move-down-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.index);
+            console.log('[edit.js] Переместить вопрос вниз, индекс:', idx);
             moveQuestionDown(idx);
         });
     });
     document.querySelectorAll('.copy-question-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.index);
+            console.log('[edit.js] Копировать вопрос, индекс:', idx);
             copyQuestion(idx);
         });
     });
     document.querySelectorAll('.preview-exam-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
+            console.log('[edit.js] Предпросмотр экзамена');
             previewExam();
         });
     });
     document.querySelectorAll('.delete-question-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.index);
+            console.log('[edit.js] Удалить вопрос, индекс:', idx);
             const questions = getCurrentQuestionsFromDOM();
             questions.splice(idx, 1);
             renderQuestions(questions);
@@ -105,6 +119,7 @@ function renderQuestions(questions) {
     document.querySelectorAll('.question-type').forEach((select) => {
         select.addEventListener('change', () => {
             const idx = parseInt(select.dataset.index);
+            console.log('[edit.js] Изменён тип вопроса, индекс:', idx, 'новый тип:', select.value);
             const questions = getCurrentQuestionsFromDOM();
             const oldQ = questions[idx];
             questions[idx] = {
@@ -139,8 +154,8 @@ function renderOptions(q, qIdx) {
         <label class="form-label">Варианты ответов</label>
         <div class="options-list">
             ${options
-                .map(
-                    (opt, optIdx) => `
+        .map(
+            (opt, optIdx) => `
                 <div class="input-group mb-1">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0 correct-checkbox"
@@ -156,8 +171,8 @@ function renderOptions(q, qIdx) {
                     </button>
                 </div>
             `
-                )
-                .join('')}
+        )
+        .join('')}
         </div>
         <button type="button" class="btn btn-sm btn-secondary add-option-btn mt-1" data-qidx="${qIdx}">+ Добавить вариант</button>
     `;
@@ -168,6 +183,7 @@ function attachOptionHandlers() {
         btn.addEventListener('click', (e) => {
             const qIdx = parseInt(btn.dataset.qidx);
             const oIdx = parseInt(btn.dataset.oidx);
+            console.log('[edit.js] Удалить вариант, вопрос:', qIdx, 'вариант:', oIdx);
             const questions = getCurrentQuestionsFromDOM();
             if (questions[qIdx] && questions[qIdx].options) {
                 questions[qIdx].options.splice(oIdx, 1);
@@ -186,6 +202,7 @@ function attachOptionHandlers() {
     document.querySelectorAll('.add-option-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const qIdx = parseInt(btn.dataset.qidx);
+            console.log('[edit.js] Добавить вариант, вопрос:', qIdx);
             const questions = getCurrentQuestionsFromDOM();
             if (!questions[qIdx].options) questions[qIdx].options = [];
             questions[qIdx].options.push('');
@@ -195,6 +212,7 @@ function attachOptionHandlers() {
 }
 
 function getCurrentQuestionsFromDOM() {
+    console.log('[edit.js] getCurrentQuestionsFromDOM()');
     const questions = [];
     const questionCards = document.querySelectorAll('#questionsContainer .card');
     for (let card of questionCards) {
@@ -228,10 +246,12 @@ function getCurrentQuestionsFromDOM() {
             correctAnswers,
         });
     }
+    console.log('[edit.js] Собрано вопросов:', questions.length);
     return questions;
 }
 
 function addEmptyQuestion() {
+    console.log('[edit.js] Добавить пустой вопрос');
     const questions = getCurrentQuestionsFromDOM();
     questions.push({
         text: '',
@@ -244,6 +264,7 @@ function addEmptyQuestion() {
 
 function moveQuestionUp(idx) {
     if (idx === 0) return;
+    console.log('[edit.js] moveQuestionUp', idx);
     const questions = getCurrentQuestionsFromDOM();
     [questions[idx - 1], questions[idx]] = [questions[idx], questions[idx - 1]];
     renderQuestions(questions);
@@ -252,11 +273,13 @@ function moveQuestionUp(idx) {
 function moveQuestionDown(idx) {
     const questions = getCurrentQuestionsFromDOM();
     if (idx === questions.length - 1) return;
+    console.log('[edit.js] moveQuestionDown', idx);
     [questions[idx + 1], questions[idx]] = [questions[idx], questions[idx + 1]];
     renderQuestions(questions);
 }
 
 function copyQuestion(idx) {
+    console.log('[edit.js] copyQuestion', idx);
     const questions = getCurrentQuestionsFromDOM();
     const original = questions[idx];
     const copy = JSON.parse(JSON.stringify(original));
@@ -266,6 +289,7 @@ function copyQuestion(idx) {
 }
 
 function previewExam() {
+    console.log('[edit.js] previewExam()');
     const title = document.getElementById('title').value.trim() || '(без названия)';
     const description = document.getElementById('description').value;
     const questions = getCurrentQuestionsFromDOM();
@@ -277,31 +301,31 @@ function previewExam() {
         <h4>Вопросы (${questions.length})</h4>
         <div class="accordion" id="previewAccordion">
             ${questions
-                .map((q, idx) => {
-                    const typeLabel = getTypeLabel(q.type);
-                    let optionsHtml = '';
-                    if (q.type !== 'TextInput' && q.options && q.options.length) {
-                        optionsHtml = `
+        .map((q, idx) => {
+            const typeLabel = getTypeLabel(q.type);
+            let optionsHtml = '';
+            if (q.type !== 'TextInput' && q.options && q.options.length) {
+                optionsHtml = `
                         <div class="mt-2"><strong>Варианты ответов:</strong></div>
                         <ul class="list-group mt-1">
                             ${q.options
-                                .map((opt) => {
-                                    const isCorrect = q.correctAnswers.includes(opt);
-                                    return `<li class="list-group-item">${isCorrect ? '✅ ' : ''}${escapeHtml(opt)}</li>`;
-                                })
-                                .join('')}
+                    .map((opt) => {
+                        const isCorrect = q.correctAnswers.includes(opt);
+                        return `<li class="list-group-item">${isCorrect ? '✅ ' : ''}${escapeHtml(opt)}</li>`;
+                    })
+                    .join('')}
                         </ul>
                     `;
-                    }
-                    let correctHtml = '';
-                    if (q.correctAnswers && q.correctAnswers.length) {
-                        if (q.type === 'TextInput') {
-                            correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильный ответ:</strong> ${escapeHtml(q.correctAnswers[0])}</div>`;
-                        } else {
-                            correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильные ответы:</strong> ${q.correctAnswers.map((c) => escapeHtml(c)).join(', ')}</div>`;
-                        }
-                    }
-                    return `
+            }
+            let correctHtml = '';
+            if (q.correctAnswers && q.correctAnswers.length) {
+                if (q.type === 'TextInput') {
+                    correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильный ответ:</strong> ${escapeHtml(q.correctAnswers[0])}</div>`;
+                } else {
+                    correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильные ответы:</strong> ${q.correctAnswers.map((c) => escapeHtml(c)).join(', ')}</div>`;
+                }
+            }
+            return `
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="previewHeading${idx}">
                             <button class="accordion-button ${idx !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#previewCollapse${idx}" aria-expanded="${idx === 0 ? 'true' : 'false'}">
@@ -316,8 +340,8 @@ function previewExam() {
                         </div>
                     </div>
                 `;
-                })
-                .join('')}
+        })
+        .join('')}
         </div>
     `;
     document.getElementById('previewContent').innerHTML = previewHtml;
@@ -327,34 +351,28 @@ function previewExam() {
 
 function getTypeIcon(type) {
     switch (type) {
-        case 'SingleChoice':
-            return '🔘';
-        case 'MultipleChoice':
-            return '☑️';
-        case 'TextInput':
-            return '✏️';
-        default:
-            return '❓';
+        case 'SingleChoice': return '🔘';
+        case 'MultipleChoice': return '☑️';
+        case 'TextInput': return '✏️';
+        default: return '❓';
     }
 }
 
 function getTypeLabel(type) {
     switch (type) {
-        case 'SingleChoice':
-            return 'Один вариант';
-        case 'MultipleChoice':
-            return 'Несколько вариантов';
-        case 'TextInput':
-            return 'Ввод текста';
-        default:
-            return 'Неизвестный тип';
+        case 'SingleChoice': return 'Один вариант';
+        case 'MultipleChoice': return 'Несколько вариантов';
+        case 'TextInput': return 'Ввод текста';
+        default: return 'Неизвестный тип';
     }
 }
 
 async function saveExam() {
+    console.log('[edit.js] saveExam() начат');
     const title = document.getElementById('title').value.trim();
     const description = document.getElementById('description').value;
     if (!title) {
+        console.warn('[edit.js] Название экзамена пустое');
         showMessage(
             document.getElementById('questionsContainer'),
             '❌ Название экзамена обязательно',
@@ -364,6 +382,7 @@ async function saveExam() {
     }
     const questions = getCurrentQuestionsFromDOM();
     if (questions.length === 0) {
+        console.warn('[edit.js] Нет вопросов');
         showMessage(
             document.getElementById('questionsContainer'),
             '❌ Экзамен должен содержать хотя бы один вопрос',
@@ -375,6 +394,7 @@ async function saveExam() {
     for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         if (!q.text) {
+            console.warn('[edit.js] Пустой текст вопроса', i);
             showMessage(
                 document.getElementById('questionsContainer'),
                 `❌ Вопрос ${i + 1}: текст не может быть пустым`,
@@ -383,6 +403,7 @@ async function saveExam() {
             return;
         }
         if (q.type !== 'TextInput' && q.options.length < 2) {
+            console.warn('[edit.js] Недостаточно вариантов', i, q.options);
             showMessage(
                 document.getElementById('questionsContainer'),
                 `❌ Вопрос ${i + 1}: для типа ${q.type} нужно минимум 2 варианта`,
@@ -391,6 +412,7 @@ async function saveExam() {
             return;
         }
         if (q.correctAnswers.length === 0) {
+            console.warn('[edit.js] Нет правильных ответов', i);
             showMessage(
                 document.getElementById('questionsContainer'),
                 `❌ Вопрос ${i + 1}: укажите хотя бы один правильный ответ`,
@@ -400,11 +422,13 @@ async function saveExam() {
         }
     }
     try {
+        console.log('[edit.js] Вызов apiRequest PUT /api/v1/exams/${examId}');
         await apiRequest(`/api/v1/exams/${examId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title, description, questions }),
         });
+        console.log('[edit.js] Экзамен успешно сохранён');
         showMessage(
             document.getElementById('questionsContainer'),
             '✅ Экзамен успешно обновлён',
@@ -414,6 +438,7 @@ async function saveExam() {
             window.location.href = 'teacher.html';
         }, 1500);
     } catch (err) {
+        console.error('[edit.js] Ошибка сохранения:', err);
         showMessage(
             document.getElementById('questionsContainer'),
             `❌ Ошибка: ${err.message}`,
@@ -422,9 +447,13 @@ async function saveExam() {
     }
 }
 
-document.getElementById('addQuestionBtn').addEventListener('click', addEmptyQuestion);
+document.getElementById('addQuestionBtn').addEventListener('click', () => {
+    console.log('[edit.js] Нажата кнопка "Добавить вопрос"');
+    addEmptyQuestion();
+});
 document.getElementById('examForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log('[edit.js] Отправка формы редактирования');
     await saveExam();
 });
 

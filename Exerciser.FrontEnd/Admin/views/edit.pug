@@ -17,6 +17,18 @@ block content
                     label.form-label(for="description") Описание
                     textarea#description.form-control(rows="2")
                 hr
+                h5 Настройка количества вопросов для тестирования (0 = все)
+                .row.mb-3
+                    .col-md-4
+                        label.form-label(for="singleChoiceToShow") 🔘 SingleChoice
+                        input#singleChoiceToShow.form-control(type="number", min="0", value="0")
+                    .col-md-4
+                        label.form-label(for="multipleChoiceToShow") ☑️ MultipleChoice
+                        input#multipleChoiceToShow.form-control(type="number", min="0", value="0")
+                    .col-md-4
+                        label.form-label(for="textInputToShow") ✏️ TextInput
+                        input#textInputToShow.form-control(type="number", min="0", value="0")
+                hr
                 h4 Вопросы
                 #questionsContainer
                 .mt-3

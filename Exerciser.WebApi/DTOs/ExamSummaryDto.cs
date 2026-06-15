@@ -19,6 +19,24 @@ public record ExamSummaryDto
     /// <summary>Количество вопросов в экзамене.</summary>
     public int QuestionsCount { get; init; }
 
+    /// <summary>Количество вопросов типа SingleChoice.</summary>
+    public int SingleChoiceCount { get; init; }
+
+    /// <summary>Количество вопросов типа MultipleChoice.</summary>
+    public int MultipleChoiceCount { get; init; }
+
+    /// <summary>Количество вопросов типа TextInput.</summary>
+    public int TextInputCount { get; init; }
+
+    /// <summary>Количество вопросов SingleChoice для показа.</summary>
+    public int SingleChoiceToShow { get; init; }
+
+    /// <summary>Количество вопросов MultipleChoice для показа.</summary>
+    public int MultipleChoiceToShow { get; init; }
+
+    /// <summary>Количество вопросов TextInput для показа.</summary>
+    public int TextInputToShow { get; init; }
+
     /// <summary>Дата и время создания экзамена (UTC).</summary>
     public DateTime CreatedAt { get; init; }
 }

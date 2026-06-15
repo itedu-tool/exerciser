@@ -45,9 +45,10 @@ block content
                         .mb-3
                             label.form-label(for="groupFile") JSON-файл группы
                             input#groupFile.form-control(type="file", accept=".json")
-                .modal-footer
-                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Отмена
-                    button.btn.btn-primary(type="submit") Импортировать
+
+                        button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Отмена
+                        button.btn.btn-primary(type="submit") Импортировать
+
 
     // Модальное окно просмотра/добавления студентов
     .modal.fade#studentsModal(tabindex="-1")
