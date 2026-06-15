@@ -2,6 +2,17 @@ name: Exerciser - Development
 values:
   - key: base_url
     value: 'http://localhost:8080'
-  - key: api_version
-    value: v1
-color: 180
+  - key: exam_file_path
+    value: ./exam.json
+  - key: group_file_path
+    value: ./group.json
+  - key: exam_id
+    value: ''
+  - key: group_id
+    value: ''
+  - key: student_id
+    value: ''
+  - key: session_id
+    value: ''
+  - key: attempt_id
+    value: ''

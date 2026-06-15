@@ -22,25 +22,13 @@ public record ExamDetailsDto
 
     /// <summary>Список вопросов экзамена.</summary>
     public List<QuestionDetailsDto> Questions { get; init; } = [];
-}
 
-/// <summary>
-/// DTO для вопроса в составе детального ответа об экзамене.
-/// </summary>
-public record QuestionDetailsDto
-{
-    /// <summary>Уникальный идентификатор вопроса.</summary>
-    public Guid Id { get; init; }
+    /// <summary>Количество вопросов SingleChoice для показа.</summary>
+    public int SingleChoiceToShow { get; init; }
 
-    /// <summary>Текст вопроса.</summary>
-    public required string Text { get; init; }
+    /// <summary>Количество вопросов MultipleChoice для показа.</summary>
+    public int MultipleChoiceToShow { get; init; }
 
-    /// <summary>Тип вопроса: SingleChoice, MultipleChoice, TextInput.</summary>
-    public required string Type { get; init; }
-
-    /// <summary>Варианты ответов (для SingleChoice и MultipleChoice).</summary>
-    public List<string> Options { get; init; } = [];
-
-    /// <summary>Правильные ответы (строки).</summary>
-    public List<string> CorrectAnswers { get; init; } = [];
+    /// <summary>Количество вопросов TextInput для показа.</summary>
+    public int TextInputToShow { get; init; }
 }

@@ -1,5 +1,7 @@
 /* global showMessage, clearMessage, showLoading, showEmpty, apiRequest, escapeHtml */
 
+console.log('[teacher.js] Скрипт загружен');
+
 const API_BASE = window.API_BASE;
 const IMPORT_URL = '/api/v1/exams/import';
 const EXAMS_URL = '/api/v1/exams';
@@ -17,10 +19,13 @@ if (modalEl) {
 }
 
 async function importExam(file) {
+    console.log('[teacher.js] importExam() начат, файл:', file.name, file.size);
     const formData = new FormData();
     formData.append('file', file);
     try {
+        console.log('[teacher.js] Вызов apiRequest POST', IMPORT_URL);
         const data = await apiRequest(IMPORT_URL, { method: 'POST', body: formData });
+        console.log('[teacher.js] Импорт успешен, получены данные:', data);
         showMessage(
             importResultDiv,
             `✅ Экзамен "${data.title}" импортирован!\nID: ${data.id}\nВопросов: ${data.questionsCount}`,
@@ -28,22 +33,27 @@ async function importExam(file) {
         );
         await loadExamsList();
     } catch (err) {
+        console.error('[teacher.js] Ошибка импорта:', err);
         showMessage(importResultDiv, `❌ Ошибка импорта: ${err.message}`, 'error');
-        console.error(err);
     }
 }
 
 uploadBtn.addEventListener('click', async () => {
+    console.log('[teacher.js] Нажата кнопка "Загрузить"');
     if (!fileInput.files || fileInput.files.length === 0) {
+        console.warn('[teacher.js] Файл не выбран');
         showMessage(importResultDiv, '❌ Выберите JSON-файл', 'error');
         return;
     }
     const file = fileInput.files[0];
+    console.log('[teacher.js] Выбран файл:', file.name, file.size);
     if (!file.name.toLowerCase().endsWith('.json')) {
+        console.warn('[teacher.js] Файл не JSON');
         showMessage(importResultDiv, '❌ Файл должен быть в формате JSON', 'error');
         return;
     }
     if (file.size > 10 * 1024 * 1024) {
+        console.warn('[teacher.js] Файл превышает 10 MB');
         showMessage(importResultDiv, '❌ Файл превышает 10 MB', 'error');
         return;
     }
@@ -52,10 +62,14 @@ uploadBtn.addEventListener('click', async () => {
 });
 
 async function loadExamsList() {
+    console.log('[teacher.js] loadExamsList() начат');
     showLoading(examsListDiv);
     try {
+        console.log('[teacher.js] Вызов apiRequest GET', EXAMS_URL);
         const exams = await apiRequest(EXAMS_URL);
+        console.log('[teacher.js] Получены экзамены:', exams);
         if (!Array.isArray(exams) || exams.length === 0) {
+            console.log('[teacher.js] Экзаменов нет, показываем пустое состояние');
             showEmpty(
                 examsListDiv,
                 'Нет доступных экзаменов. Загрузите первый экзамен через импорт.'
@@ -64,12 +78,13 @@ async function loadExamsList() {
         }
         renderExamsList(exams);
     } catch (err) {
+        console.error('[teacher.js] Ошибка загрузки списка экзаменов:', err);
         examsListDiv.innerHTML = `<div class="alert alert-danger">❌ Ошибка загрузки: ${err.message}</div>`;
-        console.error(err);
     }
 }
 
 function renderExamsList(exams) {
+    console.log('[teacher.js] renderExamsList(), количество экзаменов:', exams.length);
     if (!exams.length) {
         showEmpty(examsListDiv, 'Нет доступных экзаменов. Загрузите первый экзамен через импорт.');
         return;
@@ -82,7 +97,12 @@ function renderExamsList(exams) {
                 <div>
                     <strong>${escapeHtml(exam.title)}</strong>
                     <div class="small text-muted">${escapeHtml(exam.description || 'Без описания')}</div>
-                    <div class="small">Вопросов: ${exam.questionsCount} | Создан: ${new Date(exam.createdAt).toLocaleString()}</div>
+                    <div class="small">
+                        Вопросов в базе: ${exam.questionsCount}
+                        (🔘 ${exam.singleChoiceCount} | ☑️ ${exam.multipleChoiceCount} | ✏️ ${exam.textInputCount})
+                    </div>
+                    <div class="small">Показывать студенту: ${exam.questionsToShow} из ${exam.questionsCount}</div>
+                    <div class="small">Создан: ${new Date(exam.createdAt).toLocaleString()}</div>
                 </div>
                 <div>
                     <button class="btn btn-sm btn-info view-btn" data-id="${exam.id}">👁️ Просмотр</button>
@@ -94,52 +114,60 @@ function renderExamsList(exams) {
     `
         )
         .join('');
+
     document.querySelectorAll('.view-btn').forEach((btn) => {
-        btn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            await showExamDetails(id);
+        btn.addEventListener('click', () => {
+            console.log('[teacher.js] Нажата кнопка "Просмотр" для экзамена', btn.dataset.id);
+            showExamDetails(btn.dataset.id);
         });
     });
     document.querySelectorAll('.edit-btn').forEach((btn) => {
-        btn.addEventListener('click', (e) => {
-            const id = btn.dataset.id;
-            window.location.href = `edit.html?id=${id}`;
+        btn.addEventListener('click', () => {
+            console.log('[teacher.js] Нажата кнопка "Редактировать" для экзамена', btn.dataset.id);
+            window.location.href = `edit.html?id=${btn.dataset.id}`;
         });
     });
     document.querySelectorAll('.delete-btn').forEach((btn) => {
-        btn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
+        btn.addEventListener('click', async () => {
+            console.log('[teacher.js] Нажата кнопка "Удалить" для экзамена', btn.dataset.id);
             if (confirm('Удалить экзамен? Это действие необратимо.')) {
-                await deleteExam(id);
+                await deleteExam(btn.dataset.id);
             }
         });
     });
 }
 
 async function deleteExam(id) {
+    console.log('[teacher.js] deleteExam() для id:', id);
     try {
+        console.log('[teacher.js] Вызов apiRequest DELETE', `${EXAMS_URL}/${id}`);
         await apiRequest(`${EXAMS_URL}/${id}`, { method: 'DELETE' });
+        console.log('[teacher.js] Экзамен удалён');
         showMessage(importResultDiv, '✅ Экзамен удалён', 'success');
         await loadExamsList();
         if (modal) modal.hide();
     } catch (err) {
+        console.error('[teacher.js] Ошибка удаления:', err);
         showMessage(importResultDiv, `❌ Ошибка удаления: ${err.message}`, 'error');
     }
 }
 
 async function showExamDetails(id) {
+    console.log('[teacher.js] showExamDetails() для id:', id);
     try {
+        console.log('[teacher.js] Вызов apiRequest GET', `${EXAMS_URL}/${id}`);
         const exam = await apiRequest(`${EXAMS_URL}/${id}`);
+        console.log('[teacher.js] Получен экзамен:', exam);
         renderExamDetails(exam);
         if (modal) modal.show();
     } catch (err) {
+        console.error('[teacher.js] Ошибка загрузки деталей:', err);
         showMessage(importResultDiv, `❌ Ошибка загрузки деталей: ${err.message}`, 'error');
     }
 }
 
 function renderExamDetails(exam) {
+    console.log('[teacher.js] renderExamDetails()');
     modalContent.innerHTML = `
         <h3>${escapeHtml(exam.title)}</h3>
         <p><strong>Описание:</strong> ${escapeHtml(exam.description || '—')}</p>
@@ -148,40 +176,40 @@ function renderExamDetails(exam) {
         <h4>Вопросы (${exam.questions.length})</h4>
         <div class="accordion" id="questionsAccordion">
             ${exam.questions
-                .map((q, idx) => {
-                    const typeIcon = getTypeIcon(q.type);
-                    const typeLabel = getTypeLabel(q.type);
-                    let optionsHtml = '';
-                    if (q.options && q.options.length) {
-                        optionsHtml = `
+        .map((q, idx) => {
+            const typeIcon = getTypeIcon(q.type);
+            const typeLabel = getTypeLabel(q.type);
+            let optionsHtml = '';
+            if (q.options && q.options.length) {
+                optionsHtml = `
                         <div class="mt-2"><strong>Варианты ответов:</strong></div>
                         <div class="list-group mt-1">
                             ${q.options
-                                .map((opt) => {
-                                    const isCorrect =
-                                        q.correctAnswers && q.correctAnswers.includes(opt);
-                                    const checkMark = isCorrect ? '✅ ' : '';
-                                    return `
+                    .map((opt) => {
+                        const isCorrect =
+                            q.correctAnswers && q.correctAnswers.includes(opt);
+                        const checkMark = isCorrect ? '✅ ' : '';
+                        return `
                                     <div class="list-group-item d-flex align-items-center">
                                         <span class="me-2">${checkMark}</span>
                                         <span>${escapeHtml(opt)}</span>
                                     </div>
                                 `;
-                                })
-                                .join('')}
+                    })
+                    .join('')}
                         </div>
                     `;
-                    }
-                    let textInputHtml = '';
-                    if (q.type === 'TextInput' && q.correctAnswers && q.correctAnswers.length) {
-                        textInputHtml = `
+            }
+            let textInputHtml = '';
+            if (q.type === 'TextInput' && q.correctAnswers && q.correctAnswers.length) {
+                textInputHtml = `
                         <div class="mt-2 text-success">
                             <strong>✓ Правильный ответ:</strong>
                             <span class="badge bg-success">${escapeHtml(q.correctAnswers[0])}</span>
                         </div>
                     `;
-                    }
-                    return `
+            }
+            return `
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading${idx}">
                             <button class="accordion-button ${idx !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${idx}" aria-expanded="${idx === 0 ? 'true' : 'false'}" aria-controls="collapse${idx}">
@@ -199,35 +227,27 @@ function renderExamDetails(exam) {
                         </div>
                     </div>
                 `;
-                })
-                .join('')}
+        })
+        .join('')}
         </div>
     `;
 }
 
 function getTypeIcon(type) {
     switch (type) {
-        case 'SingleChoice':
-            return '🔘';
-        case 'MultipleChoice':
-            return '☑️';
-        case 'TextInput':
-            return '✏️';
-        default:
-            return '❓';
+        case 'SingleChoice': return '🔘';
+        case 'MultipleChoice': return '☑️';
+        case 'TextInput': return '✏️';
+        default: return '❓';
     }
 }
 
 function getTypeLabel(type) {
     switch (type) {
-        case 'SingleChoice':
-            return 'Один вариант';
-        case 'MultipleChoice':
-            return 'Несколько вариантов';
-        case 'TextInput':
-            return 'Ввод текста';
-        default:
-            return 'Неизвестный тип';
+        case 'SingleChoice': return 'Один вариант';
+        case 'MultipleChoice': return 'Несколько вариантов';
+        case 'TextInput': return 'Ввод текста';
+        default: return 'Неизвестный тип';
     }
 }
 

@@ -49,7 +49,13 @@ function showEmpty(container, message = 'Нет данных') {
  */
 async function apiRequest(endpoint, options = {}) {
     const url = `${window.API_BASE}${endpoint}`;
+    console.log(`[apiRequest] → ${options.method || 'GET'} ${url}`, options);
+    // Если передан FormData, не устанавливаем Content-Type - браузер сделает это автоматически с правильным boundary
+    if (options.body instanceof FormData) {
+        console.log('[apiRequest] Обнаружен FormData, заголовок Content-Type будет установлен браузером');
+    }
     const response = await fetch(url, options);
+    console.log(`[apiRequest] ← ${response.status} ${response.statusText}`);
     if (!response.ok) {
         let errorMsg = `Ошибка ${response.status}`;
         try {
@@ -58,10 +64,16 @@ async function apiRequest(endpoint, options = {}) {
         } catch {
             // игнорируем, если ответ не JSON
         }
+        console.error(`[apiRequest] Ошибка: ${errorMsg}`);
         throw new Error(errorMsg);
     }
-    if (response.status === 204) return null;
-    return await response.json();
+    if (response.status === 204) {
+        console.log('[apiRequest] Ответ 204 No Content');
+        return null;
+    }
+    const data = await response.json();
+    console.log('[apiRequest] Успешно получены данные:', data);
+    return data;
 }
 
 /**

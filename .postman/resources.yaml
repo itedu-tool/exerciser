@@ -1,6 +1,6 @@
 # Use this workspace to collaborate
 workspace:
-  id: 81da0c97-d158-4b72-b93f-a5cce51737dc
+  id: f0a7ab2b-2374-4a6a-98d1-680748cdaea7
 
 localResources:
   specs:
@@ -10,4 +10,4 @@ localResources:
 
 cloudResources:
   collections:
-    ..\postman\collections\Exerciser API: a4c01abd-17c6-47e0-9501-5938bee9120c
+    ..\postman\collections\Exerciser API: 3027b95a-ab73-457b-9dd6-c6436d71c8ad

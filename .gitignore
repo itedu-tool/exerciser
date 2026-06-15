@@ -494,3 +494,4 @@ internal-nlog-trace.log
 .postman/**/*.local.json
 .postman/logs/
 .postman/results/
+postman/

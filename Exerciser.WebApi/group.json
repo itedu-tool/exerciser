@@ -1,0 +1,15 @@
+{
+  "name": "Группа 1",
+  "students": [
+    {
+      "lastName": "Иванов",
+      "firstName": "Иван",
+      "patronymic": "Иванович"
+    },
+    {
+      "lastName": "Петрова",
+      "firstName": "Мария",
+      "patronymic": null
+    }
+  ]
+}
