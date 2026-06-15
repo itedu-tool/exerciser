@@ -709,42 +709,64 @@ try
     .Produces(StatusCodes.Status404NotFound);
 
     // POST /api/v1/attempts/{id}/finish - Завершить попытку и сохранить ответы (требуется X-Session-Id).
-    attemptsGroup.MapPost($"/{{id:guid}}/finish",
-            async (Guid id, FinishAttemptRequest request, HttpContext httpContext, IAttemptRepository attemptRepo) =>
+attemptsGroup.MapPost($"/{{id:guid}}/finish",
+        async (Guid id, FinishAttemptRequest request, HttpContext httpContext, IAttemptRepository attemptRepo) =>
+        {
+            if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out var sessionIdHeader) ||
+                !Guid.TryParse(sessionIdHeader, out Guid sessionId))
+                return Results.BadRequest(new { error = "X-Session-Id header required" });
+
+            var attempt = await attemptRepo.GetByIdAsync(id);
+            if (attempt == null)
+                return Results.NotFound(new { error = "Attempt not found" });
+
+            if (attempt.SessionId != sessionId)
+                return Results.BadRequest(new { error = "Attempt does not belong to this session" });
+
+            if (attempt.FinishedAt != null)
+                return Results.BadRequest(new { error = "Attempt already finished" });
+
+            // Преобразование JsonElement в примитивные типы
+            var storedAnswers = request.Answers.Select(a =>
             {
-                if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out var sessionIdHeader) ||
-                    !Guid.TryParse(sessionIdHeader, out Guid sessionId))
-                    return Results.BadRequest(new { error = "X-Session-Id header required" });
-
-                var attempt = await attemptRepo.GetByIdAsync(id);
-                if (attempt == null)
-                    return Results.NotFound(new { error = "Attempt not found" });
-
-                if (attempt.SessionId != sessionId)
-                    return Results.BadRequest(new { error = "Attempt does not belong to this session" });
-
-                if (attempt.FinishedAt != null)
-                    return Results.BadRequest(new { error = "Attempt already finished" });
-
-                var storedAnswers = request.Answers.Select(a => new StoredAnswer
+                object? answerValue;
+                if (a.Answer is JsonElement jsonElement)
                 {
-                    QuestionId = a.QuestionId, AnswerValue = a.Answer, Score = a.Score
-                }).ToList();
+                    answerValue = jsonElement.ValueKind switch
+                    {
+                        JsonValueKind.String => jsonElement.GetString(),
+                        JsonValueKind.Array => jsonElement.EnumerateArray().Select(e => e.GetString()).ToList(),
+                        JsonValueKind.Null => null,
+                        _ => jsonElement.ToString()
+                    };
+                }
+                else
+                {
+                    answerValue = a.Answer;
+                }
 
-                attempt.Answers = storedAnswers;
-                attempt.FinishedAt = request.FinishedAt;
-                attempt.TotalScore = request.TotalScore;
-                await attemptRepo.UpdateAsync(attempt);
+                return new StoredAnswer
+                {
+                    QuestionId = a.QuestionId,
+                    AnswerValue = answerValue,
+                    Score = a.Score
+                };
+            }).ToList();
 
-                return Results.Ok(new { success = true });
-            })
-        .WithName("FinishAttempt")
-        .WithSummary("Завершить попытку и сохранить ответы")
-        .WithDescription("Принимает все ответы студента и итоговый балл. Требуется заголовок X-Session-Id.")
-        .Accepts<FinishAttemptRequest>("application/json")
-        .Produces<object>(StatusCodes.Status200OK)
-        .Produces<object>(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status404NotFound);
+            attempt.Answers = storedAnswers;
+            attempt.FinishedAt = request.FinishedAt;
+            attempt.TotalScore = request.TotalScore;
+            await attemptRepo.UpdateAsync(attempt);
+
+            return Results.Ok(new { success = true });
+        })
+    .WithName("FinishAttempt")
+    .WithSummary("Завершить попытку и сохранить ответы")
+    .WithDescription("Принимает все ответы студента и итоговый балл. Требуется заголовок X-Session-Id.")
+    .Accepts<FinishAttemptRequest>("application/json")
+    .Produces<object>(StatusCodes.Status200OK)
+    .Produces<object>(StatusCodes.Status400BadRequest)
+    .Produces(StatusCodes.Status404NotFound);
 
     // GET /api/v1/attempts/{id}/result - Получить результат завершённой попытки (требуется X-Session-Id).
     attemptsGroup.MapGet($"/{{id:guid}}/result",
