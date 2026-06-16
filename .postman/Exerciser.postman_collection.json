@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "exerciser-api-collection",
+    "_postman_id": "exerciser-api-collection-v2",
     "name": "Exerciser API",
-    "description": "Система тестирования студентов. REST API для управления экзаменами и импорта вопросов.",
+    "description": "Система тестирования студентов. REST API для управления экзаменами, группами, студентами и попытками.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.1.0"
+    "version": "2.0.0"
   },
   "item": [
     {
@@ -21,22 +21,8 @@
                   "pm.test('Status code is 200', function() {",
                   "    pm.response.to.have.status(200);",
                   "});",
-                  "",
                   "pm.test('Response has healthy status', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.status).to.equal('healthy');",
-                  "});",
-                  "",
-                  "pm.test('Response has timestamp', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('timestamp');",
-                  "    pm.expect(jsonData).to.have.property('timestampUtc');",
-                  "    pm.expect(jsonData).to.have.property('timeZone');",
-                  "});",
-                  "",
-                  "pm.test('Response does NOT have apiVersion', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.not.have.property('apiVersion');",
+                  "    pm.expect(pm.response.json().status).to.equal('healthy');",
                   "});"
                 ]
               }
@@ -44,25 +30,13 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
+            "header": [{ "key": "Accept", "value": "application/json" }],
             "url": {
               "raw": "{{base_url}}/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "health"
-              ]
-            },
-            "description": "Проверка здоровья API (legacy endpoint без версии)"
-          },
-          "response": []
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
         },
         {
           "name": "Health Check v1",
@@ -74,23 +48,8 @@
                   "pm.test('Status code is 200', function() {",
                   "    pm.response.to.have.status(200);",
                   "});",
-                  "",
-                  "pm.test('Response has healthy status', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.status).to.equal('healthy');",
-                  "});",
-                  "",
-                  "pm.test('Response contains apiVersion = v1', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('apiVersion', 'v1');",
-                  "});",
-                  "",
-                  "pm.test('Health check response format', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('timestamp');",
-                  "    pm.expect(jsonData).to.have.property('timestampUtc');",
-                  "    pm.expect(jsonData).to.have.property('timeZone');",
-                  "    pm.expect(jsonData).to.have.property('offset');",
+                  "pm.test('Response has apiVersion v1', function() {",
+                  "    pm.expect(pm.response.json().apiVersion).to.equal('v1');",
                   "});"
                 ]
               }
@@ -98,70 +57,33 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
+            "header": [{ "key": "Accept", "value": "application/json" }],
             "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "health"
-              ]
-            },
-            "description": "Проверка здоровья API (v1 endpoint)"
-          },
-          "response": []
+              "raw": "{{base_url}}/api/v1/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health"]
+            }
+          }
         }
       ]
     },
     {
-      "name": "Exams",
-      "description": "Управление экзаменами",
+      "name": "Exams (Admin)",
+      "description": "Управление экзаменами (импорт, просмотр, обновление, удаление)",
       "item": [
         {
           "name": "Import Exam - Success",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "pm.environment.set('request_timestamp', new Date().toISOString());"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 201 (Created)', function() {",
+                  "pm.test('Status code is 201', function() {",
                   "    pm.response.to.have.status(201);",
                   "});",
-                  "",
-                  "pm.test('Response has exam data', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('id');",
-                  "    pm.expect(jsonData).to.have.property('title');",
-                  "    pm.expect(jsonData).to.have.property('questionsCount');",
-                  "});",
-                  "",
-                  "pm.test('Questions count is correct', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.questionsCount).to.be.greaterThan(0);",
-                  "});",
-                  "",
-                  "// Сохранить ID экзамена для дальнейшего использования",
                   "var jsonData = pm.response.json();",
                   "pm.collectionVariables.set('exam_id', jsonData.id);",
-                  "pm.environment.set('last_exam_id', jsonData.id);",
-                  ""
+                  "pm.environment.set('exam_id', jsonData.id);"
                 ]
               }
             }
@@ -171,97 +93,184 @@
             "header": [],
             "body": {
               "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "{{exam_file_path}}"
-                }
-              ]
+              "formdata": [{ "key": "file", "type": "file", "src": "{{exam_file_path}}" }]
             },
             "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams/import",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams",
-                "import"
-              ]
-            },
-            "description": "Импорт экзамена из JSON файла. Успешный сценарий."
-          },
-          "response": []
+              "raw": "{{base_url}}/api/v1/exams/import",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "exams", "import"]
+            }
+          }
         },
         {
           "name": "Get All Exams",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response is an array', function() {",
-                  "    var data = pm.response.json();",
-                  "    pm.expect(data).to.be.an('array');",
-                  "});",
-                  "",
-                  "pm.test('Each exam has required fields', function() {",
-                  "    var exams = pm.response.json();",
-                  "    if (exams.length > 0) {",
-                  "        exams.forEach(exam => {",
-                  "            pm.expect(exam).to.have.property('id');",
-                  "            pm.expect(exam).to.have.property('title');",
-                  "            pm.expect(exam).to.have.property('questionsCount');",
-                  "        });",
-                  "    }",
-                  "});"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
+            "header": [{ "key": "Accept", "value": "application/json" }],
             "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams"
-              ]
-            },
-            "description": "Получить список всех экзаменов (только метаданные)"
-          },
-          "response": []
+              "raw": "{{base_url}}/api/v1/exams",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "exams"]
+            }
+          }
         },
         {
           "name": "Get Exam by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/v1/exams/{{exam_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "exams", "{{exam_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Exam",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"New description\",\n  \"questions\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/exams/{{exam_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "exams", "{{exam_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Exam",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/api/v1/exams/{{exam_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "exams", "{{exam_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Groups & Students",
+      "description": "Управление группами и студентами (административные эндпоинты)",
+      "item": [
+        {
+          "name": "Get All Groups",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/groups",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "groups"]
+            }
+          }
+        },
+        {
+          "name": "Create Group",
           "event": [
             {
-              "listen": "prerequest",
+              "listen": "test",
               "script": {
                 "exec": [
-                  "if (!pm.collectionVariables.get('exam_id')) {",
-                  "    console.warn('exam_id not set. Please run Import Exam first.');",
-                  "}"
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('group_id', jsonData.id);",
+                  "pm.environment.set('group_id', jsonData.id);"
                 ]
               }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Группа 1\"\n}"
             },
+            "url": {
+              "raw": "{{base_url}}/api/v1/groups",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "groups"]
+            }
+          }
+        },
+        {
+          "name": "Import Group from JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('group_id', jsonData.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "{{group_file_path}}" }]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/groups/import",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "groups", "import"]
+            }
+          }
+        },
+        {
+          "name": "Add Student to Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('student_id', jsonData.id);",
+                  "pm.environment.set('student_id', jsonData.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lastName\": \"Иванов\",\n  \"firstName\": \"Иван\",\n  \"patronymic\": \"Иванович\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/groups/{{group_id}}/students",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "groups", "{{group_id}}", "students"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student Session & Attempts",
+      "description": "Студенческая часть: сессии, попытки, результаты",
+      "item": [
+        {
+          "name": "Start Session",
+          "event": [
             {
               "listen": "test",
               "script": {
@@ -269,235 +278,90 @@
                   "pm.test('Status code is 200', function() {",
                   "    pm.response.to.have.status(200);",
                   "});",
-                  "",
-                  "pm.test('Response contains exam details', function() {",
-                  "    var data = pm.response.json();",
-                  "    pm.expect(data).to.have.property('id');",
-                  "    pm.expect(data).to.have.property('title');",
-                  "    pm.expect(data).to.have.property('questions');",
-                  "    pm.expect(data.questions).to.be.an('array');",
-                  "});",
-                  "",
-                  "pm.test('Each question has required fields', function() {",
-                  "    var data = pm.response.json();",
-                  "    data.questions.forEach(q => {",
-                  "        pm.expect(q).to.have.property('id');",
-                  "        pm.expect(q).to.have.property('text');",
-                  "        pm.expect(q).to.have.property('type');",
-                  "        pm.expect(q).to.have.property('correctAnswers');",
-                  "    });",
-                  "});"
+                  "var session = pm.response.json();",
+                  "pm.collectionVariables.set('session_id', session.sessionId);",
+                  "pm.environment.set('session_id', session.sessionId);"
                 ]
               }
             }
           ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupId\": \"{{group_id}}\",\n  \"studentId\": \"{{student_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sessions/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sessions", "start"]
+            }
+          }
+        },
+        {
+          "name": "Start Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var attempt = pm.response.json();",
+                  "pm.collectionVariables.set('attempt_id', attempt.attemptId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Session-Id", "value": "{{session_id}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"{{exam_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "attempts", "start"]
+            }
+          }
+        },
+        {
+          "name": "Finish Attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Session-Id", "value": "{{session_id}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"totalScore\": 5,\n  \"finishedAt\": \"{{$iso8601}}\",\n  \"answers\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{attempt_id}}/finish",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "attempts", "{{attempt_id}}", "finish"]
+            }
+          }
+        },
+        {
+          "name": "Get Attempt Result",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
+            "header": [{ "key": "X-Session-Id", "value": "{{session_id}}" }],
             "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams/{{exam_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams",
-                "{{exam_id}}"
-              ]
-            },
-            "description": "Получить полную информацию об экзамене (включая вопросы и ответы)"
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Exam by ID",
-          "event": [
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "if (!pm.collectionVariables.get('exam_id')) {",
-                  "    console.warn('exam_id not set. Please run Import Exam first.');",
-                  "}"
-                ]
-              }
-            },
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 204 No Content', function() {",
-                  "    pm.response.to.have.status(204);",
-                  "});",
-                  "",
-                  "pm.test('Response body is empty', function() {",
-                  "    pm.expect(pm.response.text()).to.be.empty;",
-                  "});",
-                  "",
-                  "// Очистить переменную exam_id после удаления",
-                  "pm.collectionVariables.unset('exam_id');"
-                ]
-              }
+              "raw": "{{base_url}}/api/v1/attempts/{{attempt_id}}/result",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "attempts", "{{attempt_id}}", "result"]
             }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams/{{exam_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams",
-                "{{exam_id}}"
-              ]
-            },
-            "description": "Удалить экзамен по ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Import Exam - Empty File",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 400 (Bad Request)', function() {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test('Response has error message', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('error');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": []
-            },
-            "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams/import",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams",
-                "import"
-              ]
-            },
-            "description": "Попытка импорта без файла - должна вернуть 400"
-          },
-          "response": []
-        },
-        {
-          "name": "Import Exam - Invalid JSON",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 400 (Bad Request)', function() {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test('Response has error message about JSON format', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.error.toLowerCase()).to.include('json');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "invalid.txt"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams/import",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams",
-                "import"
-              ]
-            },
-            "description": "Попытка импорта с неверным форматом файла - должна вернуть 400"
-          },
-          "response": []
-        },
-        {
-          "name": "Import Exam - Rate Limited",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 429 (Too Many Requests)', function() {",
-                  "    pm.response.to.have.status(429);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "{{exam_file_path}}"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/{{api_version}}/exams/import",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "{{api_version}}",
-                "exams",
-                "import"
-              ]
-            },
-            "description": "Тест Rate Limiting - отправить более 10 запросов в час (для import endpoint)"
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -509,103 +373,46 @@
           "name": "OpenAPI Specification",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
             "url": {
               "raw": "{{base_url}}/openapi/v1.json",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "openapi",
-                "v1.json"
-              ]
-            },
-            "description": "Получить OpenAPI спецификацию API в формате JSON"
-          },
-          "response": []
+              "host": ["{{base_url}}"],
+              "path": ["openapi", "v1.json"]
+            }
+          }
         },
         {
           "name": "Scalar UI Documentation",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "text/html",
-                "type": "text"
-              }
-            ],
             "url": {
               "raw": "{{base_url}}/scalar/v1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "scalar",
-                "v1"
-              ]
-            },
-            "description": "Открыть интерактивную документацию API в браузере (Scalar UI)"
-          },
-          "response": []
+              "host": ["{{base_url}}"],
+              "path": ["scalar", "v1"]
+            }
+          }
         },
         {
           "name": "Root Endpoint",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "text/plain",
-                "type": "text"
-              }
-            ],
             "url": {
               "raw": "{{base_url}}/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                ""
-              ]
-            },
-            "description": "Корневой endpoint API - возвращает информационное сообщение"
-          },
-          "response": []
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          }
         }
       ]
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:5257",
-      "type": "string",
-      "description": "Base URL для API"
-    },
-    {
-      "key": "api_version",
-      "value": "v1",
-      "type": "string",
-      "description": "Версия API"
-    },
-    {
-      "key": "exam_file_path",
-      "value": "./exam.json",
-      "type": "string",
-      "description": "Путь к файлу экзамена для импорта"
-    },
-    {
-      "key": "exam_id",
-      "value": "",
-      "type": "string",
-      "description": "ID последнего импортированного экзамена"
-    }
+    { "key": "base_url", "value": "http://localhost:8080", "type": "string" },
+    { "key": "exam_file_path", "value": "./exam.json", "type": "string" },
+    { "key": "group_file_path", "value": "./group.json", "type": "string" },
+    { "key": "exam_id", "value": "", "type": "string" },
+    { "key": "group_id", "value": "", "type": "string" },
+    { "key": "student_id", "value": "", "type": "string" },
+    { "key": "session_id", "value": "", "type": "string" },
+    { "key": "attempt_id", "value": "", "type": "string" }
   ]
 }

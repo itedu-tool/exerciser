@@ -1,9 +1,11 @@
 $kind: collection
-name: Exerciser API
-description: Система тестирования студентов. REST API для управления экзаменами и импорта вопросов.
+description: Система тестирования студентов. REST API для управления экзаменами, группами, студентами и попытками.
 variables:
   base_url: http://localhost:8080
-  api_version: v1
   exam_file_path: ./exam.json
+  group_file_path: ./group.json
   exam_id: ""
-  last_exam_id: ""
+  group_id: ""
+  student_id: ""
+  session_id: ""
+  attempt_id: ""

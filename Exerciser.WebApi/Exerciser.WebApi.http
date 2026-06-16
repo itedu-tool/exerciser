@@ -1,6 +1,8 @@
 @baseUrl = http://localhost:8080
 @baseUrlWithVersion = {{baseUrl}}/api/v1
 @examsUrl = {{baseUrlWithVersion}}/exams
+@attemptsUrl = {{baseUrlWithVersion}}/attempts
+@groupsUrl = {{baseUrlWithVersion}}/groups
 
 ### Проверка корневого эндпоинта
 GET {{baseUrl}}/
@@ -22,6 +24,8 @@ Accept: application/json
 GET {{baseUrl}}/scalar/v1
 Accept: text/html
 
+### ==================== Администрирование экзаменов ====================
+
 ### Импорт экзамена (пример: загружаем файл exam.json)
 POST {{examsUrl}}/import
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
@@ -42,5 +46,113 @@ Accept: application/json
 GET {{examsUrl}}/{{examId}}
 Accept: application/json
 
-### Удалить экзамен по ID (замените {id} на реальный GUID)
+### Удалить экзамен по ID
 DELETE {{examsUrl}}/{{examId}}
+
+### Полное обновление экзамена
+PUT {{examsUrl}}/{{examId}}
+Content-Type: application/json
+
+{
+  "title": "Обновлённое название",
+  "description": "Новое описание",
+  "questions": []
+}
+
+### ==================== Управление группами и студентами ====================
+
+### Получить список всех групп со студентами
+GET {{groupsUrl}}
+Accept: application/json
+
+### Создать новую группу
+POST {{groupsUrl}}
+Content-Type: application/json
+
+{
+  "name": "Группа 1"
+}
+
+### Импорт группы из JSON-файла (пример: group.json)
+POST {{groupsUrl}}/import
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="group.json"
+Content-Type: application/json
+
+< ./group.json
+------WebKitFormBoundary--
+
+### Добавить студента в группу (замените {groupId} на реальный GUID)
+@groupId = 019eabf3-12fe-7542-8285-ccc4d5a260ec
+POST {{groupsUrl}}/{{groupId}}/students
+Content-Type: application/json
+
+{
+  "lastName": "Иванов",
+  "firstName": "Иван",
+  "patronymic": "Иванович"
+}
+
+### ==================== Студенческая сессия ====================
+
+### Начать сессию (логин) – требуется groupId и studentId из предыдущих шагов
+# @name startSession
+POST {{baseUrlWithVersion}}/sessions/start
+Content-Type: application/json
+
+{
+  "groupId": "{{groupId}}",
+  "studentId": "019eabf3-12fe-7542-8285-ccc4d5a260ed"
+}
+
+### Сохранить sessionId из ответа
+@sessionId = {{startSession.response.body.sessionId}}
+
+### ==================== Попытки прохождения экзаменов ====================
+
+### Начать новую попытку (требуется X-Session-Id)
+# @name startAttempt
+POST {{attemptsUrl}}/start
+X-Session-Id: {{sessionId}}
+Content-Type: application/json
+
+{
+  "examId": "{{examId}}"
+}
+
+### Сохранить attemptId
+@attemptId = {{startAttempt.response.body.attemptId}}
+
+### Завершить попытку (отправить ответы)
+POST {{attemptsUrl}}/{{attemptId}}/finish
+X-Session-Id: {{sessionId}}
+Content-Type: application/json
+
+{
+  "totalScore": 5,
+  "finishedAt": "2026-06-11T12:00:00Z",
+  "answers": [
+    {
+      "questionId": "019eabf3-12fe-7542-8285-ccc4d5a260ee",
+      "answer": "Common Language Runtime",
+      "score": 3
+    },
+    {
+      "questionId": "019eabf3-12fe-7542-8285-ccc4d5a260ef",
+      "answer": "private",
+      "score": 1
+    },
+    {
+      "questionId": "019eabf3-12fe-7542-8285-ccc4d5a260f0",
+      "answer": ["int", "bool", "struct"],
+      "score": 3
+    }
+  ]
+}
+
+### Получить результат попытки
+GET {{attemptsUrl}}/{{attemptId}}/result
+X-Session-Id: {{sessionId}}
+Accept: application/json

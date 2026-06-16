@@ -1,5 +1,5 @@
 {
-  "_postman_id": "exerciser-dev-env",
+  "id": "exerciser-dev-env",
   "name": "Exerciser - Development",
   "values": [
     {
@@ -9,27 +9,49 @@
       "type": "default"
     },
     {
-      "key": "api_version",
-      "value": "v1",
+      "key": "exam_file_path",
+      "value": "./exam.json",
       "enabled": true,
       "type": "default"
     },
     {
-      "key": "exam_file_path",
-      "value": "./exam.json",
+      "key": "group_file_path",
+      "value": "./group.json",
       "enabled": true,
-      "type": "default",
-      "description": "Путь к файлу экзамена для импорта"
+      "type": "default"
     },
     {
       "key": "exam_id",
       "value": "",
       "enabled": true,
-      "type": "default",
-      "description": "ID последнего импортированного экзамена (сохраняется автоматически)"
+      "type": "default"
+    },
+    {
+      "key": "group_id",
+      "value": "",
+      "enabled": true,
+      "type": "default"
+    },
+    {
+      "key": "student_id",
+      "value": "",
+      "enabled": true,
+      "type": "default"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "enabled": true,
+      "type": "default"
+    },
+    {
+      "key": "attempt_id",
+      "value": "",
+      "enabled": true,
+      "type": "default"
     }
   ],
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2024-06-09T12:00:00.000Z",
+  "_postman_exported_at": "2026-06-11T14:30:00.000Z",
   "_postman_exported_using": "Postman/11.0.0"
 }
