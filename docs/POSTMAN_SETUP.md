@@ -49,15 +49,17 @@ docker run -d \
 
 **Способ 3: Через URL (если размещено на GitHub)**
 1. **File** → **Import** → **Link**
-2. Вставить URL: `https://raw.githubusercontent.com/your-repo/main/.postman/Exerciser.postman_collection.json`
+2. Вставить URL: `https://raw.githubusercontent.com/itedu-tool/exerciser/main/.postman/Exerciser.postman_collection.json`
 3. Нажать **Import**
 
 ### Шаг 3: Проверка импорта
 
 В левой панели должна появиться папка **"Exerciser API"** с подпапками:
-- ✅ Health
-- ✅ Exams
-- ✅ API Information
+- ✅ **Health** – проверка работоспособности API
+- ✅ **Exams (Admin)** – управление экзаменами (импорт, получение, обновление, удаление)
+- ✅ **Groups & Students** – управление группами и студентами
+- ✅ **Student Session & Attempts** – студенческая сессия и попытки
+- ✅ **API Information** – документация и информация об API
 
 ---
 
@@ -79,9 +81,10 @@ docker run -d \
 ### Шаг 3: Проверка переменных
 
 Нажать на иконку Environment рядом с именем. Должны быть переменные:
-- `base_url` = `http://localhost:5257`
-- `api_version` = `v1`
+- `base_url` = `http://localhost:8080`
 - `exam_file_path` = `./exam.json`
+- `group_file_path` = `./group.json`
+- `exam_id`, `group_id`, `student_id`, `session_id`, `attempt_id` – будут заполняться автоматически во время выполнения запросов
 
 ---
 
@@ -96,8 +99,8 @@ docker run -d \
 ```json
 {
   "status": "healthy",
-  "timestamp": "2024-06-05T12:14:57.123",
-  "timestampUtc": "2024-06-05T12:14:57.123Z",
+  "timestamp": "2026-06-15T12:14:57.123",
+  "timestampUtc": "2026-06-15T12:14:57.123Z",
   "timeZone": "UTC",
   "offset": "00:00:00"
 }
@@ -105,7 +108,7 @@ docker run -d \
 
 ### Пример 2: Импорт Экзамена
 
-1. Открыть **Exams** → **Import Exam - Success**
+1. Открыть **Exams (Admin)** → **Import Exam - Success**
 2. Убедиться, что файл `exam.json` находится в том же каталоге
 3. Нажать **Send**
 4. Должен получиться ответ **201 Created**:
@@ -118,18 +121,33 @@ docker run -d \
 }
 ```
 
-### Пример 3: Переменные в запросе
+> **Примечание:** ID экзамена автоматически сохранится в переменную `exam_id` для использования в следующих запросах.
+
+### Пример 3: Управление группами и студентами
+
+1. Открыть **Groups & Students** → **Get All Groups** – получить список групп
+2. Открыть **Create Group** – создать новую группу
+3. Открыть **Import Group from JSON** – импортировать группу из файла `group.json`
+4. Открыть **Add Student to Group** – добавить студента в существующую группу (ID группы берётся из переменной `group_id`)
+
+### Пример 4: Студенческая сессия и попытки (полный цикл)
+
+1. **Start Session** – создать сессию для студента (укажите `groupId` и `studentId` из предыдущих шагов). `sessionId` сохранится автоматически.
+2. **Start Attempt** – начать попытку для выбранного экзамена (заголовок `X-Session-Id` подставится автоматически). `attemptId` сохранится.
+3. **Finish Attempt** – завершить попытку, отправив ответы.
+4. **Get Attempt Result** – получить результат завершённой попытки.
+
+### Пример 5: Переменные в запросе
 
 Заметьте в URL:
 ```
-{{base_url}}/api/{{api_version}}/exams/import
+{{base_url}}/api/v1/exams/import
 ```
 
 Это означает:
-- `{{base_url}}` → `http://localhost:5257` (из Environment)
-- `{{api_version}}` → `v1` (из Environment)
+- `{{base_url}}` → `http://localhost:8080` (из Environment)
 
-Итоговый URL: `http://localhost:5257/api/v1/exams/import`
+Итоговый URL: `http://localhost:8080/api/v1/exams/import`
 
 ---
 
@@ -166,12 +184,12 @@ Postman откроет **Collection Runner** и запустит все запр
 
 | Endpoint | Лимит | Период |
 |----------|-------|--------|
-| General (Health) | 100 | 1 минута |
+| General (Health, Exams, Groups, Sessions) | 100 | 1 минута |
 | Import Exam | 10 | 1 час |
 
 ### Тестирование Rate Limiting
 
-1. Открыть **Exams** → **Import Exam - Rate Limited**
+1. Открыть **Exams (Admin)** → **Import Exam - Success**
 2. Отправить запрос 11 раз подряд (используя **Ctrl+Enter**)
 3. На 11-м запросе должен получиться ответ **429 Too Many Requests**
 
@@ -199,7 +217,7 @@ docker compose ps
 docker compose up -d
 
 # Проверить, доступен ли API
-curl http://localhost:5257/health
+curl http://localhost:8080/health
 ```
 
 ### Проблема 2: "Invalid file path"
@@ -207,7 +225,7 @@ curl http://localhost:5257/health
 **Причина:** Путь к `exam.json` неправильный
 
 **Решение:**
-1. Открыть **Exams** → **Import Exam - Success**
+1. Открыть **Exams (Admin)** → **Import Exam - Success**
 2. Нажать **Body** → **form-data**
 3. В поле `file` нажать на иконку файла
 4. Выбрать файл `exam.json` из вашей папки проекта
@@ -281,8 +299,8 @@ if (!pm.environment.get('exam_id')) {
 
 1. Нажать **Collection** → **Share**
 2. Выбрать способ:
-   - **Postman Link** (облако)
-   - **Export** (JSON файл)
+    - **Postman Link** (облако)
+    - **Export** (JSON файл)
 3. Поделиться ссылкой или файлом с командой
 
 ---
@@ -296,6 +314,6 @@ if (!pm.environment.get('exam_id')) {
 
 ---
 
-**Версия:** 1.0.0  
-**Последнее обновление:** 2024-06-05  
+**Версия:** 1.2.0  
+**Последнее обновление:** 2026-06-15  
 **API Version:** v1
