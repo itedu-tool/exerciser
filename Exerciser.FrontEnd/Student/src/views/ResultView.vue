@@ -17,7 +17,12 @@
             </div>
             <hr />
             <h5>Детали по вопросам</h5>
-            <div v-for="(q, idx) in result?.questions" :key="idx" class="mb-3 border p-2 rounded">
+            <div
+                v-for="(q, idx) in result?.questions"
+                :key="idx"
+                class="mb-3 border rounded p-2 border-start border-4"
+                :class="questionBorderClass(q.score, q.maxScore)"
+            >
                 <p><strong>Вопрос {{ idx + 1 }}:</strong> {{ q.text }}</p>
                 <p><strong>Тип:</strong> {{ q.type }}</p>
                 <p><strong>Ваш ответ:</strong> {{ formatAnswer(q.userAnswer) }}</p>
@@ -42,6 +47,12 @@ const loading = ref(true)
 function formatAnswer(answer) {
     if (Array.isArray(answer)) return answer.join(', ') || '(не выбрано)'
     return answer || '(не введено)'
+}
+
+function questionBorderClass(score, maxScore) {
+    if (score === maxScore) return 'border-success'   // полностью правильно
+    if (score === 0) return 'border-danger'           // полностью неправильно
+    return 'border-warning'                            // частично правильно
 }
 
 async function loadResult() {
