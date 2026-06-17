@@ -7,47 +7,22 @@
         <button class="btn btn-primary mt-2" @click="$router.push('/exams')">Вернуться к списку</button>
     </div>
     <div v-else>
-        <!-- Заголовок и таймер -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>{{ exam?.title }}</h2>
-            <Timer :seconds="timeLeft" @timeout="autoSubmit" />
-        </div>
-        <p class="text-muted">{{ exam?.description }}</p>
-
-        <!-- Панель прогресса -->
-        <div class="progress-panel card mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-          <span>
-            <strong>Прогресс:</strong> {{ answeredCount }} из {{ exam?.questions?.length || 0 }} вопросов отвечено
-          </span>
-                    <span class="text-primary">{{ Math.round((answeredCount / (exam?.questions?.length || 1)) * 100) }}%</span>
-                </div>
-                <div class="progress mt-2" style="height: 8px">
-                    <div class="progress-bar bg-success" role="progressbar" :style="{ width: progressPercent + '%' }"></div>
-                </div>
+        <!-- Sticky header: таймер + прогресс-бар -->
+        <div class="sticky-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">{{ exam?.title }}</h2>
+                <Timer :seconds="timeLeft" @timeout="autoSubmit" />
+            </div>
+            <div class="progress mt-2" style="height: 6px;">
+                <div
+                    class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    :style="{ width: progressPercent + '%' }"
+                ></div>
             </div>
         </div>
 
-        <!-- Навигация по вопросам (сетка) -->
-        <div class="question-nav mb-4">
-            <div class="d-flex flex-wrap gap-2">
-                <button
-                    v-for="(q, idx) in exam?.questions"
-                    :key="q.id"
-                    type="button"
-                    class="btn btn-sm"
-                    :class="{
-            'btn-success': isAnswered(q.id),
-            'btn-outline-secondary': !isAnswered(q.id),
-            'btn-primary': currentQuestionIndex === idx
-          }"
-                    @click="scrollToQuestion(idx)"
-                >
-                    {{ idx + 1 }}
-                </button>
-            </div>
-        </div>
+        <p class="text-muted mt-3">{{ exam?.description }}</p>
 
         <!-- Форма с вопросами -->
         <form @submit.prevent="submitAttempt" @keydown.enter.prevent>
@@ -56,13 +31,14 @@
                     v-for="(q, idx) in exam?.questions"
                     :key="q.id"
                     :is="questionComponent(q.type)"
-                    :ref="el => setQuestionRef(el, idx)"
                     :question="q"
                     :index="idx"
                     :savedAnswer="answers[q.id]"
                     @answer="saveAnswer"
                 />
             </div>
+
+            <!-- Кнопки внизу (после всех вопросов) -->
             <div class="mt-4 d-flex justify-content-between">
                 <button type="button" class="btn btn-secondary" @click="$router.push('/exams')">Отмена</button>
                 <button type="submit" class="btn btn-success" :disabled="submitting">
@@ -74,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 import Timer from '../components/Timer.vue'
@@ -93,28 +69,19 @@ const answers = ref({})
 const submitting = ref(false)
 const timeLeft = ref(3600) // 1 час в секундах
 
-const questionsContainer = ref(null)
-const questionRefs = ref([])
-
-// Количество отвеченных вопросов
-const answeredCount = computed(() => {
+// Прогресс (только полоса)
+const progressPercent = computed(() => {
     if (!exam.value?.questions) return 0
-    return exam.value.questions.filter(q => {
+    const total = exam.value.questions.length
+    if (total === 0) return 0
+    const answered = exam.value.questions.filter(q => {
         const answer = answers.value[q.id]
         if (!answer) return false
         if (Array.isArray(answer)) return answer.length > 0
         return answer !== '' && answer !== null && answer !== undefined
     }).length
+    return Math.round((answered / total) * 100)
 })
-
-// Процент для прогресс-бара
-const progressPercent = computed(() => {
-    const total = exam.value?.questions?.length || 1
-    return Math.round((answeredCount.value / total) * 100)
-})
-
-// Текущий индекс активного вопроса (для подсветки в навигации)
-let currentQuestionIndex = ref(0)
 
 const questionComponent = (type) => {
     if (type === 'SingleChoice') return QuestionSingleChoice
@@ -122,29 +89,10 @@ const questionComponent = (type) => {
     return QuestionTextInput
 }
 
-function setQuestionRef(el, idx) {
-    if (el) {
-        questionRefs.value[idx] = el
-    }
-}
-
-function isAnswered(questionId) {
-    const answer = answers.value[questionId]
-    if (!answer) return false
-    if (Array.isArray(answer)) return answer.length > 0
-    return answer !== '' && answer !== null && answer !== undefined
-}
-
 function saveAnswer({ questionId, answer }) {
     answers.value[questionId] = answer
 }
 
-/**
- * Расчёт балла за один вопрос по правилам.
- * @param {Object} question - объект вопроса (с полями type, correctAnswers)
- * @param {string|string[]|null} answer - ответ студента
- * @returns {number} балл за вопрос (0 или положительное число)
- */
 function calculateScoreForQuestion(question, answer) {
     const { type, correctAnswers } = question
 
@@ -191,9 +139,9 @@ function calculateScoreForQuestion(question, answer) {
 }
 
 async function submitAttempt() {
+    if (submitting.value) return
     submitting.value = true
     try {
-        // Формируем массив ответов с баллами
         const answerList = []
         let totalScore = 0
 
@@ -212,23 +160,12 @@ async function submitAttempt() {
 
         await api.finishAttempt(attemptId, totalScore, answerList, finishedAt)
 
-        // Удаляем сохранённый экзамен из sessionStorage
         sessionStorage.removeItem(`attempt_${attemptId}`)
         router.push(`/result/${attemptId}`)
     } catch (err) {
         alert('Ошибка при завершении: ' + err.message)
     } finally {
         submitting.value = false
-    }
-}
-
-function scrollToQuestion(idx) {
-    currentQuestionIndex.value = idx
-    const element = questionRefs.value[idx]?.$el || questionRefs.value[idx]
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        element.classList.add('highlight')
-        setTimeout(() => element.classList.remove('highlight'), 1500)
     }
 }
 
@@ -271,44 +208,23 @@ function autoSubmit() {
     }
 }
 
-// Intersection Observer для отслеживания видимого вопроса
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const idx = questionRefs.value.findIndex(ref => ref?.$el === entry.target || ref === entry.target)
-            if (idx !== -1) currentQuestionIndex.value = idx
-        }
-    })
-}, { threshold: 0.5 })
-
-onMounted(() => {
-    loadAttempt()
-    nextTick(() => {
-        if (questionsContainer.value) {
-            const elements = questionRefs.value.map(ref => ref?.$el || ref).filter(Boolean)
-            elements.forEach(el => observer.observe(el))
-        }
-    })
-})
+onMounted(loadAttempt)
 </script>
 
 <style scoped>
-.question-nav {
-    background: #f8f9fa;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
+.sticky-header {
     position: sticky;
-    top: 10px;
+    top: 0;
     z-index: 100;
+    background: white;
+    padding: 12px 0 8px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
 }
 
-.progress-panel {
-    background: #f8f9fa;
-}
-
-.highlight {
-    transition: background-color 0.3s;
-    background-color: #fff3cd !important;
-    border-left: 4px solid #ffc107;
+@media (prefers-color-scheme: dark) {
+    .sticky-header {
+        background: #212529;
+    }
 }
 </style>
