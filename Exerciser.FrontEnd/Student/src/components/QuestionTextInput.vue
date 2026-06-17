@@ -2,7 +2,6 @@
     <div class="question-card card mb-3">
         <div class="card-header">
             <strong>Вопрос {{ index + 1 }}</strong>
-            <span class="badge bg-secondary ms-2">✏️ Ввод текста</span>
         </div>
         <div class="card-body">
             <p class="card-text">{{ question.text }}</p>
