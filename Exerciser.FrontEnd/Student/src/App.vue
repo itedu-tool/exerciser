@@ -1,9 +1,19 @@
 <template>
     <div id="app">
-        <nav class="navbar navbar-dark bg-dark" v-if="isAuthenticated">
+        <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
             <div class="container">
-                <span class="navbar-brand">📚 Exerciser – Студент</span>
-                <button class="btn btn-outline-light" @click="logout">Выйти</button>
+                <a class="navbar-brand" href="#">📚 Exerciser – Студент</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li v-if="isAuthenticated" class="nav-item">
+                            <a class="nav-link" href="#" @click.prevent="logout">Выйти</a>
+                        </li>
+                        <ThemeSelector @theme-changed="applyTheme" />
+                    </ul>
+                </div>
             </div>
         </nav>
         <main class="container mt-4">
@@ -13,9 +23,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import auth from './services/auth'
+import ThemeSelector from './components/ThemeSelector.vue'
+import { THEME_STORAGE_KEY, AVAILABLE_THEMES } from './config/themes'
 
 const router = useRouter()
 const isAuthenticated = computed(() => auth.isAuthenticated())
@@ -24,8 +36,32 @@ function logout() {
     auth.logout()
     router.push('/login')
 }
+
+function applyTheme(themeUrl) {
+    let link = document.getElementById('theme-stylesheet')
+    if (!link) {
+        link = document.createElement('link')
+        link.id = 'theme-stylesheet'
+        link.rel = 'stylesheet'
+        document.head.appendChild(link)
+    }
+    link.href = themeUrl
+}
+
+onMounted(() => {
+    const savedThemeId = localStorage.getItem(THEME_STORAGE_KEY)
+    if (savedThemeId) {
+        const theme = AVAILABLE_THEMES.find(t => t.id === savedThemeId)
+        if (theme) {
+            applyTheme(theme.url)
+            return
+        }
+    }
+    const defaultTheme = AVAILABLE_THEMES.find(t => t.id === 'flatly') || AVAILABLE_THEMES[0]
+    applyTheme(defaultTheme.url)
+})
 </script>
 
 <style>
-@import 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css';
+/* CSS будет загружен через импорт в main.js */
 </style>

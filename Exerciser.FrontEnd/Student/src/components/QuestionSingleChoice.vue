@@ -2,7 +2,6 @@
     <div class="question-card card mb-3">
         <div class="card-header">
             <strong>Вопрос {{ index + 1 }}</strong>
-            <span class="badge bg-secondary ms-2">🔘 Один вариант</span>
         </div>
         <div class="card-body">
             <p class="card-text">{{ question.text }}</p>
@@ -14,8 +13,11 @@
                     :value="option"
                     v-model="selected"
                     @change="updateAnswer"
+                    :id="`q${question.id}_${option}`"
                 />
-                <label class="form-check-label">{{ option }}</label>
+                <label class="form-check-label" :for="`q${question.id}_${option}`">
+                    {{ option }}
+                </label>
             </div>
         </div>
     </div>
