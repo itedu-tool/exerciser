@@ -50,7 +50,7 @@
         </div>
 
         <!-- Форма с вопросами -->
-        <form @submit.prevent="submitAttempt">
+        <form @submit.prevent="submitAttempt" @keydown.enter.prevent>
             <div ref="questionsContainer">
                 <component
                     v-for="(q, idx) in exam?.questions"
@@ -139,17 +139,80 @@ function saveAnswer({ questionId, answer }) {
     answers.value[questionId] = answer
 }
 
+/**
+ * Расчёт балла за один вопрос по правилам.
+ * @param {Object} question - объект вопроса (с полями type, correctAnswers)
+ * @param {string|string[]|null} answer - ответ студента
+ * @returns {number} балл за вопрос (0 или положительное число)
+ */
+function calculateScoreForQuestion(question, answer) {
+    const { type, correctAnswers } = question
+
+    if (!answer || (Array.isArray(answer) && answer.length === 0) || (typeof answer === 'string' && answer.trim() === '')) {
+        return 0
+    }
+
+    switch (type) {
+        case 'SingleChoice': {
+            return answer === correctAnswers[0] ? 1 : 0
+        }
+
+        case 'MultipleChoice': {
+            if (!Array.isArray(answer)) return 0
+            const selected = answer.filter(item => item && item.trim() !== '')
+            if (selected.length === 0) return 0
+
+            const correctSet = new Set(correctAnswers)
+            let correctSelected = 0
+            let incorrectSelected = 0
+
+            for (const val of selected) {
+                if (correctSet.has(val)) {
+                    correctSelected++
+                } else {
+                    incorrectSelected++
+                }
+            }
+
+            const score = correctSelected - incorrectSelected
+            return Math.max(0, score)
+        }
+
+        case 'TextInput': {
+            const userAnswer = typeof answer === 'string' ? answer.trim() : ''
+            if (userAnswer === '') return 0
+            const expected = correctAnswers[0]?.trim() || ''
+            return userAnswer === expected ? 3 : 0
+        }
+
+        default:
+            return 0
+    }
+}
+
 async function submitAttempt() {
     submitting.value = true
     try {
-        const totalScore = 0 // бэкенд пересчитает
+        // Формируем массив ответов с баллами
+        const answerList = []
+        let totalScore = 0
+
+        for (const question of exam.value.questions) {
+            const userAnswer = answers.value[question.id] ?? null
+            const score = calculateScoreForQuestion(question, userAnswer)
+            totalScore += score
+            answerList.push({
+                questionId: question.id,
+                answer: userAnswer,
+                score: score
+            })
+        }
+
         const finishedAt = new Date().toISOString()
-        const answerList = Object.entries(answers.value).map(([questionId, answer]) => ({
-            questionId,
-            answer,
-            score: 0
-        }))
+
         await api.finishAttempt(attemptId, totalScore, answerList, finishedAt)
+
+        // Удаляем сохранённый экзамен из sessionStorage
         sessionStorage.removeItem(`attempt_${attemptId}`)
         router.push(`/result/${attemptId}`)
     } catch (err) {
@@ -164,7 +227,6 @@ function scrollToQuestion(idx) {
     const element = questionRefs.value[idx]?.$el || questionRefs.value[idx]
     if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Добавим временную подсветку
         element.classList.add('highlight')
         setTimeout(() => element.classList.remove('highlight'), 1500)
     }
@@ -186,7 +248,6 @@ async function loadAttempt() {
     }
 
     try {
-        // Если добавили эндпоинт GET /attempts/{id}/exam, можно его использовать
         const response = await api.getAttemptExam?.(attemptId)
         exam.value = response?.data
         sessionStorage.setItem(`attempt_${attemptId}`, JSON.stringify(exam.value))
@@ -210,7 +271,7 @@ function autoSubmit() {
     }
 }
 
-// Отслеживаем, какой вопрос виден в окне (для смены текущего индекса)
+// Intersection Observer для отслеживания видимого вопроса
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {

@@ -43,15 +43,16 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, from, next) => {
+// Исправленный navigation guard – без вызова next(), возвращаем значение напрямую
+router.beforeEach((to, from) => {
     const isAuthenticated = auth.isAuthenticated()
     if (to.meta.requiresAuth && !isAuthenticated) {
-        next('/login')
-    } else if (to.meta.requiresGuest && isAuthenticated) {
-        next('/exams')
-    } else {
-        next()
+        return '/login'
     }
+    if (to.meta.requiresGuest && isAuthenticated) {
+        return '/exams'
+    }
+    return true
 })
 
 export default router

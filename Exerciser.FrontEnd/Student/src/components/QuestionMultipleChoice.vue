@@ -13,8 +13,11 @@
                     :value="option"
                     v-model="selected"
                     @change="updateAnswer"
+                    :id="`q${question.id}_${option}`"
                 />
-                <label class="form-check-label">{{ option }}</label>
+                <label class="form-check-label" :for="`q${question.id}_${option}`">
+                    {{ option }}
+                </label>
             </div>
         </div>
     </div>
