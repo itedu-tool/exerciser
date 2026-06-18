@@ -7,13 +7,17 @@ block vars
 block content
     .card
         .card-header
-            h5.mb-0 🔍 Проверка работоспособности API
+            h5.mb-0
+                i.bi.bi-heart-pulse.me-2
+                | Проверка работоспособности API
         .card-body
             .list-group.mb-3
                 each endpoint in ['/health', '/', '/openapi/v1.json', '/scalar/v1', '/api/v1/health']
                     .list-group-item.d-flex.justify-content-between.align-items-center
                         code #{endpoint}
-                        button.btn.btn-sm.btn-outline-primary.test-btn(data-endpoint=endpoint) Проверить
+                        button.btn.btn-sm.btn-outline-primary.test-btn(data-endpoint=endpoint)
+                            i.bi.bi-play-circle.me-1
+                            | Проверить
             #healthResult
 
 block scripts

@@ -9,11 +9,17 @@ block content
         .col-md-12
             .card.mb-4
                 .card-header
-                    h5.mb-0 👥 Управление группами и студентами
+                    h5.mb-0
+                        i.bi.bi-people.me-2
+                        | Управление группами и студентами
                 .card-body
                     .d-flex.justify-content-between.mb-3
-                        button#createGroupBtn.btn.btn-success(type="button") + Новая группа
-                        button#importGroupBtn.btn.btn-info(type="button") 📂 Импорт группы (JSON)
+                        button#createGroupBtn.btn.btn-success(type="button")
+                            i.bi.bi-plus-circle.me-1
+                            | Новая группа
+                        button#importGroupBtn.btn.btn-info(type="button")
+                            i.bi.bi-folder-open.me-1
+                            | Импорт группы (JSON)
                     #groupsList
                         .text-muted Загрузка...
 
@@ -22,7 +28,9 @@ block content
         .modal-dialog
             .modal-content
                 .modal-header
-                    h5.modal-title Создать новую группу
+                    h5.modal-title
+                        i.bi.bi-person-plus.me-2
+                        | Создать новую группу
                     button.btn-close(type="button", data-bs-dismiss="modal")
                 .modal-body
                     form#createGroupForm
@@ -30,37 +38,49 @@ block content
                             label.form-label(for="groupName") Название группы *
                             input#groupName.form-control(type="text", required)
                 .modal-footer
-                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Отмена
-                    button.btn.btn-primary(type="submit") Создать
+                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal")
+                        i.bi.bi-x-circle.me-1
+                        | Отмена
+                    button.btn.btn-primary(type="submit")
+                        i.bi.bi-check-circle.me-1
+                        | Создать
 
     // Модальное окно импорта группы (файл)
     .modal.fade#importGroupModal(tabindex="-1")
         .modal-dialog
             .modal-content
                 .modal-header
-                    h5.modal-title Импорт группы из JSON
+                    h5.modal-title
+                        i.bi.bi-upload.me-2
+                        | Импорт группы из JSON
                     button.btn-close(type="button", data-bs-dismiss="modal")
                 .modal-body
                     form#importGroupForm
                         .mb-3
                             label.form-label(for="groupFile") JSON-файл группы
                             input#groupFile.form-control(type="file", accept=".json")
-
-                        button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Отмена
-                        button.btn.btn-primary(type="submit") Импортировать
-
+                        button.btn.btn-secondary(type="button", data-bs-dismiss="modal")
+                            i.bi.bi-x-circle.me-1
+                            | Отмена
+                        button.btn.btn-primary(type="submit")
+                            i.bi.bi-upload.me-1
+                            | Импортировать
 
     // Модальное окно просмотра/добавления студентов
     .modal.fade#studentsModal(tabindex="-1")
         .modal-dialog.modal-lg
             .modal-content
                 .modal-header
-                    h5.modal-title#studentsModalTitle Студенты группы
+                    h5.modal-title#studentsModalTitle
+                        i.bi.bi-person-lines-fill.me-2
+                        | Студенты группы
                     button.btn-close(type="button", data-bs-dismiss="modal")
                 .modal-body
                     #studentsContent
                     hr
-                    h6 Добавить нового студента
+                    h6
+                        i.bi.bi-person-add.me-2
+                        | Добавить нового студента
                     form#addStudentForm
                         input(type="hidden", id="currentGroupId")
                         .mb-2
@@ -72,9 +92,13 @@ block content
                         .mb-2
                             label.form-label(for="studentPatronymic") Отчество (необязательно)
                             input#studentPatronymic.form-control(type="text")
-                        button.btn.btn-primary(type="submit") Добавить студента
+                        button.btn.btn-primary(type="submit")
+                            i.bi.bi-person-plus.me-1
+                            | Добавить студента
                 .modal-footer
-                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Закрыть
+                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal")
+                        i.bi.bi-x-circle.me-1
+                        | Закрыть
 
 block scripts
     script(src="scripts/utils.js")

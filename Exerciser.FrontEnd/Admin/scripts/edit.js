@@ -24,7 +24,6 @@ async function loadExam() {
         console.log('[edit.js] Получен экзамен:', exam);
         document.getElementById('title').value = exam.title;
         document.getElementById('description').value = exam.description || '';
-        // Заполняем поля количества вопросов для показа
         document.getElementById('singleChoiceToShow').value = exam.singleChoiceToShow || 0;
         document.getElementById('multipleChoiceToShow').value = exam.multipleChoiceToShow || 0;
         document.getElementById('textInputToShow').value = exam.textInputToShow || 0;
@@ -55,11 +54,21 @@ function renderQuestions(questions) {
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong>Вопрос ${idx + 1}</strong>
                 <div>
-                    <button type="button" class="btn btn-sm btn-secondary move-up-btn" data-index="${idx}" ${idx === 0 ? 'disabled' : ''}>▲ Вверх</button>
-                    <button type="button" class="btn btn-sm btn-secondary move-down-btn" data-index="${idx}" ${idx === questions.length - 1 ? 'disabled' : ''}>▼ Вниз</button>
-                    <button type="button" class="btn btn-sm btn-info copy-question-btn" data-index="${idx}">📋 Копировать</button>
-                    <button type="button" class="btn btn-sm btn-primary preview-exam-btn" data-index="${idx}">👁️ Предпросмотр</button>
-                    <button type="button" class="btn btn-sm btn-danger delete-question-btn" data-index="${idx}">🗑️ Удалить</button>
+                    <button type="button" class="btn btn-sm btn-secondary move-up-btn" data-index="${idx}" ${idx === 0 ? 'disabled' : ''}>
+                        <i class="bi bi-arrow-up"></i> Вверх
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary move-down-btn" data-index="${idx}" ${idx === questions.length - 1 ? 'disabled' : ''}>
+                        <i class="bi bi-arrow-down"></i> Вниз
+                    </button>
+                    <button type="button" class="btn btn-sm btn-info copy-question-btn" data-index="${idx}">
+                        <i class="bi bi-copy"></i> Копировать
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary preview-exam-btn" data-index="${idx}">
+                        <i class="bi bi-eye"></i> Предпросмотр
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger delete-question-btn" data-index="${idx}">
+                        <i class="bi bi-trash3"></i> Удалить
+                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -171,14 +180,16 @@ function renderOptions(q, qIdx) {
                     </div>
                     <input type="text" class="form-control option-text" value="${escapeHtml(opt)}" data-qidx="${qIdx}" data-oidx="${optIdx}">
                     <button class="btn btn-outline-danger remove-option-btn" type="button" data-qidx="${qIdx}" data-oidx="${optIdx}" title="Удалить вариант">
-                        🗑️
+                        <i class="bi bi-trash3"></i>
                     </button>
                 </div>
             `
         )
         .join('')}
         </div>
-        <button type="button" class="btn btn-sm btn-secondary add-option-btn mt-1" data-qidx="${qIdx}">+ Добавить вариант</button>
+        <button type="button" class="btn btn-sm btn-secondary add-option-btn mt-1" data-qidx="${qIdx}">
+            <i class="bi bi-plus-circle"></i> Добавить вариант
+        </button>
     `;
 }
 
@@ -403,7 +414,6 @@ async function saveExam() {
         return;
     }
 
-    // Проверка, что количество вопросов для показа не превышает доступное
     const singleAvailable = questions.filter(q => q.type === 'SingleChoice').length;
     const multipleAvailable = questions.filter(q => q.type === 'MultipleChoice').length;
     const textAvailable = questions.filter(q => q.type === 'TextInput').length;

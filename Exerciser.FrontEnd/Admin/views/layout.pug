@@ -3,9 +3,14 @@ html(lang="ru")
     head
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
         title Exerciser – #{title}
+
         link#theme-stylesheet(rel="stylesheet", href="https://bootswatch.com/5/flatly/bootstrap.min.css")
+        link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
+
         include includes/config.pug
+
         block head
     body
         block vars
@@ -13,23 +18,37 @@ html(lang="ru")
             - var currentPage = ""
         nav.navbar.navbar-expand-lg.bg-dark(data-bs-theme="dark")
             .container-fluid
-                a.navbar-brand(href="index.html") 📚 Exerciser
+                a.navbar-brand(href="index.html")
+                    i.bi.bi-book.me-2
+                    | Exerciser
                 button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarNav")
                     span.navbar-toggler-icon
                 .collapse.navbar-collapse(id="navbarNav")
                     ul.navbar-nav.ms-auto
                         li.nav-item
-                            a.nav-link(href="index.html", class=currentPage === 'index' ? 'active' : '') Главная
+                            a.nav-link(href="index.html", class=currentPage === 'index' ? 'active' : '')
+                                i.bi.bi-house.me-1
+                                | Главная
                         li.nav-item
-                            a.nav-link(href="teacher.html", class=currentPage === 'teacher' ? 'active' : '') Экзамены
+                            a.nav-link(href="teacher.html", class=currentPage === 'teacher' ? 'active' : '')
+                                i.bi.bi-journal.me-1
+                                | Экзамены
                         li.nav-item
-                            a.nav-link(href="groups.html", class=currentPage === 'groups' ? 'active' : '') Группы
+                            a.nav-link(href="groups.html", class=currentPage === 'groups' ? 'active' : '')
+                                i.bi.bi-people.me-1
+                                | Группы
                         li.nav-item
-                            a.nav-link(href="analytics.html", class=currentPage === 'analytics' ? 'active' : '') 📊 Аналитика
+                            a.nav-link(href="analytics.html", class=currentPage === 'analytics' ? 'active' : '')
+                                i.bi.bi-bar-chart.me-1
+                                | Аналитика
                         li.nav-item
-                            a.nav-link(href="health.html", class=currentPage === 'health' ? 'active' : '') Диагностика API
+                            a.nav-link(href="health.html", class=currentPage === 'health' ? 'active' : '')
+                                i.bi.bi-heart-pulse.me-1
+                                | Диагностика API
                         li.nav-item.dropdown
-                            a.nav-link.dropdown-toggle(href="#", role="button", data-bs-toggle="dropdown") 🎨 Тема
+                            a.nav-link.dropdown-toggle(href="#", role="button", data-bs-toggle="dropdown")
+                                i.bi.bi-palette.me-1
+                                | Тема
                             ul.dropdown-menu.dropdown-menu-end#theme-selector
         main.container.mt-4
             block content

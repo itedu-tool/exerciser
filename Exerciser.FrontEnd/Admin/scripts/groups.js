@@ -188,7 +188,9 @@ function renderGroupsList(groups) {
                     <div class="small text-muted">Студентов: ${group.students.length}</div>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-info view-students-btn" data-id="${group.id}" data-name="${escapeHtml(group.name)}">👥 Студенты</button>
+                    <button class="btn btn-sm btn-info view-students-btn" data-id="${group.id}" data-name="${escapeHtml(group.name)}">
+                        <i class="bi bi-people"></i> Студенты
+                    </button>
                 </div>
             </div>
         </div>
@@ -227,7 +229,7 @@ async function showGroupStudents(groupId) {
         }
         container.innerHTML = `
             <ul class="list-group">
-                ${group.students.map((s) => `<li class="list-group-item">${escapeHtml(s.fullName)}</li>`).join('')}
+                ${group.students.map((s) => `<li class="list-group-item"><i class="bi bi-person me-2"></i>${escapeHtml(s.fullName)}</li>`).join('')}
             </ul>
         `;
     } catch (err) {

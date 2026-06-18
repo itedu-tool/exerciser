@@ -105,9 +105,15 @@ function renderExamsList(exams) {
                     <div class="small">Создан: ${new Date(exam.createdAt).toLocaleString()}</div>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-info view-btn" data-id="${exam.id}">👁️ Просмотр</button>
-                    <button class="btn btn-sm btn-warning edit-btn" data-id="${exam.id}">✏️ Редактировать</button>
-                    <button class="btn btn-sm btn-danger delete-btn" data-id="${exam.id}">🗑️ Удалить</button>
+                    <button class="btn btn-sm btn-info view-btn" data-id="${exam.id}">
+                        <i class="bi bi-eye"></i> Просмотр
+                    </button>
+                    <button class="btn btn-sm btn-warning edit-btn" data-id="${exam.id}">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </button>
+                    <button class="btn btn-sm btn-danger delete-btn" data-id="${exam.id}">
+                        <i class="bi bi-trash3"></i> Удалить
+                    </button>
                 </div>
             </div>
         </div>

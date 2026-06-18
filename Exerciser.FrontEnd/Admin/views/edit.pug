@@ -2,12 +2,14 @@ extends layout
 
 block vars
     - var title = "Редактирование экзамена"
-    - var currentPage = "edit"
+    - var currentPage = "teacher"
 
 block content
     .card
         .card-header
-            h5.mb-0 ✏️ Редактирование экзамена
+            h5.mb-0
+                i.bi.bi-pencil-square.me-2
+                | Редактирование экзамена
         .card-body
             form#examForm
                 .mb-3
@@ -16,37 +18,47 @@ block content
                 .mb-3
                     label.form-label(for="description") Описание
                     textarea#description.form-control(rows="2")
-                hr
-                h5 Настройка количества вопросов для тестирования (0 = все)
                 .row.mb-3
                     .col-md-4
-                        label.form-label(for="singleChoiceToShow") 🔘 SingleChoice
+                        label.form-label(for="singleChoiceToShow") SingleChoice (показывать)
                         input#singleChoiceToShow.form-control(type="number", min="0", value="0")
+                        small.text-muted 0 = все
                     .col-md-4
-                        label.form-label(for="multipleChoiceToShow") ☑️ MultipleChoice
+                        label.form-label(for="multipleChoiceToShow") MultipleChoice (показывать)
                         input#multipleChoiceToShow.form-control(type="number", min="0", value="0")
+                        small.text-muted 0 = все
                     .col-md-4
-                        label.form-label(for="textInputToShow") ✏️ TextInput
+                        label.form-label(for="textInputToShow") TextInput (показывать)
                         input#textInputToShow.form-control(type="number", min="0", value="0")
+                        small.text-muted 0 = все
                 hr
-                h4 Вопросы
+                h5
+                    i.bi.bi-question-circle.me-2
+                    | Вопросы
                 #questionsContainer
+                    .text-muted Загрузка...
                 .mt-3
-                    button#addQuestionBtn.btn.btn-outline-primary(type="button") + Добавить вопрос
-                hr
-                .d-flex.justify-content-between
-                    button.btn.btn-secondary(type="button", onclick="history.back()") Отмена
-                    button#saveBtn.btn.btn-primary(type="submit") Сохранить изменения
+                    button#addQuestionBtn.btn.btn-secondary(type="button")
+                        i.bi.bi-plus-circle.me-1
+                        | Добавить вопрос
+                    button.btn.btn-success(type="submit")
+                        i.bi.bi-save.me-1
+                        | Сохранить экзамен
 
+    // Модальное окно предпросмотра
     .modal.fade#previewModal(tabindex="-1")
         .modal-dialog.modal-lg
             .modal-content
                 .modal-header
-                    h5.modal-title Предпросмотр экзамена
+                    h5.modal-title
+                        i.bi.bi-eye.me-2
+                        | Предпросмотр экзамена
                     button.btn-close(type="button", data-bs-dismiss="modal")
                 .modal-body#previewContent
                 .modal-footer
-                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Закрыть
+                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal")
+                        i.bi.bi-x-circle.me-1
+                        | Закрыть
 
 block scripts
     script(src="scripts/utils.js")

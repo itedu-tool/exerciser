@@ -7,7 +7,9 @@ block vars
 block content
     .card
         .card-header
-            h5.mb-0 📊 Аналитика по студентам (последние попытки)
+            h5.mb-0
+                i.bi.bi-bar-chart-fill.me-2
+                | Аналитика по студентам (последние попытки)
         .card-body
             .row.mb-3
                 .col-md-4
@@ -20,7 +22,9 @@ block content
                         option(value="") Все экзамены
                 .col-md-4
                     label.form-label &nbsp;
-                    button#clearFiltersBtn.btn.btn-outline-secondary.w-100 Сбросить фильтры
+                    button#clearFiltersBtn.btn.btn-outline-secondary.w-100
+                        i.bi.bi-arrow-counterclockwise.me-1
+                        | Сбросить фильтры
 
             #analyticsResult
                 .text-muted Загрузка...
