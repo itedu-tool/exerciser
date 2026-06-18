@@ -3,6 +3,7 @@
 @examsUrl = {{baseUrlWithVersion}}/exams
 @attemptsUrl = {{baseUrlWithVersion}}/attempts
 @groupsUrl = {{baseUrlWithVersion}}/groups
+@analyticsUrl = {{baseUrlWithVersion}}/analytics
 
 ### Проверка корневого эндпоинта
 GET {{baseUrl}}/
@@ -23,6 +24,12 @@ Accept: application/json
 ### Доступ к Scalar UI (проверка, что UI загружается)
 GET {{baseUrl}}/scalar/v1
 Accept: text/html
+
+### ==================== Аналитика ====================
+
+### Получить последние завершённые попытки по каждому студенту и экзамену
+GET {{analyticsUrl}}/attempts/last
+Accept: application/json
 
 ### ==================== Администрирование экзаменов ====================
 
@@ -56,7 +63,10 @@ Content-Type: application/json
 {
   "title": "Обновлённое название",
   "description": "Новое описание",
-  "questions": []
+  "questions": [],
+  "singleChoiceToShow": 0,
+  "multipleChoiceToShow": 0,
+  "textInputToShow": 0
 }
 
 ### ==================== Управление группами и студентами ====================
@@ -132,7 +142,7 @@ Content-Type: application/json
 
 {
   "totalScore": 5,
-  "finishedAt": "2026-06-11T12:00:00Z",
+  "finishedAt": "2026-06-18T12:00:00Z",
   "answers": [
     {
       "questionId": "019eabf3-12fe-7542-8285-ccc4d5a260ee",
