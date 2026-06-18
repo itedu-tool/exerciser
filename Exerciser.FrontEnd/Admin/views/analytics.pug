@@ -1,0 +1,41 @@
+extends layout
+
+block vars
+    - var title = "Аналитика студентов"
+    - var currentPage = "analytics"
+
+block content
+    .card
+        .card-header
+            h5.mb-0 📊 Аналитика по студентам (последние попытки)
+        .card-body
+            .row.mb-3
+                .col-md-4
+                    label.form-label(for="groupFilter") Фильтр по группе
+                    select#groupFilter.form-select
+                        option(value="") Все группы
+                .col-md-4
+                    label.form-label(for="examFilter") Фильтр по экзамену
+                    select#examFilter.form-select
+                        option(value="") Все экзамены
+                .col-md-4
+                    label.form-label &nbsp;
+                    button#clearFiltersBtn.btn.btn-outline-secondary.w-100 Сбросить фильтры
+
+            #analyticsResult
+                .text-muted Загрузка...
+            table.table.table-striped.table-hover.d-none#analyticsTable
+                thead
+                    tr
+                        th.sortable(data-sort="studentFullName") Студент
+                        th.sortable(data-sort="groupName") Группа
+                        th.sortable(data-sort="examTitle") Экзамен
+                        th.sortable(data-sort="score") Баллы
+                        th.sortable(data-sort="percent") %
+                        th.sortable(data-sort="finishedAt") Дата завершения
+                        th.sortable(data-sort="duration") Время (мин)
+                tbody#analyticsBody
+
+block scripts
+    script(src="scripts/utils.js")
+    script(src="scripts/analytics.js")

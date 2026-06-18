@@ -860,6 +860,51 @@ attemptsGroup.MapPost($"/{{id:guid}}/finish",
 
     #endregion
 
+    #region Аналитика
+    
+    RouteGroupBuilder analyticsGroup = app.MapGroup($"{apiV1Prefix}/analytics")
+        .WithTags("Analytics")
+        .RequireRateLimiting("fixed");
+    
+    // GET /api/v1/analytics/attempts/last - Последние завершённые попытки по каждому студенту и экзамену
+    analyticsGroup.MapGet("/attempts/last", async (IAttemptRepository attemptRepo) =>
+    {
+        var attempts = await attemptRepo.GetLastFinishedAttemptsByStudentAndExamAsync();
+        var result = attempts.Select(a =>
+        {
+            // Вычисляем максимальный балл для этого экзамена (на основе снимка вопросов)
+            int maxScore = a.Exam.Questions.Sum(q =>
+                q.Type == "SingleChoice" ? 1 :
+                q.Type == "MultipleChoice" ? q.CorrectAnswers.Count :
+                3);
+            int percent = maxScore > 0 ? (int)Math.Round((double)a.TotalScore / maxScore * 100) : 0;
+            int durationMinutes = a.FinishedAt.HasValue && a.StartedAt != default
+                ? (int)Math.Round((a.FinishedAt.Value - a.StartedAt).TotalMinutes)
+                : 0;
+    
+            return new AttemptAnalyticsDto
+            {
+                AttemptId = a.Id,
+                StudentFullName = a.Student.FullName,
+                GroupName = a.Student.GroupName,
+                ExamTitle = a.Exam.Title,
+                TotalScore = a.TotalScore,
+                MaxPossibleScore = maxScore,
+                Percent = percent,
+                FinishedAt = a.FinishedAt ?? a.StartedAt,
+                DurationMinutes = durationMinutes
+            };
+        });
+    
+        return Results.Ok(result);
+    })
+    .WithName("GetLastAttemptsAnalytics")
+    .WithSummary("Последние завершённые попытки по каждому студенту и экзамену")
+    .WithDescription("Возвращает последнюю завершённую попытку для каждой комбинации студент + экзамен.")
+    .Produces<List<AttemptAnalyticsDto>>(StatusCodes.Status200OK);
+    
+    #endregion
+    
     #endregion
 
     #region Запуск приложения
