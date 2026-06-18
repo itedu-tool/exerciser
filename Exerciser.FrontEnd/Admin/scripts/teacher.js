@@ -101,7 +101,7 @@ function renderExamsList(exams) {
                         Вопросов в базе: ${exam.questionsCount}
                         (🔘 ${exam.singleChoiceCount} | ☑️ ${exam.multipleChoiceCount} | ✏️ ${exam.textInputCount})
                     </div>
-                    <div class="small">Показывать студенту: ${exam.questionsToShow} из ${exam.questionsCount}</div>
+                    <div class="small">Показывать студенту: 🔘 ${exam.singleChoiceToShow === 0 ? 'все' : exam.singleChoiceToShow} / ☑️ ${exam.multipleChoiceToShow === 0 ? 'все' : exam.multipleChoiceToShow} / ✏️ ${exam.textInputToShow === 0 ? 'все' : exam.textInputToShow}</div>
                     <div class="small">Создан: ${new Date(exam.createdAt).toLocaleString()}</div>
                 </div>
                 <div>
@@ -172,6 +172,7 @@ function renderExamDetails(exam) {
         <h3>${escapeHtml(exam.title)}</h3>
         <p><strong>Описание:</strong> ${escapeHtml(exam.description || '—')}</p>
         <p><strong>Дата создания:</strong> ${new Date(exam.createdAt).toLocaleString()}</p>
+        <p><strong>Показывать студенту:</strong> 🔘 ${exam.singleChoiceToShow === 0 ? 'все' : exam.singleChoiceToShow} / ☑️ ${exam.multipleChoiceToShow === 0 ? 'все' : exam.multipleChoiceToShow} / ✏️ ${exam.textInputToShow === 0 ? 'все' : exam.textInputToShow}</p>
         <hr>
         <h4>Вопросы (${exam.questions.length})</h4>
         <div class="accordion" id="questionsAccordion">
