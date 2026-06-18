@@ -1,38 +1,41 @@
 <template>
     <div>
-        <h2>Доступные экзамены</h2>
-        <div v-if="loading" class="text-center">
-            <div class="spinner-border" role="status"></div>
-        </div>
-        <div v-else-if="exams.length === 0" class="alert alert-info">
-            Нет доступных экзаменов.
-        </div>
-        <div v-else class="list-group">
-            <div v-for="exam in exams" :key="exam.id" class="list-group-item">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                        <h5 class="mb-1">{{ exam.title }}</h5>
-                        <p class="mb-1 text-muted">{{ exam.description || 'Без описания' }}</p>
-                        <div class="small">
-                            <div>📚 Всего вопросов: {{ exam.questionsCount }}
-                                <span class="ms-2">🔘 {{ exam.singleChoiceCount }}</span>
-                                <span class="ms-2">☑️ {{ exam.multipleChoiceCount }}</span>
-                                <span class="ms-2">✏️ {{ exam.textInputCount }}</span>
-                            </div>
-                            <div class="mt-1 text-primary">
-                                🎯 Вам будет показано:
-                                <span class="ms-1">🔘 {{ formatToShow(exam.singleChoiceToShow, exam.singleChoiceCount) }}</span>
-                                <span class="ms-2">☑️ {{ formatToShow(exam.multipleChoiceToShow, exam.multipleChoiceCount) }}</span>
-                                <span class="ms-2">✏️ {{ formatToShow(exam.textInputToShow, exam.textInputCount) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary ms-3" @click="startExam(exam.id)" :disabled="startingExam === exam.id">
-                        {{ startingExam === exam.id ? 'Загрузка...' : 'Начать' }}
-                    </button>
-                </div>
+        <h1 class="h2"><i class="bi bi-list-ul me-2"></i>Доступные экзамены</h1>
+        <div v-if="loading" class="text-center" aria-live="polite">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Загрузка...</span>
             </div>
         </div>
+        <div v-else-if="exams.length === 0" class="alert alert-info" role="status">
+            Нет доступных экзаменов.
+        </div>
+        <ul v-else class="list-group">
+            <li v-for="exam in exams" :key="exam.id" class="list-group-item d-flex justify-content-between align-items-start flex-wrap">
+                <div class="flex-grow-1">
+                    <h2 class="h5 mb-1">{{ exam.title }}</h2>
+                    <p class="mb-1 text-muted">{{ exam.description || 'Без описания' }}</p>
+                    <div class="small">
+                        <div>
+                            <i class="bi bi-book me-1"></i> Всего вопросов: {{ exam.questionsCount }}
+                            <span class="ms-2"><i class="bi bi-circle me-1"></i>{{ exam.singleChoiceCount }}</span>
+                            <span class="ms-2"><i class="bi bi-check2-square me-1"></i>{{ exam.multipleChoiceCount }}</span>
+                            <span class="ms-2"><i class="bi bi-pencil me-1"></i>{{ exam.textInputCount }}</span>
+                        </div>
+                        <div class="mt-1 text-primary">
+                            <i class="bi bi-bullseye me-1"></i> Вам будет показано:
+                            <span class="ms-1"><i class="bi bi-circle me-1"></i>{{ formatToShow(exam.singleChoiceToShow, exam.singleChoiceCount) }}</span>
+                            <span class="ms-2"><i class="bi bi-check2-square me-1"></i>{{ formatToShow(exam.multipleChoiceToShow, exam.multipleChoiceCount) }}</span>
+                            <span class="ms-2"><i class="bi bi-pencil me-1"></i>{{ formatToShow(exam.textInputToShow, exam.textInputCount) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary ms-3" @click="startExam(exam.id)" :disabled="startingExam === exam.id">
+                    <i v-if="startingExam === exam.id" class="bi bi-hourglass-split me-1"></i>
+                    <i v-else class="bi bi-play-circle me-1"></i>
+                    {{ startingExam === exam.id ? 'Загрузка...' : 'Начать' }}
+                </button>
+            </li>
+        </ul>
     </div>
 </template>
 

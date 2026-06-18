@@ -1,7 +1,7 @@
 <template>
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            🎨 Тема
+            <i class="bi bi-palette me-1"></i> Тема
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
             <li v-for="theme in themes" :key="theme.id">
@@ -38,7 +38,6 @@ function loadSavedTheme() {
             return found.url
         }
     }
-    // По умолчанию – Flatly
     const defaultTheme = themes.find(t => t.id === 'flatly') || themes[0]
     currentThemeId.value = defaultTheme.id
     return defaultTheme.url

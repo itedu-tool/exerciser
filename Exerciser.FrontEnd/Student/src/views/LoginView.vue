@@ -1,35 +1,43 @@
 <template>
     <div class="row justify-content-center">
         <div class="col-md-6">
+            <h1 class="visually-hidden">Вход в систему</h1>
             <div class="card">
                 <div class="card-header">
-                    <h4 class="mb-0">Вход в систему тестирования</h4>
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Вход в систему тестирования
+                    </h2>
                 </div>
                 <div class="card-body">
                     <form @submit.prevent="handleLogin">
-                        <div class="mb-3">
-                            <label class="form-label">Группа</label>
-                            <select class="form-select" v-model="selectedGroupId" required>
-                                <option value="">Выберите группу</option>
-                                <option v-for="group in groups" :key="group.id" :value="group.id">
-                                    {{ group.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Студент</label>
-                            <select class="form-select" v-model="selectedStudentId" :disabled="!selectedGroupId" required>
-                                <option value="">Выберите студента</option>
-                                <option v-for="student in students" :key="student.id" :value="student.id">
-                                    {{ student.fullName }}
-                                </option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100" :disabled="!selectedGroupId || !selectedStudentId || loading">
-                            {{ loading ? 'Вход...' : 'Войти' }}
-                        </button>
+                        <fieldset>
+                            <legend class="visually-hidden">Данные для входа</legend>
+                            <div class="mb-3">
+                                <label class="form-label" for="groupSelect">Группа</label>
+                                <select id="groupSelect" class="form-select" v-model="selectedGroupId" required aria-required="true">
+                                    <option value="">Выберите группу</option>
+                                    <option v-for="group in groups" :key="group.id" :value="group.id">
+                                        {{ group.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="studentSelect">Студент</label>
+                                <select id="studentSelect" class="form-select" v-model="selectedStudentId" :disabled="!selectedGroupId" required aria-required="true">
+                                    <option value="">Выберите студента</option>
+                                    <option v-for="student in students" :key="student.id" :value="student.id">
+                                        {{ student.fullName }}
+                                    </option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100" :disabled="!selectedGroupId || !selectedStudentId || loading">
+                                <i v-if="loading" class="bi bi-hourglass-split me-1"></i>
+                                <i v-else class="bi bi-box-arrow-in-right me-1"></i>
+                                {{ loading ? 'Вход...' : 'Войти' }}
+                            </button>
+                        </fieldset>
                     </form>
-                    <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
+                    <div v-if="error" class="alert alert-danger mt-3" role="alert">{{ error }}</div>
                 </div>
             </div>
         </div>

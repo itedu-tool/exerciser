@@ -5,36 +5,56 @@ html(lang="ru")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Exerciser – #{title}
         link#theme-stylesheet(rel="stylesheet", href="https://bootswatch.com/5/flatly/bootstrap.min.css")
+        link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
         include includes/config.pug
         block head
     body
         block vars
             - var title = "Exerciser"
             - var currentPage = ""
-        nav.navbar.navbar-expand-lg.bg-dark(data-bs-theme="dark")
+        a.skip-link(href="#main-content") Перейти к содержимому
+        nav.navbar.navbar-expand-lg.bg-dark(data-bs-theme="dark" aria-label="Основная навигация")
             .container-fluid
-                a.navbar-brand(href="index.html") 📚 Exerciser
-                button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarNav")
+                a.navbar-brand(href="index.html")
+                    i.bi.bi-book.me-2
+                    | Exerciser
+                button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarNav", aria-controls="navbarNav", aria-expanded="false", aria-label="Переключить навигацию")
                     span.navbar-toggler-icon
                 .collapse.navbar-collapse(id="navbarNav")
                     ul.navbar-nav.ms-auto
                         li.nav-item
-                            a.nav-link(href="index.html", class=currentPage === 'index' ? 'active' : '') Главная
+                            a.nav-link(href="index.html", class=currentPage === 'index' ? 'active' : '', aria-current=currentPage === 'index' ? 'page' : undefined)
+                                i.bi.bi-house.me-1
+                                | Главная
                         li.nav-item
-                            a.nav-link(href="teacher.html", class=currentPage === 'teacher' ? 'active' : '') Экзамены
+                            a.nav-link(href="teacher.html", class=currentPage === 'teacher' ? 'active' : '', aria-current=currentPage === 'teacher' ? 'page' : undefined)
+                                i.bi.bi-journal.me-1
+                                | Экзамены
                         li.nav-item
-                            a.nav-link(href="groups.html", class=currentPage === 'groups' ? 'active' : '') Группы
+                            a.nav-link(href="groups.html", class=currentPage === 'groups' ? 'active' : '', aria-current=currentPage === 'groups' ? 'page' : undefined)
+                                i.bi.bi-people.me-1
+                                | Группы
                         li.nav-item
-                            a.nav-link(href="analytics.html", class=currentPage === 'analytics' ? 'active' : '') 📊 Аналитика
+                            a.nav-link(href="analytics.html", class=currentPage === 'analytics' ? 'active' : '', aria-current=currentPage === 'analytics' ? 'page' : undefined)
+                                i.bi.bi-bar-chart.me-1
+                                | Аналитика
                         li.nav-item
-                            a.nav-link(href="health.html", class=currentPage === 'health' ? 'active' : '') Диагностика API
+                            a.nav-link(href="health.html", class=currentPage === 'health' ? 'active' : '', aria-current=currentPage === 'health' ? 'page' : undefined)
+                                i.bi.bi-heart-pulse.me-1
+                                | Диагностика API
                         li.nav-item.dropdown
-                            a.nav-link.dropdown-toggle(href="#", role="button", data-bs-toggle="dropdown") 🎨 Тема
+                            a.nav-link.dropdown-toggle(href="#", role="button", data-bs-toggle="dropdown", aria-expanded="false")
+                                i.bi.bi-palette.me-1
+                                | Тема
                             ul.dropdown-menu.dropdown-menu-end#theme-selector
-        main.container.mt-4
+        main.container.mt-4#main-content
+            h1.visually-hidden #{title}
             block content
         footer.text-center.mt-5.py-3.text-muted.border-top
-            p.mb-0 © 2026 Exerciser – система тестирования студентов
+            p.mb-0
+                | ©
+                time(datetime="2026") 2026
+                |  Exerciser – система тестирования студентов
                 a.ms-2(href="https://github.com/itedu-tool/exerciser") GitHub
         script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
         script.
