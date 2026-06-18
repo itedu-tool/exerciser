@@ -45,53 +45,107 @@ function renderQuestions(questions) {
     if (questions.length === 0) {
         container.innerHTML =
             '<div class="alert alert-info">Нет вопросов. Добавьте первый вопрос.</div>';
+        return;
     }
     questions.forEach((q, idx) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'card mb-3';
-        questionDiv.dataset.index = idx;
-        questionDiv.innerHTML = `
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>Вопрос ${idx + 1}</strong>
-                <div>
-                    <button type="button" class="btn btn-sm btn-secondary move-up-btn" data-index="${idx}" ${idx === 0 ? 'disabled' : ''}>
-                        <i class="bi bi-arrow-up"></i> Вверх
-                    </button>
-                    <button type="button" class="btn btn-sm btn-secondary move-down-btn" data-index="${idx}" ${idx === questions.length - 1 ? 'disabled' : ''}>
-                        <i class="bi bi-arrow-down"></i> Вниз
-                    </button>
-                    <button type="button" class="btn btn-sm btn-info copy-question-btn" data-index="${idx}">
-                        <i class="bi bi-copy"></i> Копировать
-                    </button>
-                    <button type="button" class="btn btn-sm btn-primary preview-exam-btn" data-index="${idx}">
-                        <i class="bi bi-eye"></i> Предпросмотр
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger delete-question-btn" data-index="${idx}">
-                        <i class="bi bi-trash3"></i> Удалить
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="mb-2">
-                    <label class="form-label">Текст вопроса</label>
-                    <input type="text" class="form-control question-text" value="${escapeHtml(q.text)}">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Тип вопроса</label>
-                    <select class="form-select question-type" data-index="${idx}">
-                        <option value="SingleChoice" ${q.type === 'SingleChoice' ? 'selected' : ''}>Один вариант</option>
-                        <option value="MultipleChoice" ${q.type === 'MultipleChoice' ? 'selected' : ''}>Несколько вариантов</option>
-                        <option value="TextInput" ${q.type === 'TextInput' ? 'selected' : ''}>Ввод текста</option>
-                    </select>
-                </div>
-                <div class="options-container" data-index="${idx}">
-                    ${renderOptions(q, idx)}
-                </div>
+        const fieldset = document.createElement('fieldset');
+        fieldset.className = 'card mb-3';
+        fieldset.dataset.index = idx;
+
+        const legend = document.createElement('legend');
+        legend.className = 'card-header d-flex justify-content-between align-items-center';
+        legend.innerHTML = `
+            <strong>Вопрос ${idx + 1}</strong>
+            <div>
+                <button type="button" class="btn btn-sm btn-secondary move-up-btn" data-index="${idx}" ${idx === 0 ? 'disabled' : ''}>
+                    <i class="bi bi-arrow-up"></i> Вверх
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary move-down-btn" data-index="${idx}" ${idx === questions.length - 1 ? 'disabled' : ''}>
+                    <i class="bi bi-arrow-down"></i> Вниз
+                </button>
+                <button type="button" class="btn btn-sm btn-info copy-question-btn" data-index="${idx}">
+                    <i class="bi bi-copy"></i> Копировать
+                </button>
+                <button type="button" class="btn btn-sm btn-primary preview-exam-btn" data-index="${idx}">
+                    <i class="bi bi-eye"></i> Предпросмотр
+                </button>
+                <button type="button" class="btn btn-sm btn-danger delete-question-btn" data-index="${idx}">
+                    <i class="bi bi-trash3"></i> Удалить
+                </button>
             </div>
         `;
-        container.appendChild(questionDiv);
+        fieldset.appendChild(legend);
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        body.innerHTML = `
+            <div class="mb-2">
+                <label class="form-label" for="qtext_${idx}">Текст вопроса</label>
+                <input type="text" id="qtext_${idx}" class="form-control question-text" value="${escapeHtml(q.text)}">
+            </div>
+            <div class="mb-2">
+                <label class="form-label" for="qtype_${idx}">Тип вопроса</label>
+                <select id="qtype_${idx}" class="form-select question-type" data-index="${idx}">
+                    <option value="SingleChoice" ${q.type === 'SingleChoice' ? 'selected' : ''}>Один вариант</option>
+                    <option value="MultipleChoice" ${q.type === 'MultipleChoice' ? 'selected' : ''}>Несколько вариантов</option>
+                    <option value="TextInput" ${q.type === 'TextInput' ? 'selected' : ''}>Ввод текста</option>
+                </select>
+            </div>
+            <div class="options-container" data-index="${idx}">
+                ${renderOptions(q, idx)}
+            </div>
+        `;
+        fieldset.appendChild(body);
+        container.appendChild(fieldset);
     });
 
+    attachEventListeners();
+}
+
+function renderOptions(q, qIdx) {
+    if (q.type === 'TextInput') {
+        const correct = q.correctAnswers && q.correctAnswers[0] ? q.correctAnswers[0] : '';
+        return `
+            <div class="mb-2">
+                <label class="form-label" for="correct_${qIdx}">Правильный ответ (текст)</label>
+                <input type="text" id="correct_${qIdx}" class="form-control correct-text-input" value="${escapeHtml(correct)}" data-qidx="${qIdx}">
+            </div>
+        `;
+    }
+
+    const options = q.options || [];
+    const correctSet = new Set(q.correctAnswers || []);
+    const inputType = q.type === 'SingleChoice' ? 'radio' : 'checkbox';
+
+    let html = `<label class="form-label">Варианты ответов</label><div class="options-list">`;
+    options.forEach((opt, optIdx) => {
+        const inputId = `opt_${qIdx}_${optIdx}`;
+        html += `
+            <div class="input-group mb-1">
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0 correct-checkbox"
+                           type="${inputType}"
+                           name="correct_${qIdx}"
+                           value="${escapeHtml(opt)}"
+                           ${correctSet.has(opt) ? 'checked' : ''}
+                           data-qidx="${qIdx}" data-opt="${escapeHtml(opt)}"
+                           id="${inputId}">
+                </div>
+                <input type="text" class="form-control option-text" value="${escapeHtml(opt)}" data-qidx="${qIdx}" data-oidx="${optIdx}" aria-label="Вариант ${optIdx+1}">
+                <button class="btn btn-outline-danger remove-option-btn" type="button" data-qidx="${qIdx}" data-oidx="${optIdx}" title="Удалить вариант">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        `;
+    });
+    html += `</div>
+        <button type="button" class="btn btn-sm btn-secondary add-option-btn mt-1" data-qidx="${qIdx}">
+            <i class="bi bi-plus-circle"></i> Добавить вариант
+        </button>`;
+    return html;
+}
+
+function attachEventListeners() {
     document.querySelectorAll('.move-up-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.index);
@@ -128,7 +182,6 @@ function renderQuestions(questions) {
             renderQuestions(questions);
         });
     });
-
     document.querySelectorAll('.question-type').forEach((select) => {
         select.addEventListener('change', () => {
             const idx = parseInt(select.dataset.index);
@@ -144,56 +197,6 @@ function renderQuestions(questions) {
             renderQuestions(questions);
         });
     });
-
-    attachOptionHandlers();
-}
-
-function renderOptions(q, qIdx) {
-    if (q.type === 'TextInput') {
-        const correct = q.correctAnswers && q.correctAnswers[0] ? q.correctAnswers[0] : '';
-        return `
-            <div class="mb-2">
-                <label class="form-label">Правильный ответ (текст)</label>
-                <input type="text" class="form-control correct-text-input" value="${escapeHtml(correct)}" data-qidx="${qIdx}">
-            </div>
-        `;
-    }
-
-    const options = q.options || [];
-    const correctSet = new Set(q.correctAnswers || []);
-    const inputType = q.type === 'SingleChoice' ? 'radio' : 'checkbox';
-
-    return `
-        <label class="form-label">Варианты ответов</label>
-        <div class="options-list">
-            ${options
-        .map(
-            (opt, optIdx) => `
-                <div class="input-group mb-1">
-                    <div class="input-group-text">
-                        <input class="form-check-input mt-0 correct-checkbox"
-                               type="${inputType}"
-                               name="correct_${qIdx}"
-                               value="${escapeHtml(opt)}"
-                               ${correctSet.has(opt) ? 'checked' : ''}
-                               data-qidx="${qIdx}" data-opt="${escapeHtml(opt)}">
-                    </div>
-                    <input type="text" class="form-control option-text" value="${escapeHtml(opt)}" data-qidx="${qIdx}" data-oidx="${optIdx}">
-                    <button class="btn btn-outline-danger remove-option-btn" type="button" data-qidx="${qIdx}" data-oidx="${optIdx}" title="Удалить вариант">
-                        <i class="bi bi-trash3"></i>
-                    </button>
-                </div>
-            `
-        )
-        .join('')}
-        </div>
-        <button type="button" class="btn btn-sm btn-secondary add-option-btn mt-1" data-qidx="${qIdx}">
-            <i class="bi bi-plus-circle"></i> Добавить вариант
-        </button>
-    `;
-}
-
-function attachOptionHandlers() {
     document.querySelectorAll('.remove-option-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const qIdx = parseInt(btn.dataset.qidx);
@@ -213,7 +216,6 @@ function attachOptionHandlers() {
             }
         });
     });
-
     document.querySelectorAll('.add-option-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const qIdx = parseInt(btn.dataset.qidx);
@@ -229,15 +231,15 @@ function attachOptionHandlers() {
 function getCurrentQuestionsFromDOM() {
     console.log('[edit.js] getCurrentQuestionsFromDOM()');
     const questions = [];
-    const questionCards = document.querySelectorAll('#questionsContainer .card');
-    for (let card of questionCards) {
-        const text = card.querySelector('.question-text').value.trim();
-        const type = card.querySelector('.question-type').value;
+    const questionFields = document.querySelectorAll('#questionsContainer fieldset');
+    for (let fieldset of questionFields) {
+        const text = fieldset.querySelector('.question-text').value.trim();
+        const type = fieldset.querySelector('.question-type').value;
         let options = [];
         let correctAnswers = [];
 
         if (type !== 'TextInput') {
-            const optionRows = card.querySelectorAll('.options-list .input-group');
+            const optionRows = fieldset.querySelectorAll('.options-list .input-group');
             for (let row of optionRows) {
                 const optionTextInput = row.querySelector('.option-text');
                 const optionText = optionTextInput ? optionTextInput.value.trim() : '';
@@ -248,7 +250,7 @@ function getCurrentQuestionsFromDOM() {
                 }
             }
         } else {
-            const correctInput = card.querySelector('.correct-text-input');
+            const correctInput = fieldset.querySelector('.correct-text-input');
             if (correctInput && correctInput.value.trim()) {
                 correctAnswers = [correctInput.value.trim()];
             }
@@ -319,32 +321,29 @@ function previewExam() {
         <hr>
         <h4>Вопросы (${questions.length})</h4>
         <div class="accordion" id="previewAccordion">
-            ${questions
-        .map((q, idx) => {
-            const typeLabel = getTypeLabel(q.type);
-            let optionsHtml = '';
-            if (q.type !== 'TextInput' && q.options && q.options.length) {
-                optionsHtml = `
+            ${questions.map((q, idx) => {
+        const typeLabel = getTypeLabel(q.type);
+        let optionsHtml = '';
+        if (q.type !== 'TextInput' && q.options && q.options.length) {
+            optionsHtml = `
                         <div class="mt-2"><strong>Варианты ответов:</strong></div>
                         <ul class="list-group mt-1">
-                            ${q.options
-                    .map((opt) => {
-                        const isCorrect = q.correctAnswers.includes(opt);
-                        return `<li class="list-group-item">${isCorrect ? '✅ ' : ''}${escapeHtml(opt)}</li>`;
-                    })
-                    .join('')}
+                            ${q.options.map((opt) => {
+                const isCorrect = q.correctAnswers.includes(opt);
+                return `<li class="list-group-item">${isCorrect ? '✅ ' : ''}${escapeHtml(opt)}</li>`;
+            }).join('')}
                         </ul>
                     `;
+        }
+        let correctHtml = '';
+        if (q.correctAnswers && q.correctAnswers.length) {
+            if (q.type === 'TextInput') {
+                correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильный ответ:</strong> ${escapeHtml(q.correctAnswers[0])}</div>`;
+            } else {
+                correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильные ответы:</strong> ${q.correctAnswers.map((c) => escapeHtml(c)).join(', ')}</div>`;
             }
-            let correctHtml = '';
-            if (q.correctAnswers && q.correctAnswers.length) {
-                if (q.type === 'TextInput') {
-                    correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильный ответ:</strong> ${escapeHtml(q.correctAnswers[0])}</div>`;
-                } else {
-                    correctHtml = `<div class="mt-2 text-success"><strong>✓ Правильные ответы:</strong> ${q.correctAnswers.map((c) => escapeHtml(c)).join(', ')}</div>`;
-                }
-            }
-            return `
+        }
+        return `
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="previewHeading${idx}">
                             <button class="accordion-button ${idx !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#previewCollapse${idx}" aria-expanded="${idx === 0 ? 'true' : 'false'}">
@@ -359,8 +358,7 @@ function previewExam() {
                         </div>
                     </div>
                 `;
-        })
-        .join('')}
+    }).join('')}
         </div>
     `;
     document.getElementById('previewContent').innerHTML = previewHtml;

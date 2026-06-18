@@ -38,7 +38,8 @@ async function importExam(file) {
     }
 }
 
-uploadBtn.addEventListener('click', async () => {
+uploadBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
     console.log('[teacher.js] Нажата кнопка "Загрузить"');
     if (!fileInput.files || fileInput.files.length === 0) {
         console.warn('[teacher.js] Файл не выбран');
@@ -89,51 +90,52 @@ function renderExamsList(exams) {
         showEmpty(examsListDiv, 'Нет доступных экзаменов. Загрузите первый экзамен через импорт.');
         return;
     }
-    examsListDiv.innerHTML = exams
-        .map(
-            (exam) => `
-        <div class="exam-item mb-2 p-2 border rounded">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div>
-                    <strong>${escapeHtml(exam.title)}</strong>
-                    <div class="small text-muted">${escapeHtml(exam.description || 'Без описания')}</div>
-                    <div class="small">
-                        Вопросов в базе: ${exam.questionsCount}
-                        (🔘 ${exam.singleChoiceCount} | ☑️ ${exam.multipleChoiceCount} | ✏️ ${exam.textInputCount})
-                    </div>
-                    <div class="small">Показывать студенту: 🔘 ${exam.singleChoiceToShow === 0 ? 'все' : exam.singleChoiceToShow} / ☑️ ${exam.multipleChoiceToShow === 0 ? 'все' : exam.multipleChoiceToShow} / ✏️ ${exam.textInputToShow === 0 ? 'все' : exam.textInputToShow}</div>
-                    <div class="small">Создан: ${new Date(exam.createdAt).toLocaleString()}</div>
+    const list = document.createElement('ul');
+    list.className = 'list-group';
+    exams.forEach(exam => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-start flex-wrap';
+        li.innerHTML = `
+            <div class="flex-grow-1">
+                <strong>${escapeHtml(exam.title)}</strong>
+                <div class="small text-muted">${escapeHtml(exam.description || 'Без описания')}</div>
+                <div class="small">
+                    Вопросов в базе: ${exam.questionsCount}
+                    (🔘 ${exam.singleChoiceCount} | ☑️ ${exam.multipleChoiceCount} | ✏️ ${exam.textInputCount})
                 </div>
-                <div>
-                    <button class="btn btn-sm btn-info view-btn" data-id="${exam.id}">
-                        <i class="bi bi-eye"></i> Просмотр
-                    </button>
-                    <button class="btn btn-sm btn-warning edit-btn" data-id="${exam.id}">
-                        <i class="bi bi-pencil"></i> Редактировать
-                    </button>
-                    <button class="btn btn-sm btn-danger delete-btn" data-id="${exam.id}">
-                        <i class="bi bi-trash3"></i> Удалить
-                    </button>
-                </div>
+                <div class="small">Показывать студенту: 🔘 ${exam.singleChoiceToShow === 0 ? 'все' : exam.singleChoiceToShow} / ☑️ ${exam.multipleChoiceToShow === 0 ? 'все' : exam.multipleChoiceToShow} / ✏️ ${exam.textInputToShow === 0 ? 'все' : exam.textInputToShow}</div>
+                <div class="small">Создан: ${new Date(exam.createdAt).toLocaleString()}</div>
             </div>
-        </div>
-    `
-        )
-        .join('');
+            <div>
+                <button class="btn btn-sm btn-info view-btn" data-id="${exam.id}">
+                    <i class="bi bi-eye"></i> Просмотр
+                </button>
+                <button class="btn btn-sm btn-warning edit-btn" data-id="${exam.id}">
+                    <i class="bi bi-pencil"></i> Редактировать
+                </button>
+                <button class="btn btn-sm btn-danger delete-btn" data-id="${exam.id}">
+                    <i class="bi bi-trash3"></i> Удалить
+                </button>
+            </div>
+        `;
+        list.appendChild(li);
+    });
+    examsListDiv.innerHTML = '';
+    examsListDiv.appendChild(list);
 
-    document.querySelectorAll('.view-btn').forEach((btn) => {
+    list.querySelectorAll('.view-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             console.log('[teacher.js] Нажата кнопка "Просмотр" для экзамена', btn.dataset.id);
             showExamDetails(btn.dataset.id);
         });
     });
-    document.querySelectorAll('.edit-btn').forEach((btn) => {
+    list.querySelectorAll('.edit-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             console.log('[teacher.js] Нажата кнопка "Редактировать" для экзамена', btn.dataset.id);
             window.location.href = `edit.html?id=${btn.dataset.id}`;
         });
     });
-    document.querySelectorAll('.delete-btn').forEach((btn) => {
+    list.querySelectorAll('.delete-btn').forEach((btn) => {
         btn.addEventListener('click', async () => {
             console.log('[teacher.js] Нажата кнопка "Удалить" для экзамена', btn.dataset.id);
             if (confirm('Удалить экзамен? Это действие необратимо.')) {
@@ -182,41 +184,37 @@ function renderExamDetails(exam) {
         <hr>
         <h4>Вопросы (${exam.questions.length})</h4>
         <div class="accordion" id="questionsAccordion">
-            ${exam.questions
-        .map((q, idx) => {
-            const typeIcon = getTypeIcon(q.type);
-            const typeLabel = getTypeLabel(q.type);
-            let optionsHtml = '';
-            if (q.options && q.options.length) {
-                optionsHtml = `
+            ${exam.questions.map((q, idx) => {
+        const typeIcon = getTypeIcon(q.type);
+        const typeLabel = getTypeLabel(q.type);
+        let optionsHtml = '';
+        if (q.options && q.options.length) {
+            optionsHtml = `
                         <div class="mt-2"><strong>Варианты ответов:</strong></div>
                         <div class="list-group mt-1">
-                            ${q.options
-                    .map((opt) => {
-                        const isCorrect =
-                            q.correctAnswers && q.correctAnswers.includes(opt);
-                        const checkMark = isCorrect ? '✅ ' : '';
-                        return `
+                            ${q.options.map((opt) => {
+                const isCorrect = q.correctAnswers && q.correctAnswers.includes(opt);
+                const checkMark = isCorrect ? '✅ ' : '';
+                return `
                                     <div class="list-group-item d-flex align-items-center">
                                         <span class="me-2">${checkMark}</span>
                                         <span>${escapeHtml(opt)}</span>
                                     </div>
                                 `;
-                    })
-                    .join('')}
+            }).join('')}
                         </div>
                     `;
-            }
-            let textInputHtml = '';
-            if (q.type === 'TextInput' && q.correctAnswers && q.correctAnswers.length) {
-                textInputHtml = `
+        }
+        let textInputHtml = '';
+        if (q.type === 'TextInput' && q.correctAnswers && q.correctAnswers.length) {
+            textInputHtml = `
                         <div class="mt-2 text-success">
                             <strong>✓ Правильный ответ:</strong>
                             <span class="badge bg-success">${escapeHtml(q.correctAnswers[0])}</span>
                         </div>
                     `;
-            }
-            return `
+        }
+        return `
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading${idx}">
                             <button class="accordion-button ${idx !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${idx}" aria-expanded="${idx === 0 ? 'true' : 'false'}" aria-controls="collapse${idx}">
@@ -234,8 +232,7 @@ function renderExamDetails(exam) {
                         </div>
                     </div>
                 `;
-        })
-        .join('')}
+    }).join('')}
         </div>
     `;
 }

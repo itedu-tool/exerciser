@@ -1,6 +1,7 @@
 <template>
     <div class="timer" :class="{ 'text-danger': seconds < 60 }">
-        <i class="bi bi-clock me-1"></i> {{ formatTime }}
+        <i class="bi bi-clock me-1"></i>
+        <time :datetime="isoTime">{{ formatTime }}</time>
     </div>
 </template>
 
@@ -23,6 +24,15 @@ const formatTime = computed(() => {
     const mins = Math.floor(currentSeconds.value / 60)
     const secs = currentSeconds.value % 60
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+})
+
+const isoTime = computed(() => {
+    const mins = Math.floor(currentSeconds.value / 60)
+    const secs = currentSeconds.value % 60
+    let str = 'PT'
+    if (mins > 0) str += `${mins}M`
+    if (secs > 0) str += `${secs}S`
+    return str
 })
 
 function startTimer() {

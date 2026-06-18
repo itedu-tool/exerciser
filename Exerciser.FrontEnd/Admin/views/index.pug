@@ -5,7 +5,7 @@ block vars
     - var currentPage = "index"
 
 block content
-    .hero.bg-light.p-5.rounded-3.mb-4
+    section.hero.bg-light.p-5.rounded-3.mb-4
         .container-fluid.py-5
             h1.display-5.fw-bold Простая система для преподавателей и студентов
             p.col-md-8.fs-4
@@ -16,25 +16,25 @@ block content
             a.btn.btn-secondary.btn-lg.ms-3(href="health.html")
                 i.bi.bi-heart-pulse.me-2
                 | Диагностика API
-    .row.row-cols-1.row-cols-md-3.g-4
-        .col
+    section.row.row-cols-1.row-cols-md-3.g-4
+        article.col
             .card.h-100
                 .card-body
-                    h5.card-title
+                    h2.card-title.h5
                         i.bi.bi-file-arrow-down.me-2
                         | Импорт из JSON
                     p.card-text Загрузите файл с вопросами и правильными ответами — система сама создаст экзамен.
-        .col
+        article.col
             .card.h-100
                 .card-body
-                    h5.card-title
+                    h2.card-title.h5
                         i.bi.bi-list-ul.me-2
                         | Управление экзаменами
                     p.card-text Просматривайте список экзаменов, удаляйте ненужные, смотрите вопросы и ответы.
-        .col
+        article.col
             .card.h-100
                 .card-body
-                    h5.card-title
+                    h2.card-title.h5
                         i.bi.bi-search.me-2
                         | Проверка API
                     p.card-text Встроенная диагностика позволяет проверить работоспособность всех эндпоинтов сервера.

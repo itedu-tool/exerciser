@@ -1,11 +1,12 @@
 <template>
     <div id="app">
-        <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+        <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark" aria-label="Основная навигация">
             <div class="container">
                 <a class="navbar-brand" href="#">
                     <i class="bi bi-book me-2"></i> Exerciser – Студент
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
@@ -20,7 +21,7 @@
                 </div>
             </div>
         </nav>
-        <main class="container mt-4">
+        <main class="container mt-4" id="main-content">
             <router-view />
         </main>
     </div>

@@ -1,25 +1,36 @@
 <template>
-    <div v-if="loading" class="text-center">
-        <div class="spinner-border" role="status"></div>
+    <div v-if="loading" class="text-center" aria-live="polite">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка результатов...</span>
+        </div>
     </div>
     <div v-else class="card">
         <div class="card-header bg-success text-white">
-            <h4 class="mb-0">
+            <h1 class="h4 mb-0">
                 <i class="bi bi-trophy me-2"></i> Результаты тестирования
-            </h4>
+            </h1>
         </div>
         <div class="card-body">
-            <h5>{{ result?.examTitle }}</h5>
-            <p><i class="bi bi-person me-1"></i> <strong>Студент:</strong> {{ result?.studentFullName }}</p>
-            <p><i class="bi bi-people me-1"></i> <strong>Группа:</strong> {{ result?.groupName }}</p>
-            <p><i class="bi bi-clock-history me-1"></i> <strong>Начато:</strong> {{ new Date(result?.startedAt).toLocaleString() }}</p>
-            <p><i class="bi bi-clock me-1"></i> <strong>Завершено:</strong> {{ new Date(result?.finishedAt).toLocaleString() }}</p>
-            <div class="alert alert-info">
+            <h2 class="h5">{{ result?.examTitle }}</h2>
+            <dl class="row">
+                <dt class="col-sm-3">Студент</dt>
+                <dd class="col-sm-9"><i class="bi bi-person me-1"></i> {{ result?.studentFullName }}</dd>
+
+                <dt class="col-sm-3">Группа</dt>
+                <dd class="col-sm-9"><i class="bi bi-people me-1"></i> {{ result?.groupName }}</dd>
+
+                <dt class="col-sm-3">Начато</dt>
+                <dd class="col-sm-9"><i class="bi bi-clock-history me-1"></i> <time :datetime="result?.startedAt">{{ new Date(result?.startedAt).toLocaleString() }}</time></dd>
+
+                <dt class="col-sm-3">Завершено</dt>
+                <dd class="col-sm-9"><i class="bi bi-clock me-1"></i> <time :datetime="result?.finishedAt">{{ new Date(result?.finishedAt).toLocaleString() }}</time></dd>
+            </dl>
+            <div class="alert alert-info" role="status">
                 <i class="bi bi-star-fill me-2"></i>
                 <strong>Итоговый балл:</strong> {{ result?.totalScore }} из {{ result?.maxPossibleScore }}
             </div>
             <hr />
-            <h5><i class="bi bi-question-circle me-2"></i>Детали по вопросам</h5>
+            <h2 class="h5"><i class="bi bi-question-circle me-2"></i>Детали по вопросам</h2>
             <div
                 v-for="(q, idx) in result?.questions"
                 :key="idx"

@@ -5,13 +5,13 @@ block vars
     - var currentPage = "analytics"
 
 block content
-    .card
+    section.card
         .card-header
-            h5.mb-0
+            h2.h5.mb-0
                 i.bi.bi-bar-chart-fill.me-2
                 | Аналитика по студентам (последние попытки)
         .card-body
-            .row.mb-3
+            form#filtersForm.row.mb-3
                 .col-md-4
                     label.form-label(for="groupFilter") Фильтр по группе
                     select#groupFilter.form-select
@@ -21,24 +21,27 @@ block content
                     select#examFilter.form-select
                         option(value="") Все экзамены
                 .col-md-4
-                    label.form-label &nbsp;
-                    button#clearFiltersBtn.btn.btn-outline-secondary.w-100
+                    label.form-label.visually-hidden(for="clearFiltersBtn") Сбросить фильтры
+                    button#clearFiltersBtn.btn.btn-outline-secondary.w-100(type="button")
                         i.bi.bi-arrow-counterclockwise.me-1
                         | Сбросить фильтры
 
             #analyticsResult
                 .text-muted Загрузка...
-            table.table.table-striped.table-hover.d-none#analyticsTable
-                thead
-                    tr
-                        th.sortable(data-sort="studentFullName") Студент
-                        th.sortable(data-sort="groupName") Группа
-                        th.sortable(data-sort="examTitle") Экзамен
-                        th.sortable(data-sort="score") Баллы
-                        th.sortable(data-sort="percent") %
-                        th.sortable(data-sort="finishedAt") Дата завершения
-                        th.sortable(data-sort="duration") Время (мин)
-                tbody#analyticsBody
+
+            figure.table-responsive
+                table.table.table-striped.table-hover.d-none#analyticsTable(aria-describedby="analyticsCaption")
+                    caption#analyticsCaption.visually-hidden Результаты последних попыток студентов с указанием баллов и процентов
+                    thead
+                        tr
+                            th.sortable(scope="col", data-sort="studentFullName") Студент
+                            th.sortable(scope="col", data-sort="groupName") Группа
+                            th.sortable(scope="col", data-sort="examTitle") Экзамен
+                            th.sortable(scope="col", data-sort="score") Баллы
+                            th.sortable(scope="col", data-sort="percent") %
+                            th.sortable(scope="col", data-sort="finishedAt") Дата завершения
+                            th.sortable(scope="col", data-sort="duration") Время (мин)
+                    tbody#analyticsBody
 
 block scripts
     script(src="scripts/utils.js")
