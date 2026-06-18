@@ -3,7 +3,9 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="mb-0">Вход в систему тестирования</h4>
+                    <h4 class="mb-0">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Вход в систему тестирования
+                    </h4>
                 </div>
                 <div class="card-body">
                     <form @submit.prevent="handleLogin">
@@ -26,6 +28,8 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary w-100" :disabled="!selectedGroupId || !selectedStudentId || loading">
+                            <i v-if="loading" class="bi bi-hourglass-split me-1"></i>
+                            <i v-else class="bi bi-box-arrow-in-right me-1"></i>
                             {{ loading ? 'Вход...' : 'Войти' }}
                         </button>
                     </form>

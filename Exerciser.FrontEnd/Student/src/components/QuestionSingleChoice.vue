@@ -1,7 +1,9 @@
 <template>
     <div class="question-card card mb-3">
         <div class="card-header">
+            <i class="bi bi-circle me-2 text-primary"></i>
             <strong>Вопрос {{ index + 1 }}</strong>
+            <span class="badge bg-secondary ms-2">Один вариант</span>
         </div>
         <div class="card-body">
             <p class="card-text">{{ question.text }}</p>

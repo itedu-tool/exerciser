@@ -3,8 +3,10 @@
         <div class="spinner-border" role="status"></div>
     </div>
     <div v-else-if="error" class="alert alert-danger">
-        {{ error }}
-        <button class="btn btn-primary mt-2" @click="$router.push('/exams')">Вернуться к списку</button>
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+        <button class="btn btn-primary mt-2" @click="$router.push('/exams')">
+            <i class="bi bi-arrow-left me-1"></i> Вернуться к списку
+        </button>
     </div>
     <div v-else>
         <!-- Sticky header: таймер + прогресс-бар -->
@@ -38,10 +40,14 @@
                 />
             </div>
 
-            <!-- Кнопки внизу (после всех вопросов) -->
+            <!-- Кнопки внизу -->
             <div class="mt-4 d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" @click="$router.push('/exams')">Отмена</button>
+                <button type="button" class="btn btn-secondary" @click="$router.push('/exams')">
+                    <i class="bi bi-x-circle me-1"></i> Отмена
+                </button>
                 <button type="submit" class="btn btn-success" :disabled="submitting">
+                    <i v-if="submitting" class="bi bi-hourglass-split me-1"></i>
+                    <i v-else class="bi bi-check2-circle me-1"></i>
                     {{ submitting ? 'Отправка...' : 'Завершить тест' }}
                 </button>
             </div>
@@ -67,9 +73,8 @@ const loading = ref(true)
 const error = ref(null)
 const answers = ref({})
 const submitting = ref(false)
-const timeLeft = ref(3600) // 1 час в секундах
+const timeLeft = ref(3600) // 1 час
 
-// Прогресс (только полоса)
 const progressPercent = computed(() => {
     if (!exam.value?.questions) return 0
     const total = exam.value.questions.length

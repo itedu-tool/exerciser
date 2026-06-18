@@ -1,6 +1,6 @@
 <template>
     <div class="timer" :class="{ 'text-danger': seconds < 60 }">
-        ⏱️ {{ formatTime }}
+        <i class="bi bi-clock me-1"></i> {{ formatTime }}
     </div>
 </template>
 
