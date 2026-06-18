@@ -178,23 +178,24 @@ async function loadGroups() {
 function renderGroupsList(groups) {
     console.log('[groups.js] renderGroupsList(), количество групп:', groups.length);
     const container = document.getElementById('groupsList');
-    container.innerHTML = groups
-        .map(
-            (group) => `
-        <div class="card mb-2">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>${escapeHtml(group.name)}</strong>
-                    <div class="small text-muted">Студентов: ${group.students.length}</div>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-info view-students-btn" data-id="${group.id}" data-name="${escapeHtml(group.name)}">👥 Студенты</button>
-                </div>
+    const list = document.createElement('ul');
+    list.className = 'list-group';
+    groups.forEach(group => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+            <div>
+                <strong>${escapeHtml(group.name)}</strong>
+                <div class="small text-muted">Студентов: ${group.students.length}</div>
             </div>
-        </div>
-    `
-        )
-        .join('');
+            <button class="btn btn-sm btn-info view-students-btn" data-id="${group.id}" data-name="${escapeHtml(group.name)}">
+                <i class="bi bi-people"></i> Студенты
+            </button>
+        `;
+        list.appendChild(li);
+    });
+    container.innerHTML = '';
+    container.appendChild(list);
 
     document.querySelectorAll('.view-students-btn').forEach((btn) => {
         btn.addEventListener('click', async () => {
@@ -225,11 +226,16 @@ async function showGroupStudents(groupId) {
             container.innerHTML = '<div class="text-muted">Нет студентов в этой группе.</div>';
             return;
         }
-        container.innerHTML = `
-            <ul class="list-group">
-                ${group.students.map((s) => `<li class="list-group-item">${escapeHtml(s.fullName)}</li>`).join('')}
-            </ul>
-        `;
+        const list = document.createElement('ul');
+        list.className = 'list-group';
+        group.students.forEach(s => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = `<i class="bi bi-person me-2"></i>${escapeHtml(s.fullName)}`;
+            list.appendChild(li);
+        });
+        container.innerHTML = '';
+        container.appendChild(list);
     } catch (err) {
         console.error('[groups.js] Ошибка загрузки студентов:', err);
         container.innerHTML = `<div class="alert alert-danger">❌ Ошибка: ${err.message}</div>`;

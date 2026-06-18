@@ -1,22 +1,36 @@
 <template>
-    <div v-if="loading" class="text-center">
-        <div class="spinner-border" role="status"></div>
+    <div v-if="loading" class="text-center" aria-live="polite">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка результатов...</span>
+        </div>
     </div>
     <div v-else class="card">
         <div class="card-header bg-success text-white">
-            <h4 class="mb-0">Результаты тестирования</h4>
+            <h1 class="h4 mb-0">
+                <i class="bi bi-trophy me-2"></i> Результаты тестирования
+            </h1>
         </div>
         <div class="card-body">
-            <h5>{{ result?.examTitle }}</h5>
-            <p><strong>Студент:</strong> {{ result?.studentFullName }}</p>
-            <p><strong>Группа:</strong> {{ result?.groupName }}</p>
-            <p><strong>Начато:</strong> {{ new Date(result?.startedAt).toLocaleString() }}</p>
-            <p><strong>Завершено:</strong> {{ new Date(result?.finishedAt).toLocaleString() }}</p>
-            <div class="alert alert-info">
+            <h2 class="h5">{{ result?.examTitle }}</h2>
+            <dl class="row">
+                <dt class="col-sm-3">Студент</dt>
+                <dd class="col-sm-9"><i class="bi bi-person me-1"></i> {{ result?.studentFullName }}</dd>
+
+                <dt class="col-sm-3">Группа</dt>
+                <dd class="col-sm-9"><i class="bi bi-people me-1"></i> {{ result?.groupName }}</dd>
+
+                <dt class="col-sm-3">Начато</dt>
+                <dd class="col-sm-9"><i class="bi bi-clock-history me-1"></i> <time :datetime="result?.startedAt">{{ new Date(result?.startedAt).toLocaleString() }}</time></dd>
+
+                <dt class="col-sm-3">Завершено</dt>
+                <dd class="col-sm-9"><i class="bi bi-clock me-1"></i> <time :datetime="result?.finishedAt">{{ new Date(result?.finishedAt).toLocaleString() }}</time></dd>
+            </dl>
+            <div class="alert alert-info" role="status">
+                <i class="bi bi-star-fill me-2"></i>
                 <strong>Итоговый балл:</strong> {{ result?.totalScore }} из {{ result?.maxPossibleScore }}
             </div>
             <hr />
-            <h5>Детали по вопросам</h5>
+            <h2 class="h5"><i class="bi bi-question-circle me-2"></i>Детали по вопросам</h2>
             <div
                 v-for="(q, idx) in result?.questions"
                 :key="idx"
@@ -29,7 +43,9 @@
                 <p><strong>Правильные ответы:</strong> {{ q.correctAnswers.join(', ') }}</p>
                 <p><strong>Баллы:</strong> {{ q.score }} / {{ q.maxScore }}</p>
             </div>
-            <button class="btn btn-primary" @click="$router.push('/exams')">К списку экзаменов</button>
+            <button class="btn btn-primary" @click="$router.push('/exams')">
+                <i class="bi bi-arrow-left me-1"></i> К списку экзаменов
+            </button>
         </div>
     </div>
 </template>
@@ -50,9 +66,9 @@ function formatAnswer(answer) {
 }
 
 function questionBorderClass(score, maxScore) {
-    if (score === maxScore) return 'border-success'   // полностью правильно
-    if (score === 0) return 'border-danger'           // полностью неправильно
-    return 'border-warning'                            // частично правильно
+    if (score === maxScore) return 'border-success'
+    if (score === 0) return 'border-danger'
+    return 'border-warning'
 }
 
 async function loadResult() {
