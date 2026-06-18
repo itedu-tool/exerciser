@@ -24,6 +24,10 @@ async function loadExam() {
         console.log('[edit.js] Получен экзамен:', exam);
         document.getElementById('title').value = exam.title;
         document.getElementById('description').value = exam.description || '';
+        // Заполняем поля количества вопросов для показа
+        document.getElementById('singleChoiceToShow').value = exam.singleChoiceToShow || 0;
+        document.getElementById('multipleChoiceToShow').value = exam.multipleChoiceToShow || 0;
+        document.getElementById('textInputToShow').value = exam.textInputToShow || 0;
         renderQuestions(exam.questions || []);
     } catch (err) {
         console.error('[edit.js] Ошибка загрузки экзамена:', err);
@@ -292,11 +296,15 @@ function previewExam() {
     console.log('[edit.js] previewExam()');
     const title = document.getElementById('title').value.trim() || '(без названия)';
     const description = document.getElementById('description').value;
+    const singleChoiceToShow = parseInt(document.getElementById('singleChoiceToShow').value, 10) || 0;
+    const multipleChoiceToShow = parseInt(document.getElementById('multipleChoiceToShow').value, 10) || 0;
+    const textInputToShow = parseInt(document.getElementById('textInputToShow').value, 10) || 0;
     const questions = getCurrentQuestionsFromDOM();
 
     const previewHtml = `
         <h3>${escapeHtml(title)}</h3>
         <p><strong>Описание:</strong> ${escapeHtml(description || '—')}</p>
+        <p><strong>Показывать студенту:</strong> 🔘 ${singleChoiceToShow === 0 ? 'все' : singleChoiceToShow} / ☑️ ${multipleChoiceToShow === 0 ? 'все' : multipleChoiceToShow} / ✏️ ${textInputToShow === 0 ? 'все' : textInputToShow}</p>
         <hr>
         <h4>Вопросы (${questions.length})</h4>
         <div class="accordion" id="previewAccordion">
@@ -371,6 +379,10 @@ async function saveExam() {
     console.log('[edit.js] saveExam() начат');
     const title = document.getElementById('title').value.trim();
     const description = document.getElementById('description').value;
+    const singleChoiceToShow = parseInt(document.getElementById('singleChoiceToShow').value, 10) || 0;
+    const multipleChoiceToShow = parseInt(document.getElementById('multipleChoiceToShow').value, 10) || 0;
+    const textInputToShow = parseInt(document.getElementById('textInputToShow').value, 10) || 0;
+
     if (!title) {
         console.warn('[edit.js] Название экзамена пустое');
         showMessage(
@@ -386,6 +398,35 @@ async function saveExam() {
         showMessage(
             document.getElementById('questionsContainer'),
             '❌ Экзамен должен содержать хотя бы один вопрос',
+            'error'
+        );
+        return;
+    }
+
+    // Проверка, что количество вопросов для показа не превышает доступное
+    const singleAvailable = questions.filter(q => q.type === 'SingleChoice').length;
+    const multipleAvailable = questions.filter(q => q.type === 'MultipleChoice').length;
+    const textAvailable = questions.filter(q => q.type === 'TextInput').length;
+    if (singleChoiceToShow > 0 && singleChoiceToShow > singleAvailable) {
+        showMessage(
+            document.getElementById('questionsContainer'),
+            `❌ Количество SingleChoice для показа (${singleChoiceToShow}) превышает доступное (${singleAvailable})`,
+            'error'
+        );
+        return;
+    }
+    if (multipleChoiceToShow > 0 && multipleChoiceToShow > multipleAvailable) {
+        showMessage(
+            document.getElementById('questionsContainer'),
+            `❌ Количество MultipleChoice для показа (${multipleChoiceToShow}) превышает доступное (${multipleAvailable})`,
+            'error'
+        );
+        return;
+    }
+    if (textInputToShow > 0 && textInputToShow > textAvailable) {
+        showMessage(
+            document.getElementById('questionsContainer'),
+            `❌ Количество TextInput для показа (${textInputToShow}) превышает доступное (${textAvailable})`,
             'error'
         );
         return;
@@ -421,12 +462,20 @@ async function saveExam() {
             return;
         }
     }
+
     try {
         console.log('[edit.js] Вызов apiRequest PUT /api/v1/exams/${examId}');
         await apiRequest(`/api/v1/exams/${examId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, description, questions }),
+            body: JSON.stringify({
+                title,
+                description,
+                questions,
+                singleChoiceToShow,
+                multipleChoiceToShow,
+                textInputToShow
+            }),
         });
         console.log('[edit.js] Экзамен успешно сохранён');
         showMessage(
