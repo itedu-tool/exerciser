@@ -20,20 +20,16 @@
                 <dd class="col-sm-9"><i class="bi bi-people me-1"></i> {{ result?.groupName }}</dd>
 
                 <dt class="col-sm-3">Начато</dt>
-                <dd class="col-sm-9"><i class="bi bi-clock-history me-1"></i>
-                    <time :datetime="result?.startedAt">{{ new Date(result?.startedAt).toLocaleString() }}</time>
-                </dd>
+                <dd class="col-sm-9"><i class="bi bi-clock-history me-1"></i> <time :datetime="result?.startedAt">{{ new Date(result?.startedAt).toLocaleString() }}</time></dd>
 
                 <dt class="col-sm-3">Завершено</dt>
-                <dd class="col-sm-9"><i class="bi bi-clock me-1"></i>
-                    <time :datetime="result?.finishedAt">{{ new Date(result?.finishedAt).toLocaleString() }}</time>
-                </dd>
+                <dd class="col-sm-9"><i class="bi bi-clock me-1"></i> <time :datetime="result?.finishedAt">{{ new Date(result?.finishedAt).toLocaleString() }}</time></dd>
             </dl>
             <div class="alert alert-info" role="status">
                 <i class="bi bi-star-fill me-2"></i>
                 <strong>Итоговый балл:</strong> {{ result?.totalScore }} из {{ result?.maxPossibleScore }}
             </div>
-            <hr/>
+            <hr />
             <h2 class="h5"><i class="bi bi-question-circle me-2"></i>Детали по вопросам</h2>
             <div
                 v-for="(q, idx) in result?.questions"
@@ -42,7 +38,7 @@
                 :class="questionBorderClass(q.score, q.maxScore)"
             >
                 <p><strong>Вопрос {{ idx + 1 }}:</strong> {{ q.text }}</p>
-                <p><strong>Тип:</strong> {{ q.type }}</p>
+                <!-- Удалено: <p><strong>Тип:</strong> {{ q.type }}</p> -->
                 <p><strong>Ваш ответ:</strong> {{ formatAnswer(q.userAnswer) }}</p>
                 <p><strong>Правильные ответы:</strong> {{ q.correctAnswers.join(', ') }}</p>
                 <p><strong>Баллы:</strong> {{ q.score }} / {{ q.maxScore }}</p>
@@ -55,8 +51,8 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import api from '../services/api'
 
 const route = useRoute()
