@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Exerciser.WebApi.Models;
@@ -10,7 +11,7 @@ public record Group
     /// <summary>Уникальный идентификатор группы.</summary>
     [BsonId]
     public Guid Id { get; set; } = Guid.CreateVersion7();
-    
+
     /// <summary>Название группы.</summary>
     public required string Name { get; set; }
 

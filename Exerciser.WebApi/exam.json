@@ -5,32 +5,67 @@
     {
       "text": "Какая нормальная форма устраняет транзитивные зависимости неключевых атрибутов от первичного ключа?",
       "type": "SingleChoice",
-      "options": ["1NF", "2NF", "3NF", "НФБК"],
-      "correctAnswers": ["3NF"]
+      "options": [
+        "1NF",
+        "2NF",
+        "3NF",
+        "НФБК"
+      ],
+      "correctAnswers": [
+        "3NF"
+      ]
     },
     {
       "text": "Какой компонент ACID гарантирует, что транзакция либо выполняется полностью, либо не выполняется вовсе?",
       "type": "SingleChoice",
-      "options": ["Atomicity", "Consistency", "Isolation", "Durability"],
-      "correctAnswers": ["Atomicity"]
+      "options": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability"
+      ],
+      "correctAnswers": [
+        "Atomicity"
+      ]
     },
     {
       "text": "Какая операция реляционной алгебры позволяет выбрать строки, удовлетворяющие заданному условию?",
       "type": "SingleChoice",
-      "options": ["Проекция", "Выборка (селекция)", "Декартово произведение", "Объединение"],
-      "correctAnswers": ["Выборка (селекция)"]
+      "options": [
+        "Проекция",
+        "Выборка (селекция)",
+        "Декартово произведение",
+        "Объединение"
+      ],
+      "correctAnswers": [
+        "Выборка (селекция)"
+      ]
     },
     {
       "text": "Какой тип соединения возвращает только строки, имеющие совпадения в обеих таблицах?",
       "type": "SingleChoice",
-      "options": ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "FULL OUTER JOIN"],
-      "correctAnswers": ["INNER JOIN"]
+      "options": [
+        "LEFT JOIN",
+        "RIGHT JOIN",
+        "INNER JOIN",
+        "FULL OUTER JOIN"
+      ],
+      "correctAnswers": [
+        "INNER JOIN"
+      ]
     },
     {
       "text": "Какое ключевое слово используется в SQL для удаления всех строк таблицы с сохранением её структуры?",
       "type": "SingleChoice",
-      "options": ["DELETE", "DROP", "TRUNCATE", "REMOVE"],
-      "correctAnswers": ["TRUNCATE"]
+      "options": [
+        "DELETE",
+        "DROP",
+        "TRUNCATE",
+        "REMOVE"
+      ],
+      "correctAnswers": [
+        "TRUNCATE"
+      ]
     },
     {
       "text": "Что такое первичный ключ?",
@@ -41,37 +76,74 @@
         "Внешний ключ, ссылающийся на другую таблицу",
         "Индекс для ускорения поиска"
       ],
-      "correctAnswers": ["Уникальный идентификатор строки, не допускающий NULL"]
+      "correctAnswers": [
+        "Уникальный идентификатор строки, не допускающий NULL"
+      ]
     },
     {
       "text": "Какой оператор SQL используется для изменения структуры существующей таблицы?",
       "type": "SingleChoice",
-      "options": ["UPDATE", "ALTER TABLE", "MODIFY TABLE", "CHANGE TABLE"],
-      "correctAnswers": ["ALTER TABLE"]
+      "options": [
+        "UPDATE",
+        "ALTER TABLE",
+        "MODIFY TABLE",
+        "CHANGE TABLE"
+      ],
+      "correctAnswers": [
+        "ALTER TABLE"
+      ]
     },
     {
       "text": "Какая проблема возникает при наличии частичной зависимости неключевого атрибута от составного первичного ключа?",
       "type": "SingleChoice",
-      "options": ["Аномалия удаления", "Нарушение 2NF", "Нарушение 3NF", "Нарушение 1NF"],
-      "correctAnswers": ["Нарушение 2NF"]
+      "options": [
+        "Аномалия удаления",
+        "Нарушение 2NF",
+        "Нарушение 3NF",
+        "Нарушение 1NF"
+      ],
+      "correctAnswers": [
+        "Нарушение 2NF"
+      ]
     },
     {
       "text": "Что делает оператор DISTINCT в запросе SELECT?",
       "type": "SingleChoice",
-      "options": ["Сортирует результат", "Удаляет дубликаты строк", "Группирует данные", "Ограничивает количество строк"],
-      "correctAnswers": ["Удаляет дубликаты строк"]
+      "options": [
+        "Сортирует результат",
+        "Удаляет дубликаты строк",
+        "Группирует данные",
+        "Ограничивает количество строк"
+      ],
+      "correctAnswers": [
+        "Удаляет дубликаты строк"
+      ]
     },
     {
       "text": "Какая агрегатная функция возвращает количество строк в группе?",
       "type": "SingleChoice",
-      "options": ["SUM()", "AVG()", "COUNT()", "MAX()"],
-      "correctAnswers": ["COUNT()"]
+      "options": [
+        "SUM()",
+        "AVG()",
+        "COUNT()",
+        "MAX()"
+      ],
+      "correctAnswers": [
+        "COUNT()"
+      ]
     },
     {
       "text": "Какой тип связи между сущностями реализуется с помощью внешнего ключа в одной таблице, ссылающегося на первичный ключ другой?",
       "type": "SingleChoice",
-      "options": ["Один-к-одному", "Один-ко-многим", "Многие-ко-многим", "Рекурсивная"],
-      "correctAnswers": ["Один-ко-многим"]
+      "options": [
+        "Один-к-одному",
+        "Один-ко-многим",
+        "Многие-ко-многим",
+        "Рекурсивная"
+      ],
+      "correctAnswers": [
+        "Один-ко-многим"
+      ]
     },
     {
       "text": "Для чего используется оператор HAVING?",
@@ -82,7 +154,9 @@
         "Для замены WHERE",
         "Для сортировки результата"
       ],
-      "correctAnswers": ["Для фильтрации групп после GROUP BY"]
+      "correctAnswers": [
+        "Для фильтрации групп после GROUP BY"
+      ]
     },
     {
       "text": "Какое представление (VIEW) в SQL называется обновляемым?",
@@ -93,13 +167,22 @@
         "Которое использует JOIN",
         "Которое создано с опцией WITH CHECK OPTION"
       ],
-      "correctAnswers": ["Которое создано на основе одной таблицы без агрегации и DISTINCT"]
+      "correctAnswers": [
+        "Которое создано на основе одной таблицы без агрегации и DISTINCT"
+      ]
     },
     {
       "text": "Какой индекс физически упорядочивает строки таблицы на диске?",
       "type": "SingleChoice",
-      "options": ["Некластеризованный", "Кластеризованный", "Составной", "Полнотекстовый"],
-      "correctAnswers": ["Кластеризованный"]
+      "options": [
+        "Некластеризованный",
+        "Кластеризованный",
+        "Составной",
+        "Полнотекстовый"
+      ],
+      "correctAnswers": [
+        "Кластеризованный"
+      ]
     },
     {
       "text": "Что произойдет при попытке вставить запись с внешним ключом, ссылающимся на несуществующее значение в родительской таблице, если каскадные действия не настроены?",
@@ -110,19 +193,35 @@
         "Автоматически создастся родительская запись",
         "Запись вставится, но будет помечена как ошибочная"
       ],
-      "correctAnswers": ["Возникнет ошибка нарушения ссылочной целостности"]
+      "correctAnswers": [
+        "Возникнет ошибка нарушения ссылочной целостности"
+      ]
     },
     {
       "text": "Какая нормальная форма требует, чтобы каждый неключевой атрибут был полностью функционально зависим от всего первичного ключа?",
       "type": "SingleChoice",
-      "options": ["1NF", "2NF", "3NF", "НФБК"],
-      "correctAnswers": ["2NF"]
+      "options": [
+        "1NF",
+        "2NF",
+        "3NF",
+        "НФБК"
+      ],
+      "correctAnswers": [
+        "2NF"
+      ]
     },
     {
       "text": "Какое ключевое слово в SQL используется для создания рекурсивного обобщённого табличного выражения?",
       "type": "SingleChoice",
-      "options": ["RECURSIVE", "LOOP", "ITERATE", "WITH RECURSIVE"],
-      "correctAnswers": ["WITH RECURSIVE"]
+      "options": [
+        "RECURSIVE",
+        "LOOP",
+        "ITERATE",
+        "WITH RECURSIVE"
+      ],
+      "correctAnswers": [
+        "WITH RECURSIVE"
+      ]
     },
     {
       "text": "Для чего предназначен оператор UNION?",
@@ -133,7 +232,9 @@
         "Декартово произведение таблиц",
         "Соединение таблиц по условию"
       ],
-      "correctAnswers": ["Объединение строк из нескольких запросов с удалением дубликатов"]
+      "correctAnswers": [
+        "Объединение строк из нескольких запросов с удалением дубликатов"
+      ]
     },
     {
       "text": "Какое утверждение о триггерах верно?",
@@ -144,25 +245,48 @@
         "Триггер не может изменять данные",
         "Триггеры не влияют на целостность данных"
       ],
-      "correctAnswers": ["Триггер автоматически срабатывает при определённом событии (INSERT, UPDATE, DELETE)"]
+      "correctAnswers": [
+        "Триггер автоматически срабатывает при определённом событии (INSERT, UPDATE, DELETE)"
+      ]
     },
     {
       "text": "Что из перечисленного является примером нереляционной базы данных?",
       "type": "SingleChoice",
-      "options": ["PostgreSQL", "MySQL", "MongoDB", "Oracle"],
-      "correctAnswers": ["MongoDB"]
+      "options": [
+        "PostgreSQL",
+        "MySQL",
+        "MongoDB",
+        "Oracle"
+      ],
+      "correctAnswers": [
+        "MongoDB"
+      ]
     },
     {
       "text": "Какая модель данных использует графы узлов и рёбер для хранения информации?",
       "type": "SingleChoice",
-      "options": ["Реляционная", "Документо-ориентированная", "Графовая", "Key-value"],
-      "correctAnswers": ["Графовая"]
+      "options": [
+        "Реляционная",
+        "Документо-ориентированная",
+        "Графовая",
+        "Key-value"
+      ],
+      "correctAnswers": [
+        "Графовая"
+      ]
     },
     {
       "text": "Какой оператор в реляционной алгебре формирует подмножество столбцов отношения?",
       "type": "SingleChoice",
-      "options": ["Выборка", "Проекция", "Соединение", "Деление"],
-      "correctAnswers": ["Проекция"]
+      "options": [
+        "Выборка",
+        "Проекция",
+        "Соединение",
+        "Деление"
+      ],
+      "correctAnswers": [
+        "Проекция"
+      ]
     },
     {
       "text": "Что такое денормализация?",
@@ -173,7 +297,9 @@
         "Разделение таблиц для устранения аномалий",
         "Удаление неиспользуемых индексов"
       ],
-      "correctAnswers": ["Намеренное добавление избыточности для повышения производительности"]
+      "correctAnswers": [
+        "Намеренное добавление избыточности для повышения производительности"
+      ]
     },
     {
       "text": "Что такое нормальная форма Бойса-Кодда (НФБК)?",
@@ -184,31 +310,61 @@
         "Форма, которая разрешает многозначные зависимости",
         "То же самое, что и 4NF"
       ],
-      "correctAnswers": ["Более строгая версия 3NF, устраняющая зависимости от неключевых атрибутов"]
+      "correctAnswers": [
+        "Более строгая версия 3NF, устраняющая зависимости от неключевых атрибутов"
+      ]
     },
     {
       "text": "Какая нормальная форма устраняет многозначные зависимости?",
       "type": "SingleChoice",
-      "options": ["2NF", "3NF", "НФБК", "4NF"],
-      "correctAnswers": ["4NF"]
+      "options": [
+        "2NF",
+        "3NF",
+        "НФБК",
+        "4NF"
+      ],
+      "correctAnswers": [
+        "4NF"
+      ]
     },
     {
       "text": "Какой тип соединения возвращает все строки из обеих таблиц, соединяя совпадающие и дополняя NULL отсутствующие?",
       "type": "SingleChoice",
-      "options": ["INNER JOIN", "LEFT JOIN", "FULL OUTER JOIN", "CROSS JOIN"],
-      "correctAnswers": ["FULL OUTER JOIN"]
+      "options": [
+        "INNER JOIN",
+        "LEFT JOIN",
+        "FULL OUTER JOIN",
+        "CROSS JOIN"
+      ],
+      "correctAnswers": [
+        "FULL OUTER JOIN"
+      ]
     },
     {
       "text": "Какое ключевое слово используется для создания обобщённого табличного выражения (CTE)?",
       "type": "SingleChoice",
-      "options": ["CREATE CTE", "WITH", "DEFINE", "DECLARE"],
-      "correctAnswers": ["WITH"]
+      "options": [
+        "CREATE CTE",
+        "WITH",
+        "DEFINE",
+        "DECLARE"
+      ],
+      "correctAnswers": [
+        "WITH"
+      ]
     },
     {
       "text": "Что из перечисленного является примером key-value базы данных?",
       "type": "SingleChoice",
-      "options": ["MySQL", "MongoDB", "Redis", "Neo4j"],
-      "correctAnswers": ["Redis"]
+      "options": [
+        "MySQL",
+        "MongoDB",
+        "Redis",
+        "Neo4j"
+      ],
+      "correctAnswers": [
+        "Redis"
+      ]
     },
     {
       "text": "Какое утверждение о первичном ключе является верным?",
@@ -219,49 +375,120 @@
         "Должен быть уникальным и не содержать NULL",
         "Должен быть числовым"
       ],
-      "correctAnswers": ["Должен быть уникальным и не содержать NULL"]
+      "correctAnswers": [
+        "Должен быть уникальным и не содержать NULL"
+      ]
     },
     {
       "text": "Какой оператор реляционной алгебры строит «горизонтальное» подмножество отношения?",
       "type": "SingleChoice",
-      "options": ["Проекция", "Выборка", "Объединение", "Соединение"],
-      "correctAnswers": ["Выборка"]
+      "options": [
+        "Проекция",
+        "Выборка",
+        "Объединение",
+        "Соединение"
+      ],
+      "correctAnswers": [
+        "Выборка"
+      ]
     },
     {
       "text": "Какие из перечисленных свойств входят в ACID?",
       "type": "MultipleChoice",
-      "options": ["Atomicity", "Consistency", "Isolation", "Durability", "Scalability"],
-      "correctAnswers": ["Atomicity", "Consistency", "Isolation", "Durability"]
+      "options": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability",
+        "Scalability"
+      ],
+      "correctAnswers": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability"
+      ]
     },
     {
       "text": "Какие проблемы могут возникать в ненормализованных таблицах?",
       "type": "MultipleChoice",
-      "options": ["Аномалии вставки", "Аномалии удаления", "Аномалии обновления", "Более высокая производительность"],
-      "correctAnswers": ["Аномалии вставки", "Аномалии удаления", "Аномалии обновления"]
+      "options": [
+        "Аномалии вставки",
+        "Аномалии удаления",
+        "Аномалии обновления",
+        "Более высокая производительность"
+      ],
+      "correctAnswers": [
+        "Аномалии вставки",
+        "Аномалии удаления",
+        "Аномалии обновления"
+      ]
     },
     {
       "text": "Какие операторы SQL относятся к DDL?",
       "type": "MultipleChoice",
-      "options": ["CREATE", "ALTER", "DROP", "INSERT", "SELECT"],
-      "correctAnswers": ["CREATE", "ALTER", "DROP"]
+      "options": [
+        "CREATE",
+        "ALTER",
+        "DROP",
+        "INSERT",
+        "SELECT"
+      ],
+      "correctAnswers": [
+        "CREATE",
+        "ALTER",
+        "DROP"
+      ]
     },
     {
       "text": "Какие типы соединений сохраняют все строки из одной из таблиц даже без совпадений?",
       "type": "MultipleChoice",
-      "options": ["INNER JOIN", "LEFT OUTER JOIN", "RIGHT OUTER JOIN", "FULL OUTER JOIN", "CROSS JOIN"],
-      "correctAnswers": ["LEFT OUTER JOIN", "RIGHT OUTER JOIN", "FULL OUTER JOIN"]
+      "options": [
+        "INNER JOIN",
+        "LEFT OUTER JOIN",
+        "RIGHT OUTER JOIN",
+        "FULL OUTER JOIN",
+        "CROSS JOIN"
+      ],
+      "correctAnswers": [
+        "LEFT OUTER JOIN",
+        "RIGHT OUTER JOIN",
+        "FULL OUTER JOIN"
+      ]
     },
     {
       "text": "Какие агрегатные функции игнорируют NULL-значения?",
       "type": "MultipleChoice",
-      "options": ["COUNT(*)", "COUNT(column)", "SUM(column)", "AVG(column)", "MAX(column)"],
-      "correctAnswers": ["COUNT(column)", "SUM(column)", "AVG(column)", "MAX(column)"]
+      "options": [
+        "COUNT(*)",
+        "COUNT(column)",
+        "SUM(column)",
+        "AVG(column)",
+        "MAX(column)"
+      ],
+      "correctAnswers": [
+        "COUNT(column)",
+        "SUM(column)",
+        "AVG(column)",
+        "MAX(column)"
+      ]
     },
     {
       "text": "Какие ограничения целостности поддерживаются в реляционной модели?",
       "type": "MultipleChoice",
-      "options": ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "CHECK", "TRIGGER"],
-      "correctAnswers": ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "CHECK"]
+      "options": [
+        "PRIMARY KEY",
+        "FOREIGN KEY",
+        "UNIQUE",
+        "CHECK",
+        "TRIGGER"
+      ],
+      "correctAnswers": [
+        "PRIMARY KEY",
+        "FOREIGN KEY",
+        "UNIQUE",
+        "CHECK"
+      ]
     },
     {
       "text": "Какие из следующих утверждений о первичном ключе верны?",
@@ -273,19 +500,42 @@
         "Каждая таблица может иметь только один первичный ключ",
         "Автоматически создаёт кластеризованный индекс во всех СУБД"
       ],
-      "correctAnswers": ["Значения должны быть уникальны", "Может быть составным", "Каждая таблица может иметь только один первичный ключ"]
+      "correctAnswers": [
+        "Значения должны быть уникальны",
+        "Может быть составным",
+        "Каждая таблица может иметь только один первичный ключ"
+      ]
     },
     {
       "text": "Какие из приведённых ниже команд SQL требуют осторожности из-за возможности безвозвратной потери данных?",
       "type": "MultipleChoice",
-      "options": ["DELETE без WHERE", "DROP TABLE", "TRUNCATE TABLE", "UPDATE с WHERE"],
-      "correctAnswers": ["DELETE без WHERE", "DROP TABLE", "TRUNCATE TABLE"]
+      "options": [
+        "DELETE без WHERE",
+        "DROP TABLE",
+        "TRUNCATE TABLE",
+        "UPDATE с WHERE"
+      ],
+      "correctAnswers": [
+        "DELETE без WHERE",
+        "DROP TABLE",
+        "TRUNCATE TABLE"
+      ]
     },
     {
       "text": "Какие модели данных относятся к NoSQL?",
       "type": "MultipleChoice",
-      "options": ["Ключ-значение", "Документная", "Графовая", "Реляционная", "Иерархическая"],
-      "correctAnswers": ["Ключ-значение", "Документная", "Графовая"]
+      "options": [
+        "Ключ-значение",
+        "Документная",
+        "Графовая",
+        "Реляционная",
+        "Иерархическая"
+      ],
+      "correctAnswers": [
+        "Ключ-значение",
+        "Документная",
+        "Графовая"
+      ]
     },
     {
       "text": "Что из перечисленного является преимуществом хранимых процедур?",
@@ -296,19 +546,43 @@
         "Инкапсуляция логики",
         "Обязательное ускорение любых запросов"
       ],
-      "correctAnswers": ["Уменьшение сетевого трафика", "Повторное использование кода", "Инкапсуляция логики"]
+      "correctAnswers": [
+        "Уменьшение сетевого трафика",
+        "Повторное использование кода",
+        "Инкапсуляция логики"
+      ]
     },
     {
       "text": "Какие операторы могут использоваться с подзапросами, возвращающими множество значений?",
       "type": "MultipleChoice",
-      "options": ["IN", "ANY", "ALL", "EXISTS", "= (равно)"],
-      "correctAnswers": ["IN", "ANY", "ALL", "EXISTS"]
+      "options": [
+        "IN",
+        "ANY",
+        "ALL",
+        "EXISTS",
+        "= (равно)"
+      ],
+      "correctAnswers": [
+        "IN",
+        "ANY",
+        "ALL",
+        "EXISTS"
+      ]
     },
     {
       "text": "Какие действия разрешены для обновляемых представлений?",
       "type": "MultipleChoice",
-      "options": ["INSERT", "UPDATE", "DELETE", "ALTER"],
-      "correctAnswers": ["INSERT", "UPDATE", "DELETE"]
+      "options": [
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "ALTER"
+      ],
+      "correctAnswers": [
+        "INSERT",
+        "UPDATE",
+        "DELETE"
+      ]
     },
     {
       "text": "Какие из следующих условий приведут к ошибке нарушения ссылочной целостности?",
@@ -328,32 +602,80 @@
     {
       "text": "Какие типы триггеров существуют в SQL по времени срабатывания?",
       "type": "MultipleChoice",
-      "options": ["BEFORE", "AFTER", "INSTEAD OF", "DURING"],
-      "correctAnswers": ["BEFORE", "AFTER", "INSTEAD OF"]
+      "options": [
+        "BEFORE",
+        "AFTER",
+        "INSTEAD OF",
+        "DURING"
+      ],
+      "correctAnswers": [
+        "BEFORE",
+        "AFTER",
+        "INSTEAD OF"
+      ]
     },
     {
       "text": "Какие функции можно использовать для работы со строками в SQL?",
       "type": "MultipleChoice",
-      "options": ["SUBSTRING", "CONCAT", "LENGTH", "UPPER", "AVG"],
-      "correctAnswers": ["SUBSTRING", "CONCAT", "LENGTH", "UPPER"]
+      "options": [
+        "SUBSTRING",
+        "CONCAT",
+        "LENGTH",
+        "UPPER",
+        "AVG"
+      ],
+      "correctAnswers": [
+        "SUBSTRING",
+        "CONCAT",
+        "LENGTH",
+        "UPPER"
+      ]
     },
     {
       "text": "Какие из перечисленных свойств относятся к транзакциям?",
       "type": "MultipleChoice",
-      "options": ["Атомарность", "Согласованность", "Изоляция", "Долговечность", "Масштабируемость"],
-      "correctAnswers": ["Атомарность", "Согласованность", "Изоляция", "Долговечность"]
+      "options": [
+        "Атомарность",
+        "Согласованность",
+        "Изоляция",
+        "Долговечность",
+        "Масштабируемость"
+      ],
+      "correctAnswers": [
+        "Атомарность",
+        "Согласованность",
+        "Изоляция",
+        "Долговечность"
+      ]
     },
     {
       "text": "Какие подходы позволяют обеспечить уникальность значений в столбце, не являющемся первичным ключом?",
       "type": "MultipleChoice",
-      "options": ["Ограничение UNIQUE", "Создание уникального индекса", "Ограничение CHECK", "Триггер, проверяющий уникальность"],
-      "correctAnswers": ["Ограничение UNIQUE", "Создание уникального индекса"]
+      "options": [
+        "Ограничение UNIQUE",
+        "Создание уникального индекса",
+        "Ограничение CHECK",
+        "Триггер, проверяющий уникальность"
+      ],
+      "correctAnswers": [
+        "Ограничение UNIQUE",
+        "Создание уникального индекса"
+      ]
     },
     {
       "text": "Какие из следующих операторов DML изменяют данные в таблице?",
       "type": "MultipleChoice",
-      "options": ["INSERT", "UPDATE", "DELETE", "SELECT"],
-      "correctAnswers": ["INSERT", "UPDATE", "DELETE"]
+      "options": [
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "SELECT"
+      ],
+      "correctAnswers": [
+        "INSERT",
+        "UPDATE",
+        "DELETE"
+      ]
     },
     {
       "text": "Какие условия необходимы для приведения таблицы к 1NF?",
@@ -364,31 +686,77 @@
         "Определён первичный ключ",
         "Все неключевые атрибуты зависят от всего ключа"
       ],
-      "correctAnswers": ["Атомарность всех значений атрибутов", "Отсутствие повторяющихся групп"]
+      "correctAnswers": [
+        "Атомарность всех значений атрибутов",
+        "Отсутствие повторяющихся групп"
+      ]
     },
     {
       "text": "Что из перечисленного является частью языка определения данных (DDL)?",
       "type": "MultipleChoice",
-      "options": ["CREATE INDEX", "CREATE VIEW", "ALTER TABLE", "DROP DATABASE"],
-      "correctAnswers": ["CREATE INDEX", "CREATE VIEW", "ALTER TABLE", "DROP DATABASE"]
+      "options": [
+        "CREATE INDEX",
+        "CREATE VIEW",
+        "ALTER TABLE",
+        "DROP DATABASE"
+      ],
+      "correctAnswers": [
+        "CREATE INDEX",
+        "CREATE VIEW",
+        "ALTER TABLE",
+        "DROP DATABASE"
+      ]
     },
     {
       "text": "Какие способы группировки данных существуют в SQL?",
       "type": "MultipleChoice",
-      "options": ["GROUP BY", "GROUPING SETS", "ROLLUP", "CUBE", "ORDER BY"],
-      "correctAnswers": ["GROUP BY", "GROUPING SETS", "ROLLUP", "CUBE"]
+      "options": [
+        "GROUP BY",
+        "GROUPING SETS",
+        "ROLLUP",
+        "CUBE",
+        "ORDER BY"
+      ],
+      "correctAnswers": [
+        "GROUP BY",
+        "GROUPING SETS",
+        "ROLLUP",
+        "CUBE"
+      ]
     },
     {
       "text": "Какие ограничения можно задать для столбца при создании таблицы?",
       "type": "MultipleChoice",
-      "options": ["NOT NULL", "DEFAULT значение", "CHECK (условие)", "REFERENCES таблица(столбец)", "AUTO_INCREMENT"],
-      "correctAnswers": ["NOT NULL", "DEFAULT значение", "CHECK (условие)", "REFERENCES таблица(столбец)", "AUTO_INCREMENT"]
+      "options": [
+        "NOT NULL",
+        "DEFAULT значение",
+        "CHECK (условие)",
+        "REFERENCES таблица(столбец)",
+        "AUTO_INCREMENT"
+      ],
+      "correctAnswers": [
+        "NOT NULL",
+        "DEFAULT значение",
+        "CHECK (условие)",
+        "REFERENCES таблица(столбец)",
+        "AUTO_INCREMENT"
+      ]
     },
     {
       "text": "Какие из следующих нормальных форм находятся за пределами 3NF?",
       "type": "MultipleChoice",
-      "options": ["НФБК", "4NF", "5NF", "2NF", "1NF"],
-      "correctAnswers": ["НФБК", "4NF", "5NF"]
+      "options": [
+        "НФБК",
+        "4NF",
+        "5NF",
+        "2NF",
+        "1NF"
+      ],
+      "correctAnswers": [
+        "НФБК",
+        "4NF",
+        "5NF"
+      ]
     },
     {
       "text": "Какие виды зависимостей устраняются в процессе нормализации выше 3NF?",
@@ -400,7 +768,10 @@
         "Зависимости соединения",
         "Частичные зависимости"
       ],
-      "correctAnswers": ["Многозначные зависимости", "Зависимости соединения"]
+      "correctAnswers": [
+        "Многозначные зависимости",
+        "Зависимости соединения"
+      ]
     },
     {
       "text": "Какие из следующих утверждений о CTE (обобщённых табличных выражениях) верны?",
@@ -412,25 +783,59 @@
         "Существуют только в рамках одного запроса",
         "Могут быть материализованы для повышения производительности"
       ],
-      "correctAnswers": ["Могут быть рекурсивными", "Определяются с помощью WITH", "Существуют только в рамках одного запроса"]
+      "correctAnswers": [
+        "Могут быть рекурсивными",
+        "Определяются с помощью WITH",
+        "Существуют только в рамках одного запроса"
+      ]
     },
     {
       "text": "Какие из следующих операций реляционной алгебры являются бинарными (принимают два отношения)?",
       "type": "MultipleChoice",
-      "options": ["Объединение", "Пересечение", "Разность", "Выборка", "Проекция"],
-      "correctAnswers": ["Объединение", "Пересечение", "Разность"]
+      "options": [
+        "Объединение",
+        "Пересечение",
+        "Разность",
+        "Выборка",
+        "Проекция"
+      ],
+      "correctAnswers": [
+        "Объединение",
+        "Пересечение",
+        "Разность"
+      ]
     },
     {
       "text": "Какие типы данных являются числовыми в SQL?",
       "type": "MultipleChoice",
-      "options": ["INTEGER", "DECIMAL", "VARCHAR", "FLOAT", "DATE"],
-      "correctAnswers": ["INTEGER", "DECIMAL", "FLOAT"]
+      "options": [
+        "INTEGER",
+        "DECIMAL",
+        "VARCHAR",
+        "FLOAT",
+        "DATE"
+      ],
+      "correctAnswers": [
+        "INTEGER",
+        "DECIMAL",
+        "FLOAT"
+      ]
     },
     {
       "text": "Что из перечисленного является типами связей в ER-модели?",
       "type": "MultipleChoice",
-      "options": ["Один-к-одному", "Один-ко-многим", "Многие-ко-многим", "Многие-к-одному", "Рекурсивная"],
-      "correctAnswers": ["Один-к-одному", "Один-ко-многим", "Многие-ко-многим"]
+      "options": [
+        "Один-к-одному",
+        "Один-ко-многим",
+        "Многие-ко-многим",
+        "Многие-к-одному",
+        "Рекурсивная"
+      ],
+      "correctAnswers": [
+        "Один-к-одному",
+        "Один-ко-многим",
+        "Многие-ко-многим"
+      ]
     },
     {
       "text": "Какие утверждения о внешнем ключе верны?",
@@ -452,158 +857,244 @@
     {
       "text": "Какие ключевые слова используются для сортировки данных в SQL?",
       "type": "MultipleChoice",
-      "options": ["ORDER BY", "ASC", "DESC", "SORT BY", "GROUP BY"],
-      "correctAnswers": ["ORDER BY", "ASC", "DESC"]
+      "options": [
+        "ORDER BY",
+        "ASC",
+        "DESC",
+        "SORT BY",
+        "GROUP BY"
+      ],
+      "correctAnswers": [
+        "ORDER BY",
+        "ASC",
+        "DESC"
+      ]
     },
     {
       "text": "Какая реляционная операция возвращает строки, которые присутствуют в обоих отношениях?",
       "type": "TextInput",
-      "correctAnswers": ["пересечение"]
+      "correctAnswers": [
+        "пересечение"
+      ]
     },
     {
       "text": "Напишите ключевое слово SQL, с помощью которого начинается создание представления.",
       "type": "TextInput",
-      "correctAnswers": ["CREATE VIEW"]
+      "correctAnswers": [
+        "CREATE VIEW"
+      ]
     },
     {
       "text": "Сколько нормальных форм обычно рассматривается в учебных курсах (до 5NF включительно)? Введите число.",
       "type": "TextInput",
-      "correctAnswers": ["5"]
+      "correctAnswers": [
+        "5"
+      ]
     },
     {
       "text": "Какая агрегатная функция возвращает среднее арифметическое значений?",
       "type": "TextInput",
-      "correctAnswers": ["AVG"]
+      "correctAnswers": [
+        "AVG"
+      ]
     },
     {
       "text": "Какая команда SQL удаляет таблицу полностью вместе со структурой?",
       "type": "TextInput",
-      "correctAnswers": ["DROP TABLE"]
+      "correctAnswers": [
+        "DROP TABLE"
+      ]
     },
     {
       "text": "Как называется специальный вид соединения, порождающий декартово произведение таблиц?",
       "type": "TextInput",
-      "correctAnswers": ["CROSS JOIN", "декартово произведение"]
+      "correctAnswers": [
+        "CROSS JOIN",
+        "декартово произведение"
+      ]
     },
     {
       "text": "В каком предложении SQL указываются условия для агрегированных данных после группировки?",
       "type": "TextInput",
-      "correctAnswers": ["HAVING"]
+      "correctAnswers": [
+        "HAVING"
+      ]
     },
     {
       "text": "Какой тип данных SQL используется для хранения целых чисел?",
       "type": "TextInput",
-      "correctAnswers": ["INTEGER", "INT"]
+      "correctAnswers": [
+        "INTEGER",
+        "INT"
+      ]
     },
     {
       "text": "Напишите функцию SQL, которая возвращает длину строки.",
       "type": "TextInput",
-      "correctAnswers": ["LENGTH", "LEN"]
+      "correctAnswers": [
+        "LENGTH",
+        "LEN"
+      ]
     },
     {
       "text": "Какое ключевое слово используется в SQL для ограничения числа возвращаемых строк в MySQL/PostgreSQL?",
       "type": "TextInput",
-      "correctAnswers": ["LIMIT"]
+      "correctAnswers": [
+        "LIMIT"
+      ]
     },
     {
       "text": "Как называется ограничение, гарантирующее, что все значения в столбце различны?",
       "type": "TextInput",
-      "correctAnswers": ["UNIQUE"]
+      "correctAnswers": [
+        "UNIQUE"
+      ]
     },
     {
       "text": "Какой оператор используется для изменения данных в существующих строках?",
       "type": "TextInput",
-      "correctAnswers": ["UPDATE"]
+      "correctAnswers": [
+        "UPDATE"
+      ]
     },
     {
       "text": "Какое свойство транзакции обеспечивает сохранение результатов после её завершения даже при сбоях?",
       "type": "TextInput",
-      "correctAnswers": ["долговечность", "Durability"]
+      "correctAnswers": [
+        "долговечность",
+        "Durability"
+      ]
     },
     {
       "text": "Какой тип индекса автоматически создаётся при объявлении PRIMARY KEY в большинстве СУБД?",
       "type": "TextInput",
-      "correctAnswers": ["уникальный индекс", "unique index"]
+      "correctAnswers": [
+        "уникальный индекс",
+        "unique index"
+      ]
     },
     {
       "text": "Как называется процесс намеренного введения избыточности для повышения производительности?",
       "type": "TextInput",
-      "correctAnswers": ["денормализация"]
+      "correctAnswers": [
+        "денормализация"
+      ]
     },
     {
       "text": "Какое ключевое слово используется для удаления всех строк таблицы без ведения журнала транзакций (в большинстве СУБД)?",
       "type": "TextInput",
-      "correctAnswers": ["TRUNCATE"]
+      "correctAnswers": [
+        "TRUNCATE"
+      ]
     },
     {
       "text": "Какая функция SQL возвращает наибольшее значение из набора?",
       "type": "TextInput",
-      "correctAnswers": ["MAX"]
+      "correctAnswers": [
+        "MAX"
+      ]
     },
     {
       "text": "Какой оператор объединяет результаты двух запросов, включая дубликаты?",
       "type": "TextInput",
-      "correctAnswers": ["UNION ALL"]
+      "correctAnswers": [
+        "UNION ALL"
+      ]
     },
     {
       "text": "Какое ограничение используется для установки значения по умолчанию для столбца?",
       "type": "TextInput",
-      "correctAnswers": ["DEFAULT"]
+      "correctAnswers": [
+        "DEFAULT"
+      ]
     },
     {
       "text": "Как называется вид подзапроса, который ссылается на столбцы внешнего запроса и выполняется для каждой строки?",
       "type": "TextInput",
-      "correctAnswers": ["коррелированный подзапрос", "correlated subquery"]
+      "correctAnswers": [
+        "коррелированный подзапрос",
+        "correlated subquery"
+      ]
     },
     {
       "text": "Напишите команду для создания индекса с именем idx_name по столбцу last_name таблицы employees.",
       "type": "TextInput",
-      "correctAnswers": ["CREATE INDEX idx_name ON employees (last_name)", "CREATE INDEX idx_name ON employees(last_name)"]
+      "correctAnswers": [
+        "CREATE INDEX idx_name ON employees (last_name)",
+        "CREATE INDEX idx_name ON employees(last_name)"
+      ]
     },
     {
       "text": "Какая нормальная форма устраняет зависимости соединения и предполагает декомпозицию без потерь? (введите номер формы)",
       "type": "TextInput",
-      "correctAnswers": ["5NF", "5", "пятая"]
+      "correctAnswers": [
+        "5NF",
+        "5",
+        "пятая"
+      ]
     },
     {
       "text": "Напишите название операции реляционной алгебры, которая из отношения выбирает подмножество столбцов.",
       "type": "TextInput",
-      "correctAnswers": ["проекция", "projection"]
+      "correctAnswers": [
+        "проекция",
+        "projection"
+      ]
     },
     {
       "text": "Какой тип данных SQL используется для хранения даты и времени?",
       "type": "TextInput",
-      "correctAnswers": ["DATETIME", "TIMESTAMP"]
+      "correctAnswers": [
+        "DATETIME",
+        "TIMESTAMP"
+      ]
     },
     {
       "text": "Какое ключевое слово используется для удаления представления?",
       "type": "TextInput",
-      "correctAnswers": ["DROP VIEW"]
+      "correctAnswers": [
+        "DROP VIEW"
+      ]
     },
     {
       "text": "Как называется ключ, состоящий из двух или более столбцов?",
       "type": "TextInput",
-      "correctAnswers": ["составной ключ", "composite key"]
+      "correctAnswers": [
+        "составной ключ",
+        "composite key"
+      ]
     },
     {
       "text": "Напишите команду SQL для добавления нового столбца email в таблицу users.",
       "type": "TextInput",
-      "correctAnswers": ["ALTER TABLE users ADD email VARCHAR(255)", "ALTER TABLE users ADD email VARCHAR (255)"]
+      "correctAnswers": [
+        "ALTER TABLE users ADD email VARCHAR(255)",
+        "ALTER TABLE users ADD email VARCHAR (255)"
+      ]
     },
     {
       "text": "Какая нормальная форма требует, чтобы каждый неключевой атрибут был взаимно независим и полностью зависел от первичного ключа? (номер)",
       "type": "TextInput",
-      "correctAnswers": ["3NF", "3", "третья"]
+      "correctAnswers": [
+        "3NF",
+        "3",
+        "третья"
+      ]
     },
     {
       "text": "Как называется специальный столбец или комбинация столбцов, однозначно идентифицирующая каждую строку?",
       "type": "TextInput",
-      "correctAnswers": ["первичный ключ", "primary key"]
+      "correctAnswers": [
+        "первичный ключ",
+        "primary key"
+      ]
     },
     {
       "text": "Какой оператор SQL используется для получения уникальных значений из столбца?",
       "type": "TextInput",
-      "correctAnswers": ["DISTINCT"]
+      "correctAnswers": [
+        "DISTINCT"
+      ]
     }
   ]
 }

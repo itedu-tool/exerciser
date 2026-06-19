@@ -10,7 +10,8 @@
             Нет доступных экзаменов.
         </div>
         <ul v-else class="list-group">
-            <li v-for="exam in exams" :key="exam.id" class="list-group-item d-flex justify-content-between align-items-start flex-wrap">
+            <li v-for="exam in exams" :key="exam.id"
+                class="list-group-item d-flex justify-content-between align-items-start flex-wrap">
                 <div class="flex-grow-1">
                     <h2 class="h5 mb-1">{{ exam.title }}</h2>
                     <p class="mb-1 text-muted">{{ exam.description || 'Без описания' }}</p>
@@ -18,14 +19,22 @@
                         <div>
                             <i class="bi bi-book me-1"></i> Всего вопросов: {{ exam.questionsCount }}
                             <span class="ms-2"><i class="bi bi-circle me-1"></i>{{ exam.singleChoiceCount }}</span>
-                            <span class="ms-2"><i class="bi bi-check2-square me-1"></i>{{ exam.multipleChoiceCount }}</span>
+                            <span class="ms-2"><i class="bi bi-check2-square me-1"></i>{{
+                                    exam.multipleChoiceCount
+                                }}</span>
                             <span class="ms-2"><i class="bi bi-pencil me-1"></i>{{ exam.textInputCount }}</span>
                         </div>
                         <div class="mt-1 text-primary">
                             <i class="bi bi-bullseye me-1"></i> Вам будет показано:
-                            <span class="ms-1"><i class="bi bi-circle me-1"></i>{{ formatToShow(exam.singleChoiceToShow, exam.singleChoiceCount) }}</span>
-                            <span class="ms-2"><i class="bi bi-check2-square me-1"></i>{{ formatToShow(exam.multipleChoiceToShow, exam.multipleChoiceCount) }}</span>
-                            <span class="ms-2"><i class="bi bi-pencil me-1"></i>{{ formatToShow(exam.textInputToShow, exam.textInputCount) }}</span>
+                            <span class="ms-1"><i class="bi bi-circle me-1"></i>{{
+                                    formatToShow(exam.singleChoiceToShow, exam.singleChoiceCount)
+                                }}</span>
+                            <span class="ms-2"><i class="bi bi-check2-square me-1"></i>{{
+                                    formatToShow(exam.multipleChoiceToShow, exam.multipleChoiceCount)
+                                }}</span>
+                            <span class="ms-2"><i class="bi bi-pencil me-1"></i>{{
+                                    formatToShow(exam.textInputToShow, exam.textInputCount)
+                                }}</span>
                         </div>
                     </div>
                 </div>
@@ -40,8 +49,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import {ref, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
 import api from '../services/api'
 
 const router = useRouter()
@@ -71,7 +80,7 @@ async function startExam(examId) {
     startingExam.value = examId
     try {
         const response = await api.startAttempt(examId)
-        const { attemptId, exam } = response.data
+        const {attemptId, exam} = response.data
         sessionStorage.setItem(`attempt_${attemptId}`, JSON.stringify(exam))
         router.push(`/attempt/${attemptId}`)
     } catch (err) {

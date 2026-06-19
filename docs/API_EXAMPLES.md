@@ -112,7 +112,8 @@ Accept: application/json
 }
 ```
 
-> **Примечание:** Поля `singleChoiceToShow`, `multipleChoiceToShow`, `textInputToShow` являются опциональными. Если не указаны (или равны 0), студенту будут показаны все вопросы соответствующего типа.
+> **Примечание:** Поля `singleChoiceToShow`, `multipleChoiceToShow`, `textInputToShow` являются опциональными. Если не
+> указаны (или равны 0), студенту будут показаны все вопросы соответствующего типа.
 
 ### Запрос
 
@@ -144,6 +145,7 @@ Content-Type: application/json
 ```
 
 **Заголовки ответа:**
+
 ```
 Location: /api/v1/exams/507f1f77bcf86cd799439011
 Content-Type: application/json
@@ -188,6 +190,7 @@ Accept: application/json
 ### Создание группы
 
 **Запрос:**
+
 ```http
 POST /api/v1/groups HTTP/1.1
 Host: localhost:8080
@@ -199,6 +202,7 @@ Content-Type: application/json
 ```
 
 **Ответ (201 Created):**
+
 ```json
 {
   "id": "019eabf3-12fe-7542-8285-ccc4d5a260ec",
@@ -210,6 +214,7 @@ Content-Type: application/json
 ### Импорт группы из JSON
 
 **Файл `group.json`:**
+
 ```json
 {
   "name": "Группа 1",
@@ -221,11 +226,13 @@ Content-Type: application/json
 ```
 
 **Запрос:**
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/groups/import -F "file=@group.json"
 ```
 
 **Ответ (201 Created):**
+
 ```json
 {
   "id": "019eabf3-12fe-7542-8285-ccc4d5a260ec",
@@ -259,6 +266,7 @@ curl -X POST http://localhost:8080/api/v1/groups/019eabf3-12fe-7542-8285-ccc4d5a
 ### Начало сессии (логин)
 
 **Запрос:**
+
 ```http
 POST /api/v1/sessions/start HTTP/1.1
 Host: localhost:8080
@@ -271,6 +279,7 @@ Content-Type: application/json
 ```
 
 **Ответ (200 OK):**
+
 ```json
 {
   "sessionId": "019eabf3-12fe-7542-8285-ccc4d5a260ee"
@@ -282,6 +291,7 @@ Content-Type: application/json
 **Заголовок:** `X-Session-Id: <sessionId>`
 
 **Запрос:**
+
 ```http
 POST /api/v1/attempts/start HTTP/1.1
 Host: localhost:8080
@@ -294,6 +304,7 @@ Content-Type: application/json
 ```
 
 **Ответ (200 OK):**
+
 ```json
 {
   "attemptId": "019eabf3-12fe-7542-8285-ccc4d5a260ef",
@@ -336,6 +347,7 @@ Content-Type: application/json
 ```
 
 **Ответ (200 OK):**
+
 ```json
 {
   "success": true
@@ -351,6 +363,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (200 OK):**
+
 ```json
 {
   "attemptId": "019eabf3-12fe-7542-8285-ccc4d5a260ef",
@@ -384,6 +397,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 **Запрос:** POST с пустым телом
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Файл не загружен"
@@ -395,6 +409,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 **Запрос:** POST с файлом `.txt` вместо `.json`
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Файл должен быть в формате JSON"
@@ -404,6 +419,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 3: Неверный JSON формат
 
 **JSON:**
+
 ```json
 {
   "title": "Test",
@@ -416,6 +432,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Неверный формат JSON: Unexpected end of JSON input"
@@ -425,6 +442,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 4: Отсутствует обязательное поле
 
 **JSON:**
+
 ```json
 {
   "description": "Test",
@@ -434,6 +452,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Название экзамена не может быть пустым"
@@ -443,6 +462,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 5: Пустой список вопросов
 
 **JSON:**
+
 ```json
 {
   "title": "Test",
@@ -452,6 +472,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Экзамен должен содержать хотя бы один вопрос"
@@ -461,6 +482,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 6: Неверный тип вопроса
 
 **JSON:**
+
 ```json
 {
   "text": "Q1",
@@ -470,6 +492,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Вопрос #1: недопустимый тип 'InvalidType'. Допустимые типы: SingleChoice, MultipleChoice, TextInput"
@@ -479,6 +502,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 7: SingleChoice с несколькими ответами
 
 **JSON:**
+
 ```json
 {
   "text": "Q1",
@@ -489,6 +513,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Вопрос #1 (SingleChoice): допускается только один правильный ответ"
@@ -498,6 +523,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 8: Правильный ответ отсутствует в вариантах
 
 **JSON:**
+
 ```json
 {
   "text": "Q1",
@@ -508,6 +534,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "Вопрос #1: правильные ответы [D] отсутствуют в вариантах ответов"
@@ -517,6 +544,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ### Пример 9: Количество вопросов для показа превышает доступное
 
 **JSON:**
+
 ```json
 {
   "title": "Test",
@@ -528,6 +556,7 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 ```
 
 **Ответ (400 Bad Request):**
+
 ```json
 {
   "error": "SingleChoiceToShow (100) превышает доступное количество (10)"
@@ -543,11 +572,13 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 **Лимит:** 10 запросов в час
 
 **Запрос #11:**
+
 ```http
 POST /api/v1/exams/import HTTP/1.1
 ```
 
 **Ответ (429 Too Many Requests):**
+
 ```json
 {
   "error": "Too many requests"
@@ -555,6 +586,7 @@ POST /api/v1/exams/import HTTP/1.1
 ```
 
 **Заголовки ответа:**
+
 ```
 Retry-After: 3600
 X-Rate-Limit-Limit: 10
@@ -567,11 +599,13 @@ X-Rate-Limit-Reset: 1717574157
 **Лимит:** 100 запросов в минуту
 
 **Запрос #101:**
+
 ```http
 GET /api/v1/health HTTP/1.1
 ```
 
 **Ответ (429 Too Many Requests):**
+
 ```json
 {
   "error": "Too many requests"
@@ -585,6 +619,7 @@ GET /api/v1/health HTTP/1.1
 ### 400 Bad Request
 
 Причины:
+
 - Пустой файл
 - Неверный формат файла (не JSON)
 - Невалидный JSON
@@ -594,6 +629,7 @@ GET /api/v1/health HTTP/1.1
 - И другие ошибки валидации
 
 **Ответ:**
+
 ```json
 {
   "error": "Описание ошибки"
@@ -605,6 +641,7 @@ GET /api/v1/health HTTP/1.1
 Причина: Превышен лимит запросов
 
 **Ответ:**
+
 ```json
 {
   "error": "Too many requests"
@@ -612,6 +649,7 @@ GET /api/v1/health HTTP/1.1
 ```
 
 **Заголовки:**
+
 ```
 Retry-After: <секунды до сброса лимита>
 ```
@@ -621,6 +659,7 @@ Retry-After: <секунды до сброса лимита>
 Причина: Внутренняя ошибка сервера
 
 **Ответ:**
+
 ```json
 {
   "error": "Внутренняя ошибка сервера. Попробуйте позже."

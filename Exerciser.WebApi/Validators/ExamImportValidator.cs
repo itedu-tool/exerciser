@@ -88,22 +88,43 @@ public class ExamImportValidator : IExamImportValidator
 
         // Проверка QuestionsToShow
         if (importData.SingleChoiceToShow < 0)
-            throw new ImportValidationException("Количество вопросов SingleChoice для показа не может быть отрицательным");
+        {
+            throw new ImportValidationException(
+                "Количество вопросов SingleChoice для показа не может быть отрицательным");
+        }
+
         if (importData.MultipleChoiceToShow < 0)
-            throw new ImportValidationException("Количество вопросов MultipleChoice для показа не может быть отрицательным");
+        {
+            throw new ImportValidationException(
+                "Количество вопросов MultipleChoice для показа не может быть отрицательным");
+        }
+
         if (importData.TextInputToShow < 0)
+        {
             throw new ImportValidationException("Количество вопросов TextInput для показа не может быть отрицательным");
+        }
 
         int actualSingleCount = importData.Questions.Count(q => q.Type == "SingleChoice");
         int actualMultipleCount = importData.Questions.Count(q => q.Type == "MultipleChoice");
         int actualTextCount = importData.Questions.Count(q => q.Type == "TextInput");
 
         if (importData.SingleChoiceToShow > actualSingleCount && importData.SingleChoiceToShow != 0)
-            throw new ImportValidationException($"SingleChoiceToShow ({importData.SingleChoiceToShow}) превышает доступное количество ({actualSingleCount})");
+        {
+            throw new ImportValidationException(
+                $"SingleChoiceToShow ({importData.SingleChoiceToShow}) превышает доступное количество ({actualSingleCount})");
+        }
+
         if (importData.MultipleChoiceToShow > actualMultipleCount && importData.MultipleChoiceToShow != 0)
-            throw new ImportValidationException($"MultipleChoiceToShow ({importData.MultipleChoiceToShow}) превышает доступное количество ({actualMultipleCount})");
+        {
+            throw new ImportValidationException(
+                $"MultipleChoiceToShow ({importData.MultipleChoiceToShow}) превышает доступное количество ({actualMultipleCount})");
+        }
+
         if (importData.TextInputToShow > actualTextCount && importData.TextInputToShow != 0)
-            throw new ImportValidationException($"TextInputToShow ({importData.TextInputToShow}) превышает доступное количество ({actualTextCount})");
+        {
+            throw new ImportValidationException(
+                $"TextInputToShow ({importData.TextInputToShow}) превышает доступное количество ({actualTextCount})");
+        }
 
 
         _logger.LogDebug("✓ Основные поля экзамена валидны");

@@ -13,7 +13,6 @@ public interface ISessionRepository
     Task<Session?> GetByIdAsync(Guid id);
 }
 
-
 public class SessionRepository : ISessionRepository
 {
     private readonly IMongoCollection<Session> _sessions;

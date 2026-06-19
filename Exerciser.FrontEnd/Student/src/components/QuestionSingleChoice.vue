@@ -26,7 +26,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import {ref, watch} from 'vue'
+
 const props = defineProps({
     question: Object,
     index: Number,
@@ -34,9 +35,11 @@ const props = defineProps({
 })
 const emit = defineEmits(['answer'])
 const selected = ref(props.savedAnswer || null)
+
 function updateAnswer() {
-    emit('answer', { questionId: props.question.id, answer: selected.value })
+    emit('answer', {questionId: props.question.id, answer: selected.value})
 }
+
 watch(() => props.savedAnswer, (newVal) => {
     if (newVal !== undefined) selected.value = newVal
 })

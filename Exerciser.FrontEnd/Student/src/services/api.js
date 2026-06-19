@@ -19,7 +19,7 @@ api.interceptors.request.use(config => {
 export default {
     // Сессии
     startSession(groupId, studentId) {
-        return api.post('/sessions/start', { groupId, studentId })
+        return api.post('/sessions/start', {groupId, studentId})
     },
 
     // Экзамены (доступные для студента)
@@ -29,7 +29,7 @@ export default {
 
     // Попытки
     startAttempt(examId) {
-        return api.post('/attempts/start', { examId })
+        return api.post('/attempts/start', {examId})
     },
 
     finishAttempt(attemptId, totalScore, answers, finishedAt) {

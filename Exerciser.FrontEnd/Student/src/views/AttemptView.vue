@@ -14,9 +14,10 @@
         <div class="sticky-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h2 mb-0">{{ exam?.title }}</h1>
-                <Timer :seconds="timeLeft" @timeout="autoSubmit" />
+                <Timer :seconds="timeLeft" @timeout="autoSubmit"/>
             </div>
-            <div class="progress mt-2" style="height: 6px;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress mt-2" style="height: 6px;" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100">
                 <div
                     class="progress-bar progress-bar-striped progress-bar-animated"
                     :style="{ width: progressPercent + '%' }"
@@ -55,8 +56,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import api from '../services/api'
 import Timer from '../components/Timer.vue'
 import QuestionSingleChoice from '../components/QuestionSingleChoice.vue'
@@ -93,12 +94,12 @@ const questionComponent = (type) => {
     return QuestionTextInput
 }
 
-function saveAnswer({ questionId, answer }) {
+function saveAnswer({questionId, answer}) {
     answers.value[questionId] = answer
 }
 
 function calculateScoreForQuestion(question, answer) {
-    const { type, correctAnswers } = question
+    const {type, correctAnswers} = question
 
     if (!answer || (Array.isArray(answer) && answer.length === 0) || (typeof answer === 'string' && answer.trim() === '')) {
         return 0
@@ -213,6 +214,7 @@ onMounted(loadAttempt)
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-bottom: 16px;
 }
+
 @media (prefers-color-scheme: dark) {
     .sticky-header {
         background: #212529;

@@ -16,23 +16,23 @@
                                 <i class="bi bi-box-arrow-right me-1"></i> Выйти
                             </a>
                         </li>
-                        <ThemeSelector @theme-changed="applyTheme" />
+                        <ThemeSelector @theme-changed="applyTheme"/>
                     </ul>
                 </div>
             </div>
         </nav>
         <main class="container mt-4" id="main-content">
-            <router-view />
+            <router-view/>
         </main>
     </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import {computed, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
 import auth from './services/auth'
 import ThemeSelector from './components/ThemeSelector.vue'
-import { THEME_STORAGE_KEY, AVAILABLE_THEMES } from './config/themes'
+import {THEME_STORAGE_KEY, AVAILABLE_THEMES} from './config/themes'
 
 const router = useRouter()
 const isAuthenticated = computed(() => auth.isAuthenticated())
