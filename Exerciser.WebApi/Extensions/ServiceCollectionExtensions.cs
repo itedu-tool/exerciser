@@ -1,20 +1,15 @@
 using System;
 using System.Linq;
 using System.Threading.RateLimiting;
-
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
-
 using MongoDB.Driver;
-
-using NLog;
-
 using Exerciser.WebApi.Models;
-
-using Microsoft.AspNetCore.Builder;
 
 namespace Exerciser.WebApi.Extensions;
 
@@ -104,7 +99,7 @@ public static class ServiceCollectionExtensions
                 mongoSettings.SocketTimeout = TimeSpan.FromSeconds(10);
                 mongoSettings.ServerSelectionTimeout = TimeSpan.FromSeconds(5);
 
-                logger.Info("✓ MongoDB pooling configured (max: 50, min: 10)");
+                logger.LogInformation("MongoDB pooling configured (max: 50, min: 10)");
                 return new MongoClient(mongoSettings);
             });
 
@@ -116,7 +111,6 @@ public static class ServiceCollectionExtensions
         {
             services.AddRateLimiter(limiterOptions =>
             {
-                // Fixed window limiter: 100 requests per minute for general endpoints
                 limiterOptions.AddFixedWindowLimiter("fixed", options =>
                 {
                     options.PermitLimit = 100;
@@ -125,7 +119,6 @@ public static class ServiceCollectionExtensions
                     options.QueueLimit = 10;
                 });
 
-                // Sliding window limiter: 10 requests per hour for import endpoint
                 limiterOptions.AddSlidingWindowLimiter("import-sliding", options =>
                 {
                     options.PermitLimit = 10;
@@ -135,7 +128,6 @@ public static class ServiceCollectionExtensions
                     options.QueueLimit = 5;
                 });
 
-                // Default rejection status code
                 limiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             });
 

@@ -6,6 +6,7 @@ using Scalar.AspNetCore;
 using NLog;
 using NLog.Web;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Exerciser.WebApi.DTOs;
@@ -14,6 +15,7 @@ using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
 using Exerciser.WebApi.Services;
 using Exerciser.WebApi.Middleware;
+using Exerciser.WebApi.Metrics;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -24,13 +26,14 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+
+using NLog.Extensions.Logging;
+
 using StackExchange.Redis;
 
 using ServiceCollectionExtensions = Exerciser.WebApi.Extensions.ServiceCollectionExtensions;
 
 BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-
-var logger = LogManager.Setup().LoadConfigurationFromFile("nlog.config").GetCurrentClassLogger();
 
 try
 {
@@ -45,7 +48,9 @@ try
 
     var corsOrigins = builder.Configuration["CORS:AllowedOrigins"];
     var allowedOrigins = ServiceCollectionExtensions.ParseCorsOrigins(corsOrigins);
-    logger.Info($"Настроены разрешённые источники CORS: {string.Join(", ", allowedOrigins)}");
+    var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole().AddNLog());
+    var logger = loggerFactory.CreateLogger<Program>();
+    logger.LogInformation("Настроены разрешённые источники CORS: {Origins}", string.Join(", ", allowedOrigins));
     builder.Services.AddCorsPolicy(allowedOrigins);
 
     builder.Services.AddOpenApiMetadata();
@@ -84,12 +89,12 @@ try
         });
         multiplexer = ConnectionMultiplexer.Connect(redisConnection);
         builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-        logger.Info("✓ Настроено кеширование Redis");
+        logger.LogInformation("Настроено кеширование Redis");
     }
     else
     {
         builder.Services.AddDistributedMemoryCache();
-        logger.Info("✓ Настроено кеширование MemoryCache (Redis недоступен)");
+        logger.LogInformation("Настроено кеширование MemoryCache (Redis недоступен)");
     }
 
     builder.Services.AddScoped<ICacheService>(sp =>
@@ -108,6 +113,12 @@ try
 
     builder.Services.AddFluentValidationAutoValidation();
     builder.Services.AddValidatorsFromAssemblyContaining<Exerciser.WebApi.Validators.FluentValidation.ImportExamDtoValidator>();
+
+    #endregion
+
+    #region Метрики
+
+    builder.Services.AddSingleton<ExerciserMetrics>();
 
     #endregion
 
@@ -145,6 +156,8 @@ try
 
     #region Middleware и маршрутизация
 
+    app.UseMiddleware<CorrelationIdMiddleware>();
+    app.UseMiddleware<MetricsMiddleware>();
     app.UseMiddleware<ExceptionHandlingMiddleware>();
     app.UseRateLimiter();
     app.UseCors("AllowConfiguredOrigins");
@@ -177,15 +190,17 @@ try
 }
 catch (Exception ex)
 {
-    logger.Fatal(ex, "Приложение завершило работу неожиданно");
+    // Логирование через статический NLog допустимо только здесь, в глобальном перехватчике.
+    // Альтернатива – использовать ILogger, но он недоступен в этом контексте.
+    NLog.LogManager.GetCurrentClassLogger().Fatal(ex, "Приложение завершило работу неожиданно");
     throw;
 }
 finally
 {
-    LogManager.Shutdown();
+    NLog.LogManager.Shutdown();
 }
 
-async Task CheckMongodbConnection(IServiceProvider services, NLog.ILogger logger)
+async Task CheckMongodbConnection(IServiceProvider services, ILogger<Program> logger)
 {
     try
     {
@@ -193,11 +208,11 @@ async Task CheckMongodbConnection(IServiceProvider services, NLog.ILogger logger
         var adminDb = client.GetDatabase("admin");
         var command = BsonDocument.Parse("{ ping: 1 }");
         await adminDb.RunCommandAsync<BsonDocument>(command);
-        logger.Info("✓ Подключение к MongoDB успешно проверено");
+        logger.LogInformation("Подключение к MongoDB успешно проверено");
     }
     catch (Exception ex)
     {
-        logger.Error(ex, "✗ Не удалось подключиться к MongoDB. Проверьте строку подключения и учётные данные.");
+        logger.LogError(ex, "Не удалось подключиться к MongoDB. Проверьте строку подключения и учётные данные.");
         throw;
     }
 }
