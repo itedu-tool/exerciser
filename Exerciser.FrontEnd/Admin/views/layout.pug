@@ -12,7 +12,6 @@ html(lang="ru")
         block vars
             - var title = "Exerciser"
             - var currentPage = ""
-        a.skip-link(href="#main-content") Перейти к содержимому
         nav.navbar.navbar-expand-lg.bg-dark(data-bs-theme="dark" aria-label="Основная навигация")
             .container-fluid
                 a.navbar-brand(href="index.html")
@@ -58,7 +57,7 @@ html(lang="ru")
                 a.ms-2(href="https://github.com/itedu-tool/exerciser") GitHub
         script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
         script.
-            (function () {
+            (function() {
                 const themeStylesheet = document.getElementById('theme-stylesheet');
                 const themeSelector = document.getElementById('theme-selector');
                 const themes = window.AVAILABLE_THEMES || [];
@@ -72,7 +71,7 @@ html(lang="ru")
                         a.className = 'dropdown-item';
                         a.setAttribute('data-theme', theme.id);
                         a.textContent = theme.name;
-                        a.addEventListener('click', function (e) {
+                        a.addEventListener('click', function(e) {
                             e.preventDefault();
                             themeStylesheet.href = theme.url;
                             localStorage.setItem('exerciser-theme', theme.id);
