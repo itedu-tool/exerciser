@@ -8,19 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" />
-    <PackageReference Include="FluentValidation.TestHelper" Version="11.3.0" />
-    <PackageReference Include="Testcontainers.MongoDb" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.Redis" Version="4.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.8" />
-    <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
+    <PackageReference Include="xunit" Version="2.9.3"/>
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2"/>
+    <PackageReference Include="FluentValidation.TestHelper" Version="11.3.0"/>
+    <PackageReference Include="Testcontainers.MongoDb" Version="4.3.0"/>
+    <PackageReference Include="Testcontainers.Redis" Version="4.3.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.8"/>
+    <PackageReference Include="Moq" Version="4.20.72"/>
+    <PackageReference Include="coverlet.collector" Version="6.0.4"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Exerciser.WebApi\Exerciser.WebApi.csproj" />
+    <ProjectReference Include="..\Exerciser.WebApi\Exerciser.WebApi.csproj"/>
   </ItemGroup>
 
 </Project>

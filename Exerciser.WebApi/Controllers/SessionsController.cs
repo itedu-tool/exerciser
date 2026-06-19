@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Exerciser.WebApi.DTOs;
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
@@ -26,21 +28,21 @@ public class SessionsController : ControllerBase
     [HttpPost("start")]
     public async Task<IActionResult> Start([FromBody] StartSessionRequest request)
     {
-        var group = await _groupRepository.GetByIdAsync(request.GroupId);
+        Group? group = await _groupRepository.GetByIdAsync(request.GroupId);
         if (group == null)
-            return BadRequest(new { error = "Группа не найдена" });
-
-        var student = group.Students.Find(s => s.Id == request.StudentId);
-        if (student == null)
-            return BadRequest(new { error = "Студент не найден в группе" });
-
-        var snapshot = new StudentSnapshot
         {
-            FullName = student.FullName,
-            GroupName = group.Name
-        };
+            return BadRequest(new { error = "Группа не найдена" });
+        }
 
-        var session = new Session { Student = snapshot };
+        Student? student = group.Students.Find(s => s.Id == request.StudentId);
+        if (student == null)
+        {
+            return BadRequest(new { error = "Студент не найден в группе" });
+        }
+
+        StudentSnapshot snapshot = new() { FullName = student.FullName, GroupName = group.Name };
+
+        Session session = new() { Student = snapshot };
         await _sessionRepository.CreateAsync(session);
 
         return Ok(new StartSessionResponse { SessionId = session.Id });

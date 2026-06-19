@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using MongoDB.Driver;
+
 using Exerciser.WebApi.Models;
 
 namespace Exerciser.WebApi.Repositories;
@@ -57,5 +59,8 @@ public class ExamRepository : RepositoryBase<Exam>, IExamRepository
     }
 
     /// <inheritdoc />
-    protected override Guid GetId(Exam entity) => entity.Id;
+    protected override Guid GetId(Exam entity)
+    {
+        return entity.Id;
+    }
 }

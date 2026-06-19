@@ -26,8 +26,8 @@ public class ExerciserMetrics
             description: "Total number of HTTP requests");
 
         RequestDuration = _meter.CreateHistogram<double>("http_request_duration_seconds",
-            unit: "s",
-            description: "Duration of HTTP requests in seconds");
+            "s",
+            "Duration of HTTP requests in seconds");
 
         ErrorsTotal = _meter.CreateCounter<int>("http_errors_total",
             description: "Total number of HTTP errors (status >= 400)");

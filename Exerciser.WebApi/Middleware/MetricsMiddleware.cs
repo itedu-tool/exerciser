@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
+
 using Exerciser.WebApi.Metrics;
 
 namespace Exerciser.WebApi.Middleware;
@@ -23,14 +25,14 @@ public class MetricsMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var stopwatch = Stopwatch.StartNew();
+        Stopwatch stopwatch = Stopwatch.StartNew();
         try
         {
             await _next(context);
             stopwatch.Stop();
 
-            var duration = stopwatch.Elapsed.TotalSeconds;
-            var statusCode = context.Response.StatusCode;
+            double duration = stopwatch.Elapsed.TotalSeconds;
+            int statusCode = context.Response.StatusCode;
 
             _metrics.RequestsTotal.Add(1,
                 new KeyValuePair<string, object?>("method", context.Request.Method),

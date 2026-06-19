@@ -1,4 +1,5 @@
 using FluentValidation;
+
 using Exerciser.WebApi.DTOs;
 
 namespace Exerciser.WebApi.Validators.FluentValidation;

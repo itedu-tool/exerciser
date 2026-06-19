@@ -1,5 +1,7 @@
 using System;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Exerciser.WebApi.DTOs;
 
 namespace Exerciser.WebApi.Controllers;
@@ -14,9 +16,9 @@ public class HealthController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        var nowLocal = DateTime.Now;
-        var utcNow = DateTime.UtcNow;
-        var timeZone = TimeZoneInfo.Local;
+        DateTime nowLocal = DateTime.Now;
+        DateTime utcNow = DateTime.UtcNow;
+        TimeZoneInfo timeZone = TimeZoneInfo.Local;
 
         return Ok(new HealthCheckResponseDto
         {

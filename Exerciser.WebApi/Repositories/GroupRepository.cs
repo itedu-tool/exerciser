@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using MongoDB.Driver;
+
 using Exerciser.WebApi.Models;
 
 namespace Exerciser.WebApi.Repositories;
@@ -56,5 +58,8 @@ public class GroupRepository : RepositoryBase<Group>, IGroupRepository
     }
 
     /// <inheritdoc />
-    protected override Guid GetId(Group entity) => entity.Id;
+    protected override Guid GetId(Group entity)
+    {
+        return entity.Id;
+    }
 }

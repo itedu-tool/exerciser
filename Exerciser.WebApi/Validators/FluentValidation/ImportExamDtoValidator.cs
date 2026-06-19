@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentValidation;
+
 using Exerciser.WebApi.DTOs;
 
 namespace Exerciser.WebApi.Validators.FluentValidation;
@@ -73,7 +75,10 @@ public class ImportQuestionDtoValidator : AbstractValidator<ImportQuestionDto>
         RuleFor(x => x)
             .Custom((dto, context) =>
             {
-                if (dto.Type == "TextInput") return;
+                if (dto.Type == "TextInput")
+                {
+                    return;
+                }
 
                 #region Проверка вариантов
 
@@ -84,10 +89,14 @@ public class ImportQuestionDtoValidator : AbstractValidator<ImportQuestionDto>
                 }
 
                 if (dto.Options.Any(string.IsNullOrWhiteSpace))
+                {
                     context.AddFailure("Варианты ответов не могут быть пустыми");
+                }
 
                 if (dto.Options.GroupBy(o => o).Any(g => g.Count() > 1))
+                {
                     context.AddFailure("Варианты ответов не должны дублироваться");
+                }
 
                 #endregion
 
@@ -100,11 +109,16 @@ public class ImportQuestionDtoValidator : AbstractValidator<ImportQuestionDto>
                 }
 
                 if (dto.Type == "SingleChoice" && dto.CorrectAnswers.Count > 1)
+                {
                     context.AddFailure("Для типа SingleChoice допускается только один правильный ответ");
+                }
 
-                var invalidAnswers = dto.CorrectAnswers.Except(dto.Options).ToList();
+                List<string> invalidAnswers = dto.CorrectAnswers.Except(dto.Options).ToList();
                 if (invalidAnswers.Any())
-                    context.AddFailure($"Правильные ответы [{string.Join(", ", invalidAnswers)}] отсутствуют в вариантах");
+                {
+                    context.AddFailure(
+                        $"Правильные ответы [{string.Join(", ", invalidAnswers)}] отсутствуют в вариантах");
+                }
 
                 #endregion
             });

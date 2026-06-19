@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+
 using StackExchange.Redis;
 
 namespace Exerciser.WebApi.Services;
@@ -111,28 +115,32 @@ public class DistributedCacheService : ICacheService
             }
 
             string pattern = $"{CacheKeyPrefix}{prefix}*";
-            var endpoints = _multiplexer.GetEndPoints();
+            EndPoint[] endpoints = _multiplexer.GetEndPoints();
             if (endpoints.Length == 0)
             {
                 _logger.LogWarning("Нет доступных Redis-эндпоинтов для удаления по префиксу");
                 return;
             }
 
-            var server = _multiplexer.GetServer(endpoints.First());
-            var db = _multiplexer.GetDatabase();
-            var keys = server.Keys(pattern: pattern);
+            IServer server = _multiplexer.GetServer(endpoints.First());
+            IDatabase db = _multiplexer.GetDatabase();
+            IEnumerable<RedisKey> keys = server.Keys(pattern: pattern);
 
             int deletedCount = 0;
-            foreach (var key in keys)
+            foreach (RedisKey key in keys)
             {
                 await db.KeyDeleteAsync(key);
                 deletedCount++;
             }
 
             if (deletedCount > 0)
+            {
                 _logger.LogDebug("Удалено {Count} ключей по префиксу '{Prefix}'", deletedCount, prefix);
+            }
             else
+            {
                 _logger.LogDebug("Ключи по префиксу '{Prefix}' не найдены", prefix);
+            }
         }
         catch (Exception ex)
         {

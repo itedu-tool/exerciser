@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
 using Exerciser.WebApi.Tests.Fixtures;
+
 using Xunit;
 
 namespace Exerciser.WebApi.Tests.Integration.Repositories;
@@ -24,11 +27,14 @@ public class AttemptRepositoryTests : IClassFixture<MongoDbFixture>
     public async Task GetLastFinishedAttemptsByStudentAndExamAsync_Should_Return_Last_Attempt_Per_Student_And_Exam()
     {
         // Arrange
-        var student = new StudentSnapshot { FullName = "Ivanov Ivan", GroupName = "Group1" };
-        var examId = Guid.NewGuid();
-        var exam = new ExamSnapshot { Id = examId, Title = "Exam1", Questions = new System.Collections.Generic.List<QuestionSnapshot>() };
+        StudentSnapshot student = new() { FullName = "Ivanov Ivan", GroupName = "Group1" };
+        Guid examId = Guid.NewGuid();
+        ExamSnapshot exam = new()
+        {
+            Id = examId, Title = "Exam1", Questions = new System.Collections.Generic.List<QuestionSnapshot>()
+        };
 
-        var attempt1 = new Attempt
+        Attempt attempt1 = new()
         {
             SessionId = Guid.NewGuid(),
             Student = student,
@@ -37,7 +43,7 @@ public class AttemptRepositoryTests : IClassFixture<MongoDbFixture>
             FinishedAt = DateTime.UtcNow.AddHours(-2),
             TotalScore = 10
         };
-        var attempt2 = new Attempt
+        Attempt attempt2 = new()
         {
             SessionId = Guid.NewGuid(),
             Student = student,
@@ -51,12 +57,12 @@ public class AttemptRepositoryTests : IClassFixture<MongoDbFixture>
         await _repository.CreateAsync(attempt2);
 
         // Act
-        var results = await _repository.GetLastFinishedAttemptsByStudentAndExamAsync();
-        var list = results.ToList();
+        IEnumerable<Attempt> results = await _repository.GetLastFinishedAttemptsByStudentAndExamAsync();
+        List<Attempt> list = results.ToList();
 
         // Assert
         Assert.Single(list);
-        var last = list.First();
+        Attempt last = list.First();
         Assert.Equal(attempt2.Id, last.Id);
         Assert.Equal(20, last.TotalScore);
     }
@@ -64,12 +70,15 @@ public class AttemptRepositoryTests : IClassFixture<MongoDbFixture>
     [Fact]
     public async Task GetLatestUnfinishedAsync_Should_Return_Only_Unfinished_Attempt()
     {
-        var sessionId = Guid.NewGuid();
-        var examId = Guid.NewGuid();
-        var student = new StudentSnapshot { FullName = "Petrov Petr", GroupName = "Group2" };
-        var exam = new ExamSnapshot { Id = examId, Title = "Exam2", Questions = new System.Collections.Generic.List<QuestionSnapshot>() };
+        Guid sessionId = Guid.NewGuid();
+        Guid examId = Guid.NewGuid();
+        StudentSnapshot student = new() { FullName = "Petrov Petr", GroupName = "Group2" };
+        ExamSnapshot exam = new()
+        {
+            Id = examId, Title = "Exam2", Questions = new System.Collections.Generic.List<QuestionSnapshot>()
+        };
 
-        var unfinished = new Attempt
+        Attempt unfinished = new()
         {
             SessionId = sessionId,
             Student = student,
@@ -77,7 +86,7 @@ public class AttemptRepositoryTests : IClassFixture<MongoDbFixture>
             StartedAt = DateTime.UtcNow,
             FinishedAt = null
         };
-        var finished = new Attempt
+        Attempt finished = new()
         {
             SessionId = sessionId,
             Student = student,
@@ -89,7 +98,7 @@ public class AttemptRepositoryTests : IClassFixture<MongoDbFixture>
         await _repository.CreateAsync(unfinished);
         await _repository.CreateAsync(finished);
 
-        var result = await _repository.GetLatestUnfinishedAsync(sessionId, examId);
+        Attempt? result = await _repository.GetLatestUnfinishedAsync(sessionId, examId);
         Assert.NotNull(result);
         Assert.Null(result.FinishedAt);
         Assert.Equal(unfinished.Id, result.Id);

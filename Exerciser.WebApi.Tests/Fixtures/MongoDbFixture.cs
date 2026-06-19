@@ -1,7 +1,10 @@
 using System;
 using System.Threading.Tasks;
+
 using MongoDB.Driver;
+
 using Testcontainers.MongoDb;
+
 using Xunit;
 
 namespace Exerciser.WebApi.Tests.Fixtures;
@@ -30,8 +33,8 @@ public class MongoDbFixture : IAsyncLifetime
 
     public async Task ClearCollectionsAsync()
     {
-        var collections = await Database.ListCollectionNamesAsync();
-        foreach (var name in await collections.ToListAsync())
+        IAsyncCursor<string>? collections = await Database.ListCollectionNamesAsync();
+        foreach (string? name in await collections.ToListAsync())
         {
             await Database.DropCollectionAsync(name);
         }

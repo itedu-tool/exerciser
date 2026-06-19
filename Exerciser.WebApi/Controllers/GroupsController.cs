@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using Exerciser.WebApi.DTOs;
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
@@ -32,16 +34,13 @@ public class GroupsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var groups = await _groupRepository.GetAllAsync();
-        var result = groups.Select(g => new GroupInfoDto
+        List<Group> groups = await _groupRepository.GetAllAsync();
+        IEnumerable<GroupInfoDto> result = groups.Select(g => new GroupInfoDto
         {
             Id = g.Id.ToString(),
             Name = g.Name,
-            Students = g.Students.Select(s => new StudentInfoDto
-            {
-                Id = s.Id.ToString(),
-                FullName = s.FullName
-            }).ToList()
+            Students = g.Students.Select(s => new StudentInfoDto { Id = s.Id.ToString(), FullName = s.FullName })
+                .ToList()
         });
         return Ok(result);
     }
@@ -52,14 +51,10 @@ public class GroupsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateGroupRequest request)
     {
-        var group = new Group { Name = request.Name };
+        Group group = new() { Name = request.Name };
         await _groupRepository.CreateAsync(group);
-        return Created($"/api/v1/groups/{group.Id}", new GroupInfoDto
-        {
-            Id = group.Id.ToString(),
-            Name = group.Name,
-            Students = new List<StudentInfoDto>()
-        });
+        return Created($"/api/v1/groups/{group.Id}",
+            new GroupInfoDto { Id = group.Id.ToString(), Name = group.Name, Students = new List<StudentInfoDto>() });
     }
 
     /// <summary>
@@ -70,40 +65,44 @@ public class GroupsController : ControllerBase
     public async Task<IActionResult> Import(IFormFile file)
     {
         if (file == null || file.Length == 0)
+        {
             return BadRequest(new { error = "Файл не загружен" });
+        }
 
         if (!Path.GetExtension(file.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase))
+        {
             return BadRequest(new { error = "Файл должен быть в формате JSON" });
+        }
 
-        using var stream = file.OpenReadStream();
-        var importData = await JsonSerializer.DeserializeAsync<ImportGroupRequest>(
+        using Stream stream = file.OpenReadStream();
+        ImportGroupRequest? importData = await JsonSerializer.DeserializeAsync<ImportGroupRequest>(
             stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (importData == null || string.IsNullOrWhiteSpace(importData.Name))
+        {
             return BadRequest(new { error = "Неверные данные группы: название обязательно" });
+        }
 
-        var group = new Group
+        Group group = new()
         {
             Name = importData.Name,
             Students = importData.Students?.Select(s => new Student
             {
-                LastName = s.LastName,
-                FirstName = s.FirstName,
-                Patronymic = s.Patronymic
+                LastName = s.LastName, FirstName = s.FirstName, Patronymic = s.Patronymic
             }).ToList() ?? new List<Student>()
         };
 
         await _groupRepository.CreateAsync(group);
-        return Created($"/api/v1/groups/{group.Id}", new GroupInfoDto
-        {
-            Id = group.Id.ToString(),
-            Name = group.Name,
-            Students = group.Students.Select(s => new StudentInfoDto
+        return Created($"/api/v1/groups/{group.Id}",
+            new GroupInfoDto
             {
-                Id = s.Id.ToString(),
-                FullName = s.FullName
-            }).ToList()
-        });
+                Id = group.Id.ToString(),
+                Name = group.Name,
+                Students = group.Students.Select(s => new StudentInfoDto
+                {
+                    Id = s.Id.ToString(), FullName = s.FullName
+                }).ToList()
+            });
     }
 
     /// <summary>
@@ -112,23 +111,20 @@ public class GroupsController : ControllerBase
     [HttpPost("{groupId:guid}/students")]
     public async Task<IActionResult> AddStudent(Guid groupId, [FromBody] AddStudentToGroupRequest request)
     {
-        var group = await _groupRepository.GetByIdAsync(groupId);
+        Group? group = await _groupRepository.GetByIdAsync(groupId);
         if (group == null)
-            return NotFound(new { error = "Группа не найдена" });
-
-        var student = new Student
         {
-            LastName = request.LastName,
-            FirstName = request.FirstName,
-            Patronymic = request.Patronymic
+            return NotFound(new { error = "Группа не найдена" });
+        }
+
+        Student student = new()
+        {
+            LastName = request.LastName, FirstName = request.FirstName, Patronymic = request.Patronymic
         };
         group.Students.Add(student);
         await _groupRepository.UpdateAsync(group);
 
-        return Created($"/api/v1/groups/{groupId}/students/{student.Id}", new StudentInfoDto
-        {
-            Id = student.Id.ToString(),
-            FullName = student.FullName
-        });
+        return Created($"/api/v1/groups/{groupId}/students/{student.Id}",
+            new StudentInfoDto { Id = student.Id.ToString(), FullName = student.FullName });
     }
 }

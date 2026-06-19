@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using MongoDB.Driver;
+
 using Exerciser.WebApi.Exceptions;
 
 namespace Exerciser.WebApi.Repositories;
@@ -41,7 +43,7 @@ public abstract class RepositoryBase<T> where T : class
     {
         try
         {
-            var filter = Builders<T>.Filter.Eq("_id", id);
+            FilterDefinition<T>? filter = Builders<T>.Filter.Eq("_id", id);
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }
         catch (MongoException ex)
@@ -76,7 +78,7 @@ public abstract class RepositoryBase<T> where T : class
     {
         try
         {
-            var filter = Builders<T>.Filter.Eq("_id", GetId(entity));
+            FilterDefinition<T>? filter = Builders<T>.Filter.Eq("_id", GetId(entity));
             await _collection.ReplaceOneAsync(filter, entity);
         }
         catch (MongoException ex)
@@ -92,8 +94,8 @@ public abstract class RepositoryBase<T> where T : class
     {
         try
         {
-            var filter = Builders<T>.Filter.Eq("_id", id);
-            var result = await _collection.DeleteOneAsync(filter);
+            FilterDefinition<T>? filter = Builders<T>.Filter.Eq("_id", id);
+            DeleteResult? result = await _collection.DeleteOneAsync(filter);
             return result.DeletedCount > 0;
         }
         catch (MongoException ex)

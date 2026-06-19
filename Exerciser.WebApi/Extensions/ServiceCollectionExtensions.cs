@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.RateLimiting;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
@@ -8,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+
 using MongoDB.Driver;
+
 using Exerciser.WebApi.Models;
 
 namespace Exerciser.WebApi.Extensions;

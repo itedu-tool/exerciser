@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using MongoDB.Bson;
 using MongoDB.Driver;
+
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Exceptions;
 
@@ -59,14 +61,17 @@ public class AttemptRepository : RepositoryBase<Attempt>, IAttemptRepository
     }
 
     /// <inheritdoc />
-    protected override Guid GetId(Attempt entity) => entity.Id;
+    protected override Guid GetId(Attempt entity)
+    {
+        return entity.Id;
+    }
 
     /// <inheritdoc />
     public async Task<Attempt?> GetLatestUnfinishedAsync(Guid sessionId, Guid examId)
     {
         try
         {
-            var filter = Builders<Attempt>.Filter.And(
+            FilterDefinition<Attempt>? filter = Builders<Attempt>.Filter.And(
                 Builders<Attempt>.Filter.Eq(a => a.SessionId, sessionId),
                 Builders<Attempt>.Filter.Eq(a => a.Exam.Id, examId),
                 Builders<Attempt>.Filter.Eq(a => a.FinishedAt, null)
@@ -87,23 +92,26 @@ public class AttemptRepository : RepositoryBase<Attempt>, IAttemptRepository
     {
         try
         {
-            var pipeline = new BsonDocument[]
+            BsonDocument[] pipeline = new BsonDocument[]
             {
-                new BsonDocument("$match", new BsonDocument("FinishedAt", new BsonDocument("$ne", BsonNull.Value))),
-                new BsonDocument("$sort", new BsonDocument("FinishedAt", -1)),
-                new BsonDocument("$group", new BsonDocument
-                {
-                    { "_id", new BsonDocument
+                new("$match", new BsonDocument("FinishedAt", new BsonDocument("$ne", BsonNull.Value))),
+                new("$sort", new BsonDocument("FinishedAt", -1)),
+                new("$group",
+                    new BsonDocument
+                    {
                         {
-                            { "studentName", "$Student.FullName" },
-                            { "groupName", "$Student.GroupName" },
-                            { "examId", "$Exam.Id" },
-                            { "examTitle", "$Exam.Title" }
-                        }
-                    },
-                    { "doc", new BsonDocument("$first", "$$ROOT") }
-                }),
-                new BsonDocument("$replaceRoot", new BsonDocument("newRoot", "$doc"))
+                            "_id",
+                            new BsonDocument
+                            {
+                                { "studentName", "$Student.FullName" },
+                                { "groupName", "$Student.GroupName" },
+                                { "examId", "$Exam.Id" },
+                                { "examTitle", "$Exam.Title" }
+                            }
+                        },
+                        { "doc", new BsonDocument("$first", "$$ROOT") }
+                    }),
+                new("$replaceRoot", new BsonDocument("newRoot", "$doc"))
             };
 
             return await _collection.Aggregate<Attempt>(pipeline).ToListAsync();

@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+
 using MongoDB.Driver;
+
 using Exerciser.WebApi.Models;
 
 namespace Exerciser.WebApi.Repositories;
@@ -38,5 +40,8 @@ public class SessionRepository : RepositoryBase<Session>, ISessionRepository
     }
 
     /// <inheritdoc />
-    protected override Guid GetId(Session entity) => entity.Id;
+    protected override Guid GetId(Session entity)
+    {
+        return entity.Id;
+    }
 }

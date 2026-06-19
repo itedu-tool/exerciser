@@ -1,7 +1,9 @@
 using System;
+
 using Exerciser.WebApi.DTOs;
 using Exerciser.WebApi.Extensions;
 using Exerciser.WebApi.Models;
+
 using Xunit;
 
 namespace Exerciser.WebApi.Tests.Unit;
@@ -11,7 +13,7 @@ public class MappingExtensionsTests
     [Fact]
     public void ToExam_Should_Map_All_Fields_Correctly()
     {
-        var dto = new ImportExamDto
+        ImportExamDto dto = new()
         {
             Title = "Test Exam",
             Description = "Description",
@@ -22,15 +24,12 @@ public class MappingExtensionsTests
             [
                 new ImportQuestionDto
                 {
-                    Text = "Q1",
-                    Type = "SingleChoice",
-                    Options = ["A", "B"],
-                    CorrectAnswers = ["A"]
+                    Text = "Q1", Type = "SingleChoice", Options = ["A", "B"], CorrectAnswers = ["A"]
                 }
             ]
         };
 
-        var exam = dto.ToExam();
+        Exam exam = dto.ToExam();
 
         Assert.Equal(dto.Title, exam.Title);
         Assert.Equal(dto.Description, exam.Description);
@@ -47,7 +46,7 @@ public class MappingExtensionsTests
     [Fact]
     public void ToSummaryDto_Should_Map_Correctly()
     {
-        var exam = new Exam
+        Exam exam = new()
         {
             Id = Guid.NewGuid(),
             Title = "Test",
@@ -58,24 +57,12 @@ public class MappingExtensionsTests
             TextInputToShow = 0,
             Questions =
             [
-                new Question
-                {
-                    Text = "Single question",
-                    Type = "SingleChoice",
-                    Options = [],
-                    CorrectAnswers = []
-                },
-                new Question
-                {
-                    Text = "Multiple question",
-                    Type = "MultipleChoice",
-                    Options = [],
-                    CorrectAnswers = []
-                }
+                new Question { Text = "Single question", Type = "SingleChoice", Options = [], CorrectAnswers = [] },
+                new Question { Text = "Multiple question", Type = "MultipleChoice", Options = [], CorrectAnswers = [] }
             ]
         };
 
-        var dto = exam.ToSummaryDto();
+        ExamSummaryDto dto = exam.ToSummaryDto();
 
         Assert.Equal(exam.Id, dto.Id);
         Assert.Equal(exam.Title, dto.Title);

@@ -1,9 +1,12 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+
 using FluentValidation;
+
 using Exerciser.WebApi.Exceptions;
 
 namespace Exerciser.WebApi.Middleware;
@@ -40,7 +43,7 @@ public class ExceptionHandlingMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        var (statusCode, errorMessage) = exception switch
+        (int statusCode, string errorMessage) = exception switch
         {
             ValidationException validationEx => (StatusCodes.Status400BadRequest, validationEx.Message),
             ImportValidationException importEx => (StatusCodes.Status400BadRequest, importEx.Message),
@@ -50,7 +53,7 @@ public class ExceptionHandlingMiddleware
         context.Response.StatusCode = statusCode;
 
         var response = new { error = errorMessage };
-        var json = JsonSerializer.Serialize(response);
+        string json = JsonSerializer.Serialize(response);
         return context.Response.WriteAsync(json);
     }
 }

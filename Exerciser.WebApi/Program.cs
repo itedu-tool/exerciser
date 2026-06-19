@@ -17,6 +17,7 @@ using Exerciser.WebApi.Repositories;
 using Exerciser.WebApi.Services;
 using Exerciser.WebApi.Middleware;
 using Exerciser.WebApi.Metrics;
+
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -38,7 +39,7 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard
 
 try
 {
-    var builder = WebApplication.CreateBuilder(args);
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
@@ -47,10 +48,10 @@ try
 
     builder.Services.AddControllers();
 
-    var corsOrigins = builder.Configuration["CORS:AllowedOrigins"];
-    var allowedOrigins = ServiceCollectionExtensions.ParseCorsOrigins(corsOrigins);
-    var loggerFactory = LoggerFactory.Create(logging => logging.AddConsole().AddNLog());
-    var logger = loggerFactory.CreateLogger<Program>();
+    string? corsOrigins = builder.Configuration["CORS:AllowedOrigins"];
+    string[] allowedOrigins = ServiceCollectionExtensions.ParseCorsOrigins(corsOrigins);
+    ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.AddConsole().AddNLog());
+    ILogger<Program> logger = loggerFactory.CreateLogger<Program>();
     logger.LogInformation("Настроены разрешённые источники CORS: {Origins}", string.Join(", ", allowedOrigins));
     builder.Services.AddCorsPolicy(allowedOrigins);
 
@@ -63,14 +64,14 @@ try
     builder.Services.AddMongoDb(logger);
     builder.Services.AddScoped<IMongoDatabase>(sp =>
     {
-        var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-        var client = sp.GetRequiredService<IMongoClient>();
+        MongoDbSettings settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+        IMongoClient client = sp.GetRequiredService<IMongoClient>();
         return client.GetDatabase(settings.DatabaseName ?? "exerciser_db");
     });
     builder.Services.AddScoped<IExamRepository>(sp =>
     {
-        var db = sp.GetRequiredService<IMongoDatabase>();
-        var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+        IMongoDatabase db = sp.GetRequiredService<IMongoDatabase>();
+        MongoDbSettings settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
         return new ExamRepository(db, settings.ExamsCollectionName ?? "Exams");
     });
     builder.Services.AddScoped<IGroupRepository, GroupRepository>();
@@ -79,7 +80,7 @@ try
 
     #region Redis и кеширование
 
-    var redisConnection = builder.Configuration["Redis:ConnectionString"];
+    string? redisConnection = builder.Configuration["Redis:ConnectionString"];
     IConnectionMultiplexer? multiplexer = null;
     if (!string.IsNullOrEmpty(redisConnection))
     {
@@ -100,9 +101,9 @@ try
 
     builder.Services.AddScoped<ICacheService>(sp =>
     {
-        var cache = sp.GetRequiredService<IDistributedCache>();
-        var log = sp.GetRequiredService<ILogger<DistributedCacheService>>();
-        var multiplexer = sp.GetService<IConnectionMultiplexer>();
+        IDistributedCache cache = sp.GetRequiredService<IDistributedCache>();
+        ILogger<DistributedCacheService> log = sp.GetRequiredService<ILogger<DistributedCacheService>>();
+        IConnectionMultiplexer? multiplexer = sp.GetService<IConnectionMultiplexer>();
         return new DistributedCacheService(cache, log, multiplexer);
     });
 
@@ -113,7 +114,8 @@ try
     #region FluentValidation
 
     builder.Services.AddFluentValidationAutoValidation();
-    builder.Services.AddValidatorsFromAssemblyContaining<Exerciser.WebApi.Validators.FluentValidation.ImportExamDtoValidator>();
+    builder.Services
+        .AddValidatorsFromAssemblyContaining<Exerciser.WebApi.Validators.FluentValidation.ImportExamDtoValidator>();
 
     #endregion
 
@@ -125,32 +127,33 @@ try
 
     #endregion
 
-    var app = builder.Build();
+    WebApplication app = builder.Build();
 
     #region Инициализация базы данных
 
-    using (var scope = app.Services.CreateScope())
+    using (IServiceScope scope = app.Services.CreateScope())
     {
-        var migration = scope.ServiceProvider.GetRequiredService<IMongoDbMigrationService>();
+        IMongoDbMigrationService migration = scope.ServiceProvider.GetRequiredService<IMongoDbMigrationService>();
         await migration.InitializeAsync();
     }
+
     await CheckMongodbConnection(app.Services, logger);
 
     #endregion
 
     #region Настройка HTTP и OpenAPI
 
-    var httpPort = builder.Configuration["ASPNETCORE_HTTP_PORT"] ?? "8080";
+    string httpPort = builder.Configuration["ASPNETCORE_HTTP_PORT"] ?? "8080";
     app.Urls.Clear();
     app.Urls.Add($"http://0.0.0.0:{httpPort}");
 
     app.MapOpenApi();
-    var apiMetadata = app.Services.GetRequiredService<IOptions<ApiMetadata>>().Value;
+    ApiMetadata? apiMetadata = app.Services.GetRequiredService<IOptions<ApiMetadata>>().Value;
     app.MapScalarApiReference(options =>
     {
         options.WithTitle(apiMetadata?.Title ?? "Exerciser API")
-               .WithTheme(ScalarTheme.Alternate)
-               .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+            .WithTheme(ScalarTheme.Alternate)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 
     #endregion
@@ -169,12 +172,12 @@ try
     #region Legacy endpoints (без версии)
 
     app.MapGet("/", () => "Exerciser API запущен. Используйте /scalar/v1 для документации.")
-       .RequireRateLimiting("fixed");
+        .RequireRateLimiting("fixed");
     app.MapGet("/health", async () =>
     {
-        var nowLocal = DateTime.Now;
-        var utcNow = DateTime.UtcNow;
-        var timeZone = TimeZoneInfo.Local;
+        DateTime nowLocal = DateTime.Now;
+        DateTime utcNow = DateTime.UtcNow;
+        TimeZoneInfo timeZone = TimeZoneInfo.Local;
         return Results.Ok(new HealthCheckResponseDto
         {
             Status = "healthy",
@@ -205,9 +208,9 @@ async Task CheckMongodbConnection(IServiceProvider services, ILogger<Program> lo
 {
     try
     {
-        var client = services.GetRequiredService<IMongoClient>();
-        var adminDb = client.GetDatabase("admin");
-        var command = BsonDocument.Parse("{ ping: 1 }");
+        IMongoClient client = services.GetRequiredService<IMongoClient>();
+        IMongoDatabase? adminDb = client.GetDatabase("admin");
+        BsonDocument? command = BsonDocument.Parse("{ ping: 1 }");
         await adminDb.RunCommandAsync<BsonDocument>(command);
         logger.LogInformation("Подключение к MongoDB успешно проверено");
     }

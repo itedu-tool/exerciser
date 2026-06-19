@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Exerciser.WebApi.DTOs;
+using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
 
 namespace Exerciser.WebApi.Controllers;
@@ -25,8 +28,8 @@ public class AnalyticsController : ControllerBase
     [HttpGet("attempts/last")]
     public async Task<IActionResult> GetLastAttempts()
     {
-        var attempts = await _attemptRepository.GetLastFinishedAttemptsByStudentAndExamAsync();
-        var result = attempts.Select(a =>
+        IEnumerable<Attempt> attempts = await _attemptRepository.GetLastFinishedAttemptsByStudentAndExamAsync();
+        IEnumerable<AttemptAnalyticsDto> result = attempts.Select(a =>
         {
             int maxScore = a.Exam.Questions.Sum(q =>
                 q.Type == "SingleChoice" ? 1 :
