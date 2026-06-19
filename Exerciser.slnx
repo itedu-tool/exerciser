@@ -1,31 +1,28 @@
 <Solution>
   <Folder Name="/docker/">
-    <File Path=".dockerignore"/>
-    <File Path=".env"/>
-    <File Path=".env.example"/>
-    <File Path="docker-compose.yml"/>
-    <File Path="Exerciser.WebApi/Dockerfile"/>
+    <File Path=".dockerignore" />
+    <File Path=".env" />
+    <File Path=".env.example" />
+    <File Path="docker-compose.yml" />
+    <File Path="Exerciser.WebApi/Dockerfile" />
   </Folder>
   <Folder Name="/docs/">
-    <File Path="CHANGELOG.md"/>
-    <File Path="docs/API_EXAMPLES.md"/>
-    <File Path="docs/POSTMAN_SETUP.md"/>
-    <File Path="LICENSE"/>
-    <File Path="README.md"/>
+    <File Path="CHANGELOG.md" />
+    <File Path="docs/API_EXAMPLES.md" />
+    <File Path="docs/POSTMAN_SETUP.md" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/git/">
-    <File Path=".gitattributes"/>
-    <File Path=".gitignore"/>
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
   </Folder>
   <Folder Name="/github/">
-    <File Path=".github/workflows/ci_cd.yml"/>
+    <File Path=".github/workflows/ci_cd.yml" />
   </Folder>
   <Folder Name="/postman/">
-    <File Path=".postman/environments/development.json"/>
-    <File Path=".postman/Exerciser.postman_collection.json"/>
+    <File Path=".postman/environments/development.json" />
+    <File Path=".postman/Exerciser.postman_collection.json" />
   </Folder>
-  <Folder Name="/scripts/">
-    <File Path="manage-services.ps1"/>
-  </Folder>
-  <Project Path="Exerciser.WebApi/Exerciser.WebApi.csproj"/>
+  <Project Path="Exerciser.WebApi/Exerciser.WebApi.csproj" />
 </Solution>
