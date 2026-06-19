@@ -1,75 +1,60 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using Exerciser.WebApi.Models;
-
 using MongoDB.Driver;
+using Exerciser.WebApi.Models;
 
 namespace Exerciser.WebApi.Repositories;
 
-/// <summary>Интерфейс репозитория для работы с группами и студентами.</summary>
+/// <summary>
+/// Интерфейс репозитория для работы с группами студентов.
+/// </summary>
 public interface IGroupRepository
 {
-    /// <summary>Получить все группы.</summary>
+    /// <summary>
+    /// Получить все группы.
+    /// </summary>
     Task<List<Group>> GetAllAsync();
 
-    /// <summary>Получить группу по идентификатору.</summary>
+    /// <summary>
+    /// Получить группу по идентификатору.
+    /// </summary>
     /// <param name="id">GUID группы.</param>
     Task<Group?> GetByIdAsync(Guid id);
 
-    /// <summary>Создать новую группу.</summary>
+    /// <summary>
+    /// Создать новую группу.
+    /// </summary>
+    /// <param name="group">Объект группы.</param>
     Task CreateAsync(Group group);
 
-    /// <summary>Обновить существующую группу (например, добавить студента).</summary>
+    /// <summary>
+    /// Обновить существующую группу.
+    /// </summary>
+    /// <param name="group">Объект группы с обновлёнными данными.</param>
     Task UpdateAsync(Group group);
 
-    /// <summary>Удалить группу по идентификатору (опционально).</summary>
+    /// <summary>
+    /// Удалить группу по идентификатору.
+    /// </summary>
+    /// <param name="id">GUID группы.</param>
     Task<bool> DeleteAsync(Guid id);
 }
 
-/// <summary>Реализация репозитория групп на основе MongoDB.</summary>
-public class GroupRepository : IGroupRepository
+/// <summary>
+/// Реализация репозитория для работы с группами в MongoDB.
+/// </summary>
+public class GroupRepository : RepositoryBase<Group>, IGroupRepository
 {
-    private readonly IMongoCollection<Group> _groups;
-
-    /// <summary>Инициализирует репозиторий с указанной коллекцией MongoDB.</summary>
+    /// <summary>
+    /// Инициализирует новый экземпляр репозитория групп.
+    /// </summary>
     /// <param name="database">База данных MongoDB.</param>
     public GroupRepository(IMongoDatabase database)
+        : base(database, "Groups")
     {
-        _groups = database.GetCollection<Group>("Groups");
     }
 
     /// <inheritdoc />
-    public async Task<List<Group>> GetAllAsync()
-    {
-        return await _groups.Find(_ => true).ToListAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task<Group?> GetByIdAsync(Guid id)
-    {
-        return await _groups.Find(g => g.Id == id).FirstOrDefaultAsync();
-    }
-
-    /// <inheritdoc />
-    public async Task CreateAsync(Group group)
-    {
-        await _groups.InsertOneAsync(group);
-    }
-
-    /// <inheritdoc />
-    public async Task UpdateAsync(Group group)
-    {
-        FilterDefinition<Group>? filter = Builders<Group>.Filter.Eq(g => g.Id, group.Id);
-        await _groups.ReplaceOneAsync(filter, group);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> DeleteAsync(Guid id)
-    {
-        FilterDefinition<Group>? filter = Builders<Group>.Filter.Eq(g => g.Id, id);
-        DeleteResult? result = await _groups.DeleteOneAsync(filter);
-        return result.DeletedCount > 0;
-    }
+    protected override Guid GetId(Group entity) => entity.Id;
 }

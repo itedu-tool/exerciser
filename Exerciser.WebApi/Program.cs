@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
+
 using Scalar.AspNetCore;
-using NLog;
+
 using NLog.Web;
+
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Exerciser.WebApi.DTOs;
