@@ -1,9 +1,7 @@
 <template>
     <fieldset class="question-card card mb-3">
         <legend class="card-header">
-            <i class="bi bi-pencil me-2 text-warning"></i>
             <strong>Вопрос {{ index + 1 }}</strong>
-            <span class="badge bg-secondary ms-2">Ввод текста</span>
         </legend>
         <div class="card-body">
             <p class="card-text">{{ question.text }}</p>

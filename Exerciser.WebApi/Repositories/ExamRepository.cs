@@ -80,7 +80,7 @@ public class ExamRepository : IExamRepository
     /// <exception cref="MongoConnectionException">Выбрасывается при проблемах с подключением к серверу MongoDB.</exception>
     public async Task UpdateAsync(Exam exam)
     {
-        var filter = Builders<Exam>.Filter.Eq(e => e.Id, exam.Id);
+        FilterDefinition<Exam>? filter = Builders<Exam>.Filter.Eq(e => e.Id, exam.Id);
         await _exams.ReplaceOneAsync(filter, exam);
     }
 

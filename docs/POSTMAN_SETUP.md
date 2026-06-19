@@ -15,15 +15,18 @@
 ## Установка Postman
 
 ### Вариант 1: Скачать приложение
+
 1. Перейти на https://www.postman.com/downloads/
 2. Выбрать свою ОС (Windows, macOS, Linux)
 3. Скачать и установить
 
 ### Вариант 2: Использовать веб-версию
+
 1. Зайти на https://web.postman.co/
 2. Создать аккаунт или войти
 
 ### Вариант 3: Docker
+
 ```bash
 docker run -d \
   --name postman \
@@ -40,21 +43,26 @@ docker run -d \
 ### Шаг 2: Импортировать Collection
 
 **Способ 1: Через UI**
+
 1. Нажать **File** → **Import**
 2. Выбрать файл `.postman/Exerciser.postman_collection.json`
 3. Нажать **Import**
 
 **Способ 2: Через drag & drop**
+
 1. Просто перетащить файл `.postman/Exerciser.postman_collection.json` в левую панель Postman
 
 **Способ 3: Через URL (если размещено на GitHub)**
+
 1. **File** → **Import** → **Link**
-2. Вставить URL: `https://raw.githubusercontent.com/itedu-tool/exerciser/main/.postman/Exerciser.postman_collection.json`
+2. Вставить URL:
+   `https://raw.githubusercontent.com/itedu-tool/exerciser/main/.postman/Exerciser.postman_collection.json`
 3. Нажать **Import**
 
 ### Шаг 3: Проверка импорта
 
 В левой панели должна появиться папка **"Exerciser API"** с подпапками:
+
 - ✅ **Health** – проверка работоспособности API
 - ✅ **Exams (Admin)** – управление экзаменами (импорт, получение, обновление, удаление)
 - ✅ **Groups & Students** – управление группами и студентами
@@ -81,10 +89,12 @@ docker run -d \
 ### Шаг 3: Проверка переменных
 
 Нажать на иконку Environment рядом с именем. Должны быть переменные:
+
 - `base_url` = `http://localhost:8080`
 - `exam_file_path` = `./exam.json`
 - `group_file_path` = `./group.json`
-- `exam_id`, `group_id`, `student_id`, `session_id`, `attempt_id` – будут заполняться автоматически во время выполнения запросов
+- `exam_id`, `group_id`, `student_id`, `session_id`, `attempt_id` – будут заполняться автоматически во время выполнения
+  запросов
 
 ---
 
@@ -128,23 +138,28 @@ docker run -d \
 1. Открыть **Groups & Students** → **Get All Groups** – получить список групп
 2. Открыть **Create Group** – создать новую группу
 3. Открыть **Import Group from JSON** – импортировать группу из файла `group.json`
-4. Открыть **Add Student to Group** – добавить студента в существующую группу (ID группы берётся из переменной `group_id`)
+4. Открыть **Add Student to Group** – добавить студента в существующую группу (ID группы берётся из переменной
+   `group_id`)
 
 ### Пример 4: Студенческая сессия и попытки (полный цикл)
 
-1. **Start Session** – создать сессию для студента (укажите `groupId` и `studentId` из предыдущих шагов). `sessionId` сохранится автоматически.
-2. **Start Attempt** – начать попытку для выбранного экзамена (заголовок `X-Session-Id` подставится автоматически). `attemptId` сохранится.
+1. **Start Session** – создать сессию для студента (укажите `groupId` и `studentId` из предыдущих шагов). `sessionId`
+   сохранится автоматически.
+2. **Start Attempt** – начать попытку для выбранного экзамена (заголовок `X-Session-Id` подставится автоматически).
+   `attemptId` сохранится.
 3. **Finish Attempt** – завершить попытку, отправив ответы.
 4. **Get Attempt Result** – получить результат завершённой попытки.
 
 ### Пример 5: Переменные в запросе
 
 Заметьте в URL:
+
 ```
 {{base_url}}/api/v1/exams/import
 ```
 
 Это означает:
+
 - `{{base_url}}` → `http://localhost:8080` (из Environment)
 
 Итоговый URL: `http://localhost:8080/api/v1/exams/import`
@@ -182,10 +197,10 @@ Postman откроет **Collection Runner** и запустит все запр
 
 ### Общие пределы
 
-| Endpoint | Лимит | Период |
-|----------|-------|--------|
-| General (Health, Exams, Groups, Sessions) | 100 | 1 минута |
-| Import Exam | 10 | 1 час |
+| Endpoint                                  | Лимит | Период   |
+|-------------------------------------------|-------|----------|
+| General (Health, Exams, Groups, Sessions) | 100   | 1 минута |
+| Import Exam                               | 10    | 1 час    |
 
 ### Тестирование Rate Limiting
 
@@ -196,6 +211,7 @@ Postman откроет **Collection Runner** и запустит все запр
 ### Как узнать оставшиеся запросы?
 
 Смотреть в **Response Headers** (вкладка **Headers** внизу):
+
 - `X-Rate-Limit-Limit` = максимум запросов
 - `X-Rate-Limit-Remaining` = осталось запросов
 - `X-Rate-Limit-Reset` = время сброса (в Unix timestamp)
@@ -209,6 +225,7 @@ Postman откроет **Collection Runner** и запустит все запр
 **Причина:** API не запущен или использован неправильный URL
 
 **Решение:**
+
 ```bash
 # Проверить, запущен ли Docker
 docker compose ps
@@ -225,6 +242,7 @@ curl http://localhost:8080/health
 **Причина:** Путь к `exam.json` неправильный
 
 **Решение:**
+
 1. Открыть **Exams (Admin)** → **Import Exam - Success**
 2. Нажать **Body** → **form-data**
 3. В поле `file` нажать на иконку файла
@@ -235,6 +253,7 @@ curl http://localhost:8080/health
 **Причина:** Environment не выбран
 
 **Решение:**
+
 1. В верхнем правом углу найти dropdown окружений
 2. Выбрать **"Exerciser - Development"**
 3. Должны видны значения переменных справа
@@ -244,6 +263,7 @@ curl http://localhost:8080/health
 **Причина:** Сервер перегружен или MongoDB недоступен
 
 **Решение:**
+
 ```bash
 # Проверить логи
 docker compose logs webapi
@@ -257,6 +277,7 @@ docker compose restart webapi
 **Причина:** Вкладка Tests скрыта или неверный формат
 
 **Решение:**
+
 1. Внизу окна должна быть вкладка **Tests**
 2. Если не видна, нажать **...** → **Show Tests**
 3. Убедиться, что Script не пустой
@@ -291,6 +312,7 @@ if (!pm.environment.get('exam_id')) {
 ### Совет 3: Экспорт результатов
 
 После запуска Collection Runner:
+
 1. Нажать **Export Results**
 2. Выбрать формат (JSON, CSV, HTML)
 3. Сохранить отчет

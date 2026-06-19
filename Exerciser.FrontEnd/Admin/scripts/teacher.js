@@ -24,7 +24,7 @@ async function importExam(file) {
     formData.append('file', file);
     try {
         console.log('[teacher.js] Вызов apiRequest POST', IMPORT_URL);
-        const data = await apiRequest(IMPORT_URL, { method: 'POST', body: formData });
+        const data = await apiRequest(IMPORT_URL, {method: 'POST', body: formData});
         console.log('[teacher.js] Импорт успешен, получены данные:', data);
         showMessage(
             importResultDiv,
@@ -149,7 +149,7 @@ async function deleteExam(id) {
     console.log('[teacher.js] deleteExam() для id:', id);
     try {
         console.log('[teacher.js] Вызов apiRequest DELETE', `${EXAMS_URL}/${id}`);
-        await apiRequest(`${EXAMS_URL}/${id}`, { method: 'DELETE' });
+        await apiRequest(`${EXAMS_URL}/${id}`, {method: 'DELETE'});
         console.log('[teacher.js] Экзамен удалён');
         showMessage(importResultDiv, '✅ Экзамен удалён', 'success');
         await loadExamsList();
@@ -239,19 +239,27 @@ function renderExamDetails(exam) {
 
 function getTypeIcon(type) {
     switch (type) {
-        case 'SingleChoice': return '🔘';
-        case 'MultipleChoice': return '☑️';
-        case 'TextInput': return '✏️';
-        default: return '❓';
+        case 'SingleChoice':
+            return '🔘';
+        case 'MultipleChoice':
+            return '☑️';
+        case 'TextInput':
+            return '✏️';
+        default:
+            return '❓';
     }
 }
 
 function getTypeLabel(type) {
     switch (type) {
-        case 'SingleChoice': return 'Один вариант';
-        case 'MultipleChoice': return 'Несколько вариантов';
-        case 'TextInput': return 'Ввод текста';
-        default: return 'Неизвестный тип';
+        case 'SingleChoice':
+            return 'Один вариант';
+        case 'MultipleChoice':
+            return 'Несколько вариантов';
+        case 'TextInput':
+            return 'Ввод текста';
+        default:
+            return 'Неизвестный тип';
     }
 }
 

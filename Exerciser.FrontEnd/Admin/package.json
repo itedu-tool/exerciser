@@ -1,6 +1,6 @@
 {
     "name": "exerciser-frontend-admin",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "type": "module",
     "description": "Административная панель для Exerciser WebApi (Pug, Bootstrap 5 + Bootswatch)",
     "scripts": {

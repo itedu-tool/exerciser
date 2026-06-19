@@ -14,7 +14,8 @@
                             <legend class="visually-hidden">Данные для входа</legend>
                             <div class="mb-3">
                                 <label class="form-label" for="groupSelect">Группа</label>
-                                <select id="groupSelect" class="form-select" v-model="selectedGroupId" required aria-required="true">
+                                <select id="groupSelect" class="form-select" v-model="selectedGroupId" required
+                                        aria-required="true">
                                     <option value="">Выберите группу</option>
                                     <option v-for="group in groups" :key="group.id" :value="group.id">
                                         {{ group.name }}
@@ -23,14 +24,16 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label" for="studentSelect">Студент</label>
-                                <select id="studentSelect" class="form-select" v-model="selectedStudentId" :disabled="!selectedGroupId" required aria-required="true">
+                                <select id="studentSelect" class="form-select" v-model="selectedStudentId"
+                                        :disabled="!selectedGroupId" required aria-required="true">
                                     <option value="">Выберите студента</option>
                                     <option v-for="student in students" :key="student.id" :value="student.id">
                                         {{ student.fullName }}
                                     </option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100" :disabled="!selectedGroupId || !selectedStudentId || loading">
+                            <button type="submit" class="btn btn-primary w-100"
+                                    :disabled="!selectedGroupId || !selectedStudentId || loading">
                                 <i v-if="loading" class="bi bi-hourglass-split me-1"></i>
                                 <i v-else class="bi bi-box-arrow-in-right me-1"></i>
                                 {{ loading ? 'Вход...' : 'Войти' }}
@@ -45,8 +48,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import {ref, watch} from 'vue'
+import {useRouter} from 'vue-router'
 import api from '../services/api'
 import auth from '../services/auth'
 

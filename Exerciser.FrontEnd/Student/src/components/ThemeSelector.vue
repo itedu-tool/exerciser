@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { AVAILABLE_THEMES, THEME_STORAGE_KEY } from '../config/themes'
+import {ref, onMounted} from 'vue'
+import {AVAILABLE_THEMES, THEME_STORAGE_KEY} from '../config/themes'
 
 const themes = AVAILABLE_THEMES
 const currentThemeId = ref(null)

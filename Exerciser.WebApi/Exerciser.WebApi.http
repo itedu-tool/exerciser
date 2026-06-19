@@ -156,7 +156,11 @@ Content-Type: application/json
     },
     {
       "questionId": "019eabf3-12fe-7542-8285-ccc4d5a260f0",
-      "answer": ["int", "bool", "struct"],
+      "answer": [
+        "int",
+        "bool",
+        "struct"
+      ],
       "score": 3
     }
   ]

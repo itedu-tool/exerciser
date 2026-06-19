@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('[groups.js] Вызов apiRequest POST /api/v1/groups с именем:', name);
             await apiRequest('/api/v1/groups', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name}),
             });
             const modalElement = document.getElementById('createGroupModal');
             const modal = bootstrap.Modal.getInstance(modalElement);
@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('[groups.js] Вызов apiRequest POST /api/v1/groups/${groupId}/students');
             await apiRequest(`/api/v1/groups/${groupId}/students`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lastName, firstName, patronymic }),
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({lastName, firstName, patronymic}),
             });
             document.getElementById('addStudentForm').reset();
             console.log('[groups.js] Студент добавлен, обновляем список студентов');
