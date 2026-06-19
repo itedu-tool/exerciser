@@ -15,7 +15,6 @@
                     <h2 class="h5 mb-1">{{ exam.title }}</h2>
                     <p class="mb-1 text-muted">{{ exam.description || 'Без описания' }}</p>
                     <div class="small">
-                        <!-- Удалена строка с общим количеством вопросов и разбивкой по типам -->
                         <div class="mt-1 text-primary">
                             <i class="bi bi-bullseye me-1"></i> Вам будет показано:
                             <span class="ms-1"><i class="bi bi-circle me-1"></i>{{ formatToShow(exam.singleChoiceToShow, exam.singleChoiceCount) }}</span>
@@ -48,7 +47,7 @@ function formatToShow(showValue, totalCount) {
     if (showValue === 0 || showValue >= totalCount) {
         return `все (${totalCount})`
     }
-    return `${showValue} из ${totalCount}`
+    return `${showValue}`
 }
 
 async function loadExams() {
