@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Scalar.AspNetCore;
@@ -13,8 +14,9 @@ using Exerciser.WebApi.Extensions;
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
 using Exerciser.WebApi.Services;
-using Exerciser.WebApi.Validators;
 using Exerciser.WebApi.Middleware;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +24,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+
+using ServiceCollectionExtensions = Exerciser.WebApi.Extensions.ServiceCollectionExtensions;
 
 BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
@@ -83,8 +87,14 @@ try
     }
     builder.Services.AddScoped<ICacheService, DistributedCacheService>();
 
-    builder.Services.AddScoped<IExamImportValidator, ExamImportValidator>();
     builder.Services.AddScoped<IMongoDbMigrationService, MongoDbMigrationService>();
+
+    #region FluentValidation
+
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddValidatorsFromAssemblyContaining<Exerciser.WebApi.Validators.FluentValidation.ImportExamDtoValidator>();
+
+    #endregion
 
     #endregion
 

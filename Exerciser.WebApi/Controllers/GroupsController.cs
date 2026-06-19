@@ -52,9 +52,6 @@ public class GroupsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateGroupRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
-            return BadRequest(new { error = "Название группы обязательно" });
-
         var group = new Group { Name = request.Name };
         await _groupRepository.CreateAsync(group);
         return Created($"/api/v1/groups/{group.Id}", new GroupInfoDto

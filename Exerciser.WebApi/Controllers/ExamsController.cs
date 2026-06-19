@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 using Exerciser.WebApi.DTOs;
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
-using Exerciser.WebApi.Validators;
 using Exerciser.WebApi.Extensions;
 
 namespace Exerciser.WebApi.Controllers;
@@ -20,10 +20,10 @@ namespace Exerciser.WebApi.Controllers;
 public class ExamsController : ControllerBase
 {
     private readonly IExamRepository _examRepository;
-    private readonly IExamImportValidator _validator;
+    private readonly IValidator<ImportExamDto> _validator;
     private readonly ILogger<ExamsController> _logger;
 
-    public ExamsController(IExamRepository examRepository, IExamImportValidator validator, ILogger<ExamsController> logger)
+    public ExamsController(IExamRepository examRepository, IValidator<ImportExamDto> validator, ILogger<ExamsController> logger)
     {
         _examRepository = examRepository;
         _validator = validator;
@@ -59,7 +59,7 @@ public class ExamsController : ControllerBase
             if (importData == null)
                 return BadRequest(new { error = "JSON не содержит данных" });
 
-            await _validator.ValidateAsync(importData);
+            await _validator.ValidateAndThrowAsync(importData);
 
             var exam = importData.ToExam();
             await _examRepository.CreateAsync(exam);
@@ -118,7 +118,7 @@ public class ExamsController : ControllerBase
         if (existing == null)
             return NotFound(new { error = "Экзамен не найден" });
 
-        await _validator.ValidateAsync(updatedExam);
+        await _validator.ValidateAndThrowAsync(updatedExam);
 
         var exam = updatedExam.ToExam();
         exam.Id = id;

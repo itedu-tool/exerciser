@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 using Exerciser.WebApi.Exceptions;
 
 namespace Exerciser.WebApi.Middleware;
@@ -41,7 +42,8 @@ public class ExceptionHandlingMiddleware
 
         var (statusCode, errorMessage) = exception switch
         {
-            ImportValidationException validationEx => (StatusCodes.Status400BadRequest, validationEx.Message),
+            ValidationException validationEx => (StatusCodes.Status400BadRequest, validationEx.Message),
+            ImportValidationException importEx => (StatusCodes.Status400BadRequest, importEx.Message),
             _ => (StatusCodes.Status500InternalServerError, "Внутренняя ошибка сервера. Попробуйте позже.")
         };
 
