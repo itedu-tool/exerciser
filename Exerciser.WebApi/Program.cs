@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Scalar.AspNetCore;
@@ -113,7 +112,7 @@ try
 
     #region Настройка HTTP и OpenAPI
 
-    var httpPort = Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORT") ?? "8080";
+    var httpPort = builder.Configuration["ASPNETCORE_HTTP_PORT"] ?? "8080";
     app.Urls.Clear();
     app.Urls.Add($"http://0.0.0.0:{httpPort}");
 
