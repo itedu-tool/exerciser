@@ -131,7 +131,7 @@ function renderOptions(q, qIdx) {
                            data-qidx="${qIdx}" data-opt="${escapeHtml(opt)}"
                            id="${inputId}">
                 </div>
-                <input type="text" class="form-control option-text" value="${escapeHtml(opt)}" data-qidx="${qIdx}" data-oidx="${optIdx}" aria-label="Вариант ${optIdx+1}">
+                <input type="text" class="form-control option-text" value="${escapeHtml(opt)}" data-qidx="${qIdx}" data-oidx="${optIdx}" aria-label="Вариант ${optIdx + 1}">
                 <button class="btn btn-outline-danger remove-option-btn" type="button" data-qidx="${qIdx}" data-oidx="${optIdx}" title="Удалить вариант">
                     <i class="bi bi-trash3"></i>
                 </button>
@@ -368,19 +368,27 @@ function previewExam() {
 
 function getTypeIcon(type) {
     switch (type) {
-        case 'SingleChoice': return '🔘';
-        case 'MultipleChoice': return '☑️';
-        case 'TextInput': return '✏️';
-        default: return '❓';
+        case 'SingleChoice':
+            return '🔘';
+        case 'MultipleChoice':
+            return '☑️';
+        case 'TextInput':
+            return '✏️';
+        default:
+            return '❓';
     }
 }
 
 function getTypeLabel(type) {
     switch (type) {
-        case 'SingleChoice': return 'Один вариант';
-        case 'MultipleChoice': return 'Несколько вариантов';
-        case 'TextInput': return 'Ввод текста';
-        default: return 'Неизвестный тип';
+        case 'SingleChoice':
+            return 'Один вариант';
+        case 'MultipleChoice':
+            return 'Несколько вариантов';
+        case 'TextInput':
+            return 'Ввод текста';
+        default:
+            return 'Неизвестный тип';
     }
 }
 
@@ -475,7 +483,7 @@ async function saveExam() {
         console.log('[edit.js] Вызов apiRequest PUT /api/v1/exams/${examId}');
         await apiRequest(`/api/v1/exams/${examId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 title,
                 description,

@@ -39,7 +39,7 @@ public class AttemptRepository : IAttemptRepository
 
     public async Task UpdateAsync(Attempt attempt)
     {
-        var filter = Builders<Attempt>.Filter.Eq(a => a.Id, attempt.Id);
+        FilterDefinition<Attempt>? filter = Builders<Attempt>.Filter.Eq(a => a.Id, attempt.Id);
         await _attempts.ReplaceOneAsync(filter, attempt);
     }
 
@@ -49,28 +49,31 @@ public class AttemptRepository : IAttemptRepository
             .SortByDescending(a => a.StartedAt)
             .FirstOrDefaultAsync();
     }
-    
+
     public async Task<IEnumerable<Attempt>> GetLastFinishedAttemptsByStudentAndExamAsync()
     {
-        var pipeline = new[]
+        BsonDocument[] pipeline = new[]
         {
             // Фильтр: только завершённые попытки
             new BsonDocument("$match", new BsonDocument("FinishedAt", new BsonDocument("$ne", BsonNull.Value))),
             // Сортировка по убыванию даты завершения
             new BsonDocument("$sort", new BsonDocument("FinishedAt", -1)),
             // Группировка по студенту + группе + экзамену
-            new BsonDocument("$group", new BsonDocument
-            {
-                { "_id", new BsonDocument
+            new BsonDocument("$group",
+                new BsonDocument
+                {
                     {
-                        { "studentName", "$Student.FullName" },
-                        { "groupName", "$Student.GroupName" },
-                        { "examId", "$Exam.Id" },
-                        { "examTitle", "$Exam.Title" }
-                    }
-                },
-                { "doc", new BsonDocument("$first", "$$ROOT") }
-            }),
+                        "_id",
+                        new BsonDocument
+                        {
+                            { "studentName", "$Student.FullName" },
+                            { "groupName", "$Student.GroupName" },
+                            { "examId", "$Exam.Id" },
+                            { "examTitle", "$Exam.Title" }
+                        }
+                    },
+                    { "doc", new BsonDocument("$first", "$$ROOT") }
+                }),
             // Замена на документ
             new BsonDocument("$replaceRoot", new BsonDocument("newRoot", "$doc"))
         };

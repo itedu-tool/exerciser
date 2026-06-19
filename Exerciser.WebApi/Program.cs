@@ -25,6 +25,7 @@ using Exerciser.WebApi.Exceptions;
 using Exerciser.WebApi.Extensions;
 
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -425,10 +426,12 @@ try
             IExamImportValidator validator,
             ILogger<Program> updateLogger) =>
         {
-            var existing = await repo.GetByIdAsync(id);
+            Exam? existing = await repo.GetByIdAsync(id);
             if (existing == null)
+            {
                 return Results.NotFound(new { error = "Экзамен не найден" });
-            
+            }
+
             try
             {
                 await validator.ValidateAsync(updatedExam);
@@ -437,8 +440,8 @@ try
             {
                 return Results.BadRequest(new { error = ex.Message });
             }
-            
-            var exam = new Exam
+
+            Exam exam = new()
             {
                 Id = id,
                 Title = updatedExam.Title,
@@ -446,10 +449,7 @@ try
                 CreatedAt = existing.CreatedAt,
                 Questions = updatedExam.Questions.Select(q => new Question
                 {
-                    Text = q.Text,
-                    Type = q.Type,
-                    Options = q.Options ?? [],
-                    CorrectAnswers = q.CorrectAnswers
+                    Text = q.Text, Type = q.Type, Options = q.Options ?? [], CorrectAnswers = q.CorrectAnswers
                 }).ToList(),
                 SingleChoiceToShow = updatedExam.SingleChoiceToShow,
                 MultipleChoiceToShow = updatedExam.MultipleChoiceToShow,
@@ -461,9 +461,7 @@ try
 
             return Results.Ok(new ExamImportResponseDto
             {
-                Id = exam.Id.ToString(),
-                Title = exam.Title,
-                QuestionsCount = exam.Questions.Count
+                Id = exam.Id.ToString(), Title = exam.Title, QuestionsCount = exam.Questions.Count
             });
         })
         .RequireRateLimiting("fixed")
@@ -504,8 +502,8 @@ try
     // GET /api/v1/groups - Получить список всех групп со студентами.
     groupsGroup.MapGet("/", async (IGroupRepository groupRepo) =>
         {
-            var groups = await groupRepo.GetAllAsync();
-            var result = groups.Select(g => new GroupInfoDto
+            List<Group> groups = await groupRepo.GetAllAsync();
+            IEnumerable<GroupInfoDto> result = groups.Select(g => new GroupInfoDto
             {
                 Id = g.Id.ToString(),
                 Name = g.Name,
@@ -522,7 +520,7 @@ try
     // POST /api/v1/groups - Создать новую группу.
     groupsGroup.MapPost("/", async (CreateGroupRequest request, IGroupRepository groupRepo) =>
         {
-            var group = new Group { Name = request.Name };
+            Group group = new() { Name = request.Name };
             await groupRepo.CreateAsync(group);
             return Results.Created($"{apiV1Prefix}/groups/{group.Id}",
                 new GroupInfoDto { Id = group.Id.ToString(), Name = group.Name, Students = [] });
@@ -537,23 +535,31 @@ try
     groupsGroup.MapPost("/import", async (HttpRequest request, IGroupRepository groupRepo) =>
         {
             if (!request.HasFormContentType)
+            {
                 return Results.BadRequest(new { error = "Expected multipart/form-data" });
+            }
 
-            var file = request.Form.Files.FirstOrDefault();
+            IFormFile? file = request.Form.Files.FirstOrDefault();
             if (file == null || file.Length == 0)
+            {
                 return Results.BadRequest(new { error = "File not provided" });
+            }
 
             if (!Path.GetExtension(file.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase))
+            {
                 return Results.BadRequest(new { error = "File must be JSON" });
+            }
 
-            using var stream = file.OpenReadStream();
-            var importData = await JsonSerializer.DeserializeAsync<ImportGroupRequest>(stream,
+            using Stream stream = file.OpenReadStream();
+            ImportGroupRequest? importData = await JsonSerializer.DeserializeAsync<ImportGroupRequest>(stream,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (importData == null || string.IsNullOrWhiteSpace(importData.Name))
+            {
                 return Results.BadRequest(new { error = "Invalid group data: name required" });
+            }
 
-            var group = new Group
+            Group group = new()
             {
                 Name = importData.Name,
                 Students = importData.Students?.Select(s => new Student
@@ -586,11 +592,13 @@ try
     groupsGroup.MapPost("/{groupId:guid}/students",
             async (Guid groupId, AddStudentToGroupRequest request, IGroupRepository groupRepo) =>
             {
-                var group = await groupRepo.GetByIdAsync(groupId);
+                Group? group = await groupRepo.GetByIdAsync(groupId);
                 if (group == null)
+                {
                     return Results.NotFound(new { error = "Group not found" });
+                }
 
-                var student = new Student
+                Student student = new()
                 {
                     LastName = request.LastName, FirstName = request.FirstName, Patronymic = request.Patronymic
                 };
@@ -615,185 +623,210 @@ try
         .RequireRateLimiting("fixed");
 
     // POST /api/v1/attempts/start - Начать новую попытку прохождения экзамена (требуется X-Session-Id).
-    attemptsGroup.MapPost("/start", async (StartAttemptRequest request, HttpContext httpContext, IExamRepository examRepo, IAttemptRepository attemptRepo, ISessionRepository sessionRepo) =>
-    {
-        if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out var sessionIdHeader) || !Guid.TryParse(sessionIdHeader, out Guid sessionId))
-            return Results.BadRequest(new { error = "X-Session-Id header required" });
-
-        var session = await sessionRepo.GetByIdAsync(sessionId);
-        if (session == null)
-            return Results.BadRequest(new { error = "Invalid session" });
-
-        var exam = await examRepo.GetByIdAsync(request.ExamId);
-        if (exam == null)
-            return Results.NotFound(new { error = "Exam not found" });
-
-        var existing = await attemptRepo.GetLatestUnfinishedAsync(sessionId, request.ExamId);
-        if (existing != null)
-            return Results.BadRequest(new { error = "Unfinished attempt already exists" });
-
-        int questionsToTakeSingle = exam.SingleChoiceToShow;
-        int questionsToTakeMultiple = exam.MultipleChoiceToShow;
-        int questionsToTakeText = exam.TextInputToShow;
-
-        var singleQuestions = exam.Questions.Where(q => q.Type == "SingleChoice").ToList();
-        var multipleQuestions = exam.Questions.Where(q => q.Type == "MultipleChoice").ToList();
-        var textQuestions = exam.Questions.Where(q => q.Type == "TextInput").ToList();
-
-        if (questionsToTakeSingle <= 0 || questionsToTakeSingle > singleQuestions.Count)
-            questionsToTakeSingle = singleQuestions.Count;
-        if (questionsToTakeMultiple <= 0 || questionsToTakeMultiple > multipleQuestions.Count)
-            questionsToTakeMultiple = multipleQuestions.Count;
-        if (questionsToTakeText <= 0 || questionsToTakeText > textQuestions.Count)
-            questionsToTakeText = textQuestions.Count;
-
-        var selectedSingle = singleQuestions.OrderBy(x => Guid.NewGuid()).Take(questionsToTakeSingle);
-        var selectedMultiple = multipleQuestions.OrderBy(x => Guid.NewGuid()).Take(questionsToTakeMultiple);
-        var selectedText = textQuestions.OrderBy(x => Guid.NewGuid()).Take(questionsToTakeText);
-
-        var finalShuffled = selectedSingle.Concat(selectedMultiple).Concat(selectedText)
-            .OrderBy(x => Guid.NewGuid())
-            .ToList();
-
-        var examSnapshot = new ExamSnapshot
-        {
-            Id = exam.Id,
-            Title = exam.Title,
-            Description = exam.Description,
-            Questions = finalShuffled.Select(q => new QuestionSnapshot
+    attemptsGroup.MapPost("/start",
+            async (StartAttemptRequest request, HttpContext httpContext, IExamRepository examRepo,
+                IAttemptRepository attemptRepo, ISessionRepository sessionRepo) =>
             {
-                Id = q.Id,
-                Text = q.Text,
-                Type = q.Type,
-                Options = q.Options,
-                CorrectAnswers = q.CorrectAnswers
-            }).ToList()
-        };
+                if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out StringValues sessionIdHeader) ||
+                    !Guid.TryParse(sessionIdHeader, out Guid sessionId))
+                {
+                    return Results.BadRequest(new { error = "X-Session-Id header required" });
+                }
 
-        var attempt = new Attempt
-        {
-            SessionId = sessionId,
-            Student = session.Student,
-            Exam = examSnapshot
-        };
-        await attemptRepo.CreateAsync(attempt);
+                Session? session = await sessionRepo.GetByIdAsync(sessionId);
+                if (session == null)
+                {
+                    return Results.BadRequest(new { error = "Invalid session" });
+                }
 
-        var examDto = new ExamSnapshotDto
-        {
-            Id = examSnapshot.Id,
-            Title = examSnapshot.Title,
-            Description = examSnapshot.Description,
-            Questions = examSnapshot.Questions.Select(q => new QuestionSnapshotDto
-            {
-                Id = q.Id,
-                Text = q.Text,
-                Type = q.Type,
-                Options = q.Options,
-                CorrectAnswers = q.CorrectAnswers
-            }).ToList()
-        };
+                Exam? exam = await examRepo.GetByIdAsync(request.ExamId);
+                if (exam == null)
+                {
+                    return Results.NotFound(new { error = "Exam not found" });
+                }
 
-        return Results.Ok(new StartAttemptResponse
-        {
-            AttemptId = attempt.Id,
-            Exam = examDto
-        });
-    })
-    .RequireRateLimiting("fixed")
-    .WithName("StartAttempt")
-    .WithSummary("Начать новую попытку прохождения экзамена")
-    .WithDescription("Создаёт новую попытку для указанного экзамена. Требуется заголовок X-Session-Id. Количество вопросов определяется полями SingleChoiceToShow, MultipleChoiceToShow, TextInputToShow экзамена.")
-    .Accepts<StartAttemptRequest>("application/json")
-    .Produces<StartAttemptResponse>(StatusCodes.Status200OK)
-    .Produces<object>(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status404NotFound);
+                Attempt? existing = await attemptRepo.GetLatestUnfinishedAsync(sessionId, request.ExamId);
+                if (existing != null)
+                {
+                    return Results.BadRequest(new { error = "Unfinished attempt already exists" });
+                }
+
+                int questionsToTakeSingle = exam.SingleChoiceToShow;
+                int questionsToTakeMultiple = exam.MultipleChoiceToShow;
+                int questionsToTakeText = exam.TextInputToShow;
+
+                List<Question> singleQuestions = exam.Questions.Where(q => q.Type == "SingleChoice").ToList();
+                List<Question> multipleQuestions = exam.Questions.Where(q => q.Type == "MultipleChoice").ToList();
+                List<Question> textQuestions = exam.Questions.Where(q => q.Type == "TextInput").ToList();
+
+                if (questionsToTakeSingle <= 0 || questionsToTakeSingle > singleQuestions.Count)
+                {
+                    questionsToTakeSingle = singleQuestions.Count;
+                }
+
+                if (questionsToTakeMultiple <= 0 || questionsToTakeMultiple > multipleQuestions.Count)
+                {
+                    questionsToTakeMultiple = multipleQuestions.Count;
+                }
+
+                if (questionsToTakeText <= 0 || questionsToTakeText > textQuestions.Count)
+                {
+                    questionsToTakeText = textQuestions.Count;
+                }
+
+                IEnumerable<Question> selectedSingle =
+                    singleQuestions.OrderBy(x => Guid.NewGuid()).Take(questionsToTakeSingle);
+                IEnumerable<Question> selectedMultiple =
+                    multipleQuestions.OrderBy(x => Guid.NewGuid()).Take(questionsToTakeMultiple);
+                IEnumerable<Question> selectedText =
+                    textQuestions.OrderBy(x => Guid.NewGuid()).Take(questionsToTakeText);
+
+                List<Question> finalShuffled = selectedSingle.Concat(selectedMultiple).Concat(selectedText)
+                    .OrderBy(x => Guid.NewGuid())
+                    .ToList();
+
+                ExamSnapshot examSnapshot = new()
+                {
+                    Id = exam.Id,
+                    Title = exam.Title,
+                    Description = exam.Description,
+                    Questions = finalShuffled.Select(q => new QuestionSnapshot
+                    {
+                        Id = q.Id,
+                        Text = q.Text,
+                        Type = q.Type,
+                        Options = q.Options,
+                        CorrectAnswers = q.CorrectAnswers
+                    }).ToList()
+                };
+
+                Attempt attempt = new() { SessionId = sessionId, Student = session.Student, Exam = examSnapshot };
+                await attemptRepo.CreateAsync(attempt);
+
+                ExamSnapshotDto examDto = new()
+                {
+                    Id = examSnapshot.Id,
+                    Title = examSnapshot.Title,
+                    Description = examSnapshot.Description,
+                    Questions = examSnapshot.Questions.Select(q => new QuestionSnapshotDto
+                    {
+                        Id = q.Id,
+                        Text = q.Text,
+                        Type = q.Type,
+                        Options = q.Options,
+                        CorrectAnswers = q.CorrectAnswers
+                    }).ToList()
+                };
+
+                return Results.Ok(new StartAttemptResponse { AttemptId = attempt.Id, Exam = examDto });
+            })
+        .RequireRateLimiting("fixed")
+        .WithName("StartAttempt")
+        .WithSummary("Начать новую попытку прохождения экзамена")
+        .WithDescription(
+            "Создаёт новую попытку для указанного экзамена. Требуется заголовок X-Session-Id. Количество вопросов определяется полями SingleChoiceToShow, MultipleChoiceToShow, TextInputToShow экзамена.")
+        .Accepts<StartAttemptRequest>("application/json")
+        .Produces<StartAttemptResponse>(StatusCodes.Status200OK)
+        .Produces<object>(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status404NotFound);
 
     // POST /api/v1/attempts/{id}/finish - Завершить попытку и сохранить ответы (требуется X-Session-Id).
-attemptsGroup.MapPost($"/{{id:guid}}/finish",
-        async (Guid id, FinishAttemptRequest request, HttpContext httpContext, IAttemptRepository attemptRepo) =>
-        {
-            if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out var sessionIdHeader) ||
-                !Guid.TryParse(sessionIdHeader, out Guid sessionId))
-                return Results.BadRequest(new { error = "X-Session-Id header required" });
-
-            var attempt = await attemptRepo.GetByIdAsync(id);
-            if (attempt == null)
-                return Results.NotFound(new { error = "Attempt not found" });
-
-            if (attempt.SessionId != sessionId)
-                return Results.BadRequest(new { error = "Attempt does not belong to this session" });
-
-            if (attempt.FinishedAt != null)
-                return Results.BadRequest(new { error = "Attempt already finished" });
-
-            // Преобразование JsonElement в примитивные типы
-            var storedAnswers = request.Answers.Select(a =>
+    attemptsGroup.MapPost($"/{{id:guid}}/finish",
+            async (Guid id, FinishAttemptRequest request, HttpContext httpContext, IAttemptRepository attemptRepo) =>
             {
-                object? answerValue;
-                if (a.Answer is JsonElement jsonElement)
+                if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out StringValues sessionIdHeader) ||
+                    !Guid.TryParse(sessionIdHeader, out Guid sessionId))
                 {
-                    answerValue = jsonElement.ValueKind switch
+                    return Results.BadRequest(new { error = "X-Session-Id header required" });
+                }
+
+                Attempt? attempt = await attemptRepo.GetByIdAsync(id);
+                if (attempt == null)
+                {
+                    return Results.NotFound(new { error = "Attempt not found" });
+                }
+
+                if (attempt.SessionId != sessionId)
+                {
+                    return Results.BadRequest(new { error = "Attempt does not belong to this session" });
+                }
+
+                if (attempt.FinishedAt != null)
+                {
+                    return Results.BadRequest(new { error = "Attempt already finished" });
+                }
+
+                // Преобразование JsonElement в примитивные типы
+                List<StoredAnswer> storedAnswers = request.Answers.Select(a =>
+                {
+                    object? answerValue;
+                    if (a.Answer is JsonElement jsonElement)
                     {
-                        JsonValueKind.String => jsonElement.GetString(),
-                        JsonValueKind.Array => jsonElement.EnumerateArray().Select(e => e.GetString()).ToList(),
-                        JsonValueKind.Null => null,
-                        _ => jsonElement.ToString()
-                    };
-                }
-                else
-                {
-                    answerValue = a.Answer;
-                }
+                        answerValue = jsonElement.ValueKind switch
+                        {
+                            JsonValueKind.String => jsonElement.GetString(),
+                            JsonValueKind.Array => jsonElement.EnumerateArray().Select(e => e.GetString()).ToList(),
+                            JsonValueKind.Null => null,
+                            _ => jsonElement.ToString()
+                        };
+                    }
+                    else
+                    {
+                        answerValue = a.Answer;
+                    }
 
-                return new StoredAnswer
-                {
-                    QuestionId = a.QuestionId,
-                    AnswerValue = answerValue,
-                    Score = a.Score
-                };
-            }).ToList();
+                    return new StoredAnswer { QuestionId = a.QuestionId, AnswerValue = answerValue, Score = a.Score };
+                }).ToList();
 
-            attempt.Answers = storedAnswers;
-            attempt.FinishedAt = request.FinishedAt;
-            attempt.TotalScore = request.TotalScore;
-            await attemptRepo.UpdateAsync(attempt);
+                attempt.Answers = storedAnswers;
+                attempt.FinishedAt = request.FinishedAt;
+                attempt.TotalScore = request.TotalScore;
+                await attemptRepo.UpdateAsync(attempt);
 
-            return Results.Ok(new { success = true });
-        })
-    .WithName("FinishAttempt")
-    .WithSummary("Завершить попытку и сохранить ответы")
-    .WithDescription("Принимает все ответы студента и итоговый балл. Требуется заголовок X-Session-Id.")
-    .Accepts<FinishAttemptRequest>("application/json")
-    .Produces<object>(StatusCodes.Status200OK)
-    .Produces<object>(StatusCodes.Status400BadRequest)
-    .Produces(StatusCodes.Status404NotFound);
+                return Results.Ok(new { success = true });
+            })
+        .WithName("FinishAttempt")
+        .WithSummary("Завершить попытку и сохранить ответы")
+        .WithDescription("Принимает все ответы студента и итоговый балл. Требуется заголовок X-Session-Id.")
+        .Accepts<FinishAttemptRequest>("application/json")
+        .Produces<object>(StatusCodes.Status200OK)
+        .Produces<object>(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status404NotFound);
 
     // GET /api/v1/attempts/{id}/result - Получить результат завершённой попытки (требуется X-Session-Id).
     attemptsGroup.MapGet($"/{{id:guid}}/result",
             async (Guid id, HttpContext httpContext, IAttemptRepository attemptRepo) =>
             {
-                if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out var sessionIdHeader) ||
+                if (!httpContext.Request.Headers.TryGetValue("X-Session-Id", out StringValues sessionIdHeader) ||
                     !Guid.TryParse(sessionIdHeader, out Guid sessionId))
+                {
                     return Results.BadRequest(new { error = "X-Session-Id header required" });
+                }
 
-                var attempt = await attemptRepo.GetByIdAsync(id);
+                Attempt? attempt = await attemptRepo.GetByIdAsync(id);
                 if (attempt == null)
+                {
                     return Results.NotFound(new { error = "Attempt not found" });
+                }
 
                 if (attempt.SessionId != sessionId)
+                {
                     return Results.BadRequest(new { error = "Access denied" });
+                }
 
-                var maxPossibleScore = attempt.Exam.Questions.Sum(q =>
+                int maxPossibleScore = attempt.Exam.Questions.Sum(q =>
                     q.Type == "SingleChoice" ? 1 :
                     q.Type == "MultipleChoice" ? q.CorrectAnswers.Count :
                     3);
 
-                var questionResults = attempt.Exam.Questions.Select(q =>
+                List<QuestionResultDto> questionResults = attempt.Exam.Questions.Select(q =>
                 {
-                    var storedAnswer = attempt.Answers.FirstOrDefault(a => a.QuestionId == q.Id);
+                    StoredAnswer? storedAnswer = attempt.Answers.FirstOrDefault(a => a.QuestionId == q.Id);
                     int maxScore = q.Type == "SingleChoice"
                         ? 1
-                        : (q.Type == "MultipleChoice" ? q.CorrectAnswers.Count : 3);
+                        : q.Type == "MultipleChoice"
+                            ? q.CorrectAnswers.Count
+                            : 3;
                     return new QuestionResultDto
                     {
                         Text = q.Text,
@@ -806,7 +839,7 @@ attemptsGroup.MapPost($"/{{id:guid}}/finish",
                     };
                 }).ToList();
 
-                var result = new AttemptResultDto
+                AttemptResultDto result = new()
                 {
                     AttemptId = attempt.Id,
                     ExamTitle = attempt.Exam.Title,
@@ -836,17 +869,21 @@ attemptsGroup.MapPost($"/{{id:guid}}/finish",
     app.MapPost($"{apiV1Prefix}/sessions/start",
             async (StartSessionRequest request, IGroupRepository groupRepo, ISessionRepository sessionRepo) =>
             {
-                var group = await groupRepo.GetByIdAsync(request.GroupId);
+                Group? group = await groupRepo.GetByIdAsync(request.GroupId);
                 if (group == null)
+                {
                     return Results.BadRequest(new { error = "Group not found" });
+                }
 
-                var student = group.Students.FirstOrDefault(s => s.Id == request.StudentId);
+                Student? student = group.Students.FirstOrDefault(s => s.Id == request.StudentId);
                 if (student == null)
+                {
                     return Results.BadRequest(new { error = "Student not found in group" });
+                }
 
-                var studentSnapshot = new StudentSnapshot { FullName = student.FullName, GroupName = group.Name };
+                StudentSnapshot studentSnapshot = new() { FullName = student.FullName, GroupName = group.Name };
 
-                var session = new Session { Student = studentSnapshot };
+                Session session = new() { Student = studentSnapshot };
                 await sessionRepo.CreateAsync(session);
                 return Results.Ok(new StartSessionResponse { SessionId = session.Id });
             })
@@ -861,50 +898,50 @@ attemptsGroup.MapPost($"/{{id:guid}}/finish",
     #endregion
 
     #region Аналитика
-    
+
     RouteGroupBuilder analyticsGroup = app.MapGroup($"{apiV1Prefix}/analytics")
         .WithTags("Analytics")
         .RequireRateLimiting("fixed");
-    
+
     // GET /api/v1/analytics/attempts/last - Последние завершённые попытки по каждому студенту и экзамену
     analyticsGroup.MapGet("/attempts/last", async (IAttemptRepository attemptRepo) =>
-    {
-        var attempts = await attemptRepo.GetLastFinishedAttemptsByStudentAndExamAsync();
-        var result = attempts.Select(a =>
         {
-            // Вычисляем максимальный балл для этого экзамена (на основе снимка вопросов)
-            int maxScore = a.Exam.Questions.Sum(q =>
-                q.Type == "SingleChoice" ? 1 :
-                q.Type == "MultipleChoice" ? q.CorrectAnswers.Count :
-                3);
-            int percent = maxScore > 0 ? (int)Math.Round((double)a.TotalScore / maxScore * 100) : 0;
-            int durationMinutes = a.FinishedAt.HasValue && a.StartedAt != default
-                ? (int)Math.Round((a.FinishedAt.Value - a.StartedAt).TotalMinutes)
-                : 0;
-    
-            return new AttemptAnalyticsDto
+            IEnumerable<Attempt> attempts = await attemptRepo.GetLastFinishedAttemptsByStudentAndExamAsync();
+            IEnumerable<AttemptAnalyticsDto> result = attempts.Select(a =>
             {
-                AttemptId = a.Id,
-                StudentFullName = a.Student.FullName,
-                GroupName = a.Student.GroupName,
-                ExamTitle = a.Exam.Title,
-                TotalScore = a.TotalScore,
-                MaxPossibleScore = maxScore,
-                Percent = percent,
-                FinishedAt = a.FinishedAt ?? a.StartedAt,
-                DurationMinutes = durationMinutes
-            };
-        });
-    
-        return Results.Ok(result);
-    })
-    .WithName("GetLastAttemptsAnalytics")
-    .WithSummary("Последние завершённые попытки по каждому студенту и экзамену")
-    .WithDescription("Возвращает последнюю завершённую попытку для каждой комбинации студент + экзамен.")
-    .Produces<List<AttemptAnalyticsDto>>(StatusCodes.Status200OK);
-    
+                // Вычисляем максимальный балл для этого экзамена (на основе снимка вопросов)
+                int maxScore = a.Exam.Questions.Sum(q =>
+                    q.Type == "SingleChoice" ? 1 :
+                    q.Type == "MultipleChoice" ? q.CorrectAnswers.Count :
+                    3);
+                int percent = maxScore > 0 ? (int)Math.Round((double)a.TotalScore / maxScore * 100) : 0;
+                int durationMinutes = a.FinishedAt.HasValue && a.StartedAt != default
+                    ? (int)Math.Round((a.FinishedAt.Value - a.StartedAt).TotalMinutes)
+                    : 0;
+
+                return new AttemptAnalyticsDto
+                {
+                    AttemptId = a.Id,
+                    StudentFullName = a.Student.FullName,
+                    GroupName = a.Student.GroupName,
+                    ExamTitle = a.Exam.Title,
+                    TotalScore = a.TotalScore,
+                    MaxPossibleScore = maxScore,
+                    Percent = percent,
+                    FinishedAt = a.FinishedAt ?? a.StartedAt,
+                    DurationMinutes = durationMinutes
+                };
+            });
+
+            return Results.Ok(result);
+        })
+        .WithName("GetLastAttemptsAnalytics")
+        .WithSummary("Последние завершённые попытки по каждому студенту и экзамену")
+        .WithDescription("Возвращает последнюю завершённую попытку для каждой комбинации студент + экзамен.")
+        .Produces<List<AttemptAnalyticsDto>>(StatusCodes.Status200OK);
+
     #endregion
-    
+
     #endregion
 
     #region Запуск приложения

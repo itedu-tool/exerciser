@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Exerciser.WebApi.Models;
+
 using MongoDB.Driver;
 
 namespace Exerciser.WebApi.Repositories;
@@ -59,15 +61,15 @@ public class GroupRepository : IGroupRepository
     /// <inheritdoc />
     public async Task UpdateAsync(Group group)
     {
-        var filter = Builders<Group>.Filter.Eq(g => g.Id, group.Id);
+        FilterDefinition<Group>? filter = Builders<Group>.Filter.Eq(g => g.Id, group.Id);
         await _groups.ReplaceOneAsync(filter, group);
     }
 
     /// <inheritdoc />
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var filter = Builders<Group>.Filter.Eq(g => g.Id, id);
-        var result = await _groups.DeleteOneAsync(filter);
+        FilterDefinition<Group>? filter = Builders<Group>.Filter.Eq(g => g.Id, id);
+        DeleteResult? result = await _groups.DeleteOneAsync(filter);
         return result.DeletedCount > 0;
     }
 }
