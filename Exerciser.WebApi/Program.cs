@@ -17,12 +17,14 @@ using Exerciser.WebApi.Middleware;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using StackExchange.Redis;
 
 using ServiceCollectionExtensions = Exerciser.WebApi.Extensions.ServiceCollectionExtensions;
 
@@ -69,7 +71,10 @@ try
     builder.Services.AddScoped<ISessionRepository, SessionRepository>();
     builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
 
+    #region Redis и кеширование
+
     var redisConnection = builder.Configuration["Redis:ConnectionString"];
+    IConnectionMultiplexer? multiplexer = null;
     if (!string.IsNullOrEmpty(redisConnection))
     {
         builder.Services.AddStackExchangeRedisCache(options =>
@@ -77,6 +82,8 @@ try
             options.Configuration = redisConnection;
             options.InstanceName = builder.Configuration["Redis:InstanceName"] ?? "Exerciser_";
         });
+        multiplexer = ConnectionMultiplexer.Connect(redisConnection);
+        builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
         logger.Info("✓ Настроено кеширование Redis");
     }
     else
@@ -84,7 +91,16 @@ try
         builder.Services.AddDistributedMemoryCache();
         logger.Info("✓ Настроено кеширование MemoryCache (Redis недоступен)");
     }
-    builder.Services.AddScoped<ICacheService, DistributedCacheService>();
+
+    builder.Services.AddScoped<ICacheService>(sp =>
+    {
+        var cache = sp.GetRequiredService<IDistributedCache>();
+        var log = sp.GetRequiredService<ILogger<DistributedCacheService>>();
+        var multiplexer = sp.GetService<IConnectionMultiplexer>();
+        return new DistributedCacheService(cache, log, multiplexer);
+    });
+
+    #endregion
 
     builder.Services.AddScoped<IMongoDbMigrationService, MongoDbMigrationService>();
 
