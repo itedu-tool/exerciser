@@ -53,7 +53,7 @@ function formatToShow(showValue, totalCount) {
 async function loadExams() {
     try {
         const response = await api.getAvailableExams()
-        exams.value = response.data
+        exams.value = response.data || []
     } catch (err) {
         console.error('Ошибка загрузки экзаменов:', err)
     } finally {

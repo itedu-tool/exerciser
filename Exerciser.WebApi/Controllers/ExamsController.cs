@@ -119,10 +119,10 @@ public class ExamsController : ControllerBase
             return Ok(cached);
         }
 
-        List<Exam>? exams = await _examRepository.GetAllAsync();
-        if (exams == null || exams.Count == 0)
+        List<Exam> exams = await _examRepository.GetAllAsync();
+        if (exams.Count == 0)
         {
-            return Ok(new { message = "Нет доступных экзаменов. Загрузите первый экзамен через импорт." });
+            return NoContent();
         }
 
         List<ExamSummaryDto> summaries = exams.Select(e => e.ToSummaryDto()).ToList();
