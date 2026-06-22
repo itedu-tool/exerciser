@@ -16,6 +16,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Exerciser.WebApi.sln
+
+      - name: Run tests
+        run: dotnet test Exerciser.WebApi.Tests/Exerciser.WebApi.Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx" --collect:"XPlat Code Coverage"
+
       - name: Extract version from tag
         id: version
         run: |

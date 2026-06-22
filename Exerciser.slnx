@@ -24,8 +24,6 @@
     <File Path=".postman/environments/development.json"/>
     <File Path=".postman/Exerciser.postman_collection.json"/>
   </Folder>
-  <Folder Name="/scripts/">
-    <File Path="manage-services.ps1"/>
-  </Folder>
+  <Project Path="Exerciser.WebApi.Tests/Exerciser.WebApi.Tests.csproj"/>
   <Project Path="Exerciser.WebApi/Exerciser.WebApi.csproj"/>
 </Solution>
