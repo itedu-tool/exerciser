@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://exerciser.example.com/group-schema.json",
+  "title": "Схема импорта группы",
+  "description": "JSON-схема для файла импорта группы студентов в Exerciser.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Название группы",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "students": {
+      "type": "array",
+      "description": "Список студентов в группе",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lastName": {
+            "type": "string",
+            "description": "Фамилия студента",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Имя студента",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "patronymic": {
+            "type": "string",
+            "description": "Отчество студента (необязательно)",
+            "maxLength": 100
+          }
+        },
+        "required": ["lastName", "firstName"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["name"],
+  "additionalProperties": false
+}
