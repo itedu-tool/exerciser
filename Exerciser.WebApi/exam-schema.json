@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://exerciser.example.com/exam-schema.json",
+  "title": "Схема импорта экзамена",
+  "description": "JSON-схема для файла импорта экзамена в Exerciser.",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Название экзамена",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "description": {
+      "type": "string",
+      "description": "Описание экзамена (необязательно)",
+      "maxLength": 2000
+    },
+    "singleChoiceToShow": {
+      "type": "integer",
+      "description": "Количество вопросов типа SingleChoice для показа студенту (0 = все)",
+      "minimum": 0
+    },
+    "multipleChoiceToShow": {
+      "type": "integer",
+      "description": "Количество вопросов типа MultipleChoice для показа студенту (0 = все)",
+      "minimum": 0
+    },
+    "textInputToShow": {
+      "type": "integer",
+      "description": "Количество вопросов типа TextInput для показа студенту (0 = все)",
+      "minimum": 0
+    },
+    "questions": {
+      "type": "array",
+      "description": "Список вопросов экзамена",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Текст вопроса",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "type": {
+            "type": "string",
+            "enum": ["SingleChoice", "MultipleChoice", "TextInput"],
+            "description": "Тип вопроса"
+          },
+          "options": {
+            "type": "array",
+            "description": "Варианты ответов (обязателен для SingleChoice и MultipleChoice)",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "uniqueItems": true
+          },
+          "correctAnswers": {
+            "type": "array",
+            "description": "Список правильных ответов",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        },
+        "required": ["text", "type", "correctAnswers"],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": { "type": { "const": "TextInput" } }
+            },
+            "then": {
+              "properties": {
+                "options": false
+              }
+            },
+            "else": {
+              "required": ["options"],
+              "properties": {
+                "options": {
+                  "minItems": 2
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "type": { "const": "SingleChoice" } }
+            },
+            "then": {
+              "properties": {
+                "correctAnswers": {
+                  "minItems": 1,
+                  "maxItems": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "required": ["title", "questions"],
+  "additionalProperties": false
+}
