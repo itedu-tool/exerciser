@@ -1,4 +1,4 @@
-﻿**/.dockerignore
+﻿﻿**/.dockerignore
 **/.env
 **/.git
 **/.gitignore
@@ -23,3 +23,30 @@
 **/values.dev.yaml
 LICENSE
 README.md
+
+# Build outputs (frontend)
+**/dist
+**/.vite
+
+# Logs
+logs/
+*.log
+*.tmp
+
+# Test results and coverage
+**/TestResults/
+**/coverage/
+*.trx
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# CI/CD (not needed in docker context)
+.github/

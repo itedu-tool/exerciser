@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 using Exerciser.WebApi.DTOs;
+using Exerciser.WebApi.Extensions;
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
-
 namespace Exerciser.WebApi.Controllers;
 
 [ApiController]
@@ -31,11 +31,7 @@ public class AnalyticsController : ControllerBase
         IEnumerable<Attempt> attempts = await _attemptRepository.GetLastFinishedAttemptsByStudentAndExamAsync();
         IEnumerable<AttemptAnalyticsDto> result = attempts.Select(a =>
         {
-            int maxScore = a.Exam.Questions.Sum(q =>
-                q.Type == "SingleChoice" ? 1 :
-                q.Type == "MultipleChoice" ? q.CorrectAnswers.Count :
-                3);
-            int percent = maxScore > 0 ? (int)Math.Round((double)a.TotalScore / maxScore * 100) : 0;
+            int maxScore = a.Exam.Questions.Sum(q => q.GetMaxScore());            int percent = maxScore > 0 ? (int)Math.Round((double)a.TotalScore / maxScore * 100) : 0;
             int durationMinutes = a.FinishedAt.HasValue && a.StartedAt != default
                 ? (int)Math.Round((a.FinishedAt.Value - a.StartedAt).TotalMinutes)
                 : 0;

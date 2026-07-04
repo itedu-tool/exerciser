@@ -13,9 +13,7 @@ using System.Threading.Tasks;
 using Exerciser.WebApi.DTOs;
 using Exerciser.WebApi.Extensions;
 using Exerciser.WebApi.Models;
-using Exerciser.WebApi.Repositories;
-using Exerciser.WebApi.Services;
-using Exerciser.WebApi.Middleware;
+using Exerciser.WebApi.Services;using Exerciser.WebApi.Middleware;
 using Exerciser.WebApi.Metrics;
 
 using FluentValidation;
@@ -36,6 +34,7 @@ using StackExchange.Redis;
 using ServiceCollectionExtensions = Exerciser.WebApi.Extensions.ServiceCollectionExtensions;
 
 BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+BsonSerializer.RegisterSerializer(typeof(QuestionType), new EnumSerializer<QuestionType>(BsonType.String));
 
 try
 {
@@ -62,69 +61,11 @@ try
 
     builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
     builder.Services.AddMongoDb(logger);
-    builder.Services.AddScoped<IMongoDatabase>(sp =>
-    {
-        MongoDbSettings settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-        IMongoClient client = sp.GetRequiredService<IMongoClient>();
-        return client.GetDatabase(settings.DatabaseName ?? "exerciser_db");
-    });
-    builder.Services.AddScoped<IExamRepository>(sp =>
-    {
-        IMongoDatabase db = sp.GetRequiredService<IMongoDatabase>();
-        MongoDbSettings settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-        return new ExamRepository(db, settings.ExamsCollectionName ?? "Exams");
-    });
-    builder.Services.AddScoped<IGroupRepository, GroupRepository>();
-    builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-    builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
-
-    #region Redis и кеширование
-
-    string? redisConnection = builder.Configuration["Redis:ConnectionString"];
-    IConnectionMultiplexer? multiplexer = null;
-    if (!string.IsNullOrEmpty(redisConnection))
-    {
-        builder.Services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = redisConnection;
-            options.InstanceName = builder.Configuration["Redis:InstanceName"] ?? "Exerciser_";
-        });
-        multiplexer = ConnectionMultiplexer.Connect(redisConnection);
-        builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-        logger.LogInformation("Настроено кеширование Redis");
-    }
-    else
-    {
-        builder.Services.AddDistributedMemoryCache();
-        logger.LogInformation("Настроено кеширование MemoryCache (Redis недоступен)");
-    }
-
-    builder.Services.AddScoped<ICacheService>(sp =>
-    {
-        IDistributedCache cache = sp.GetRequiredService<IDistributedCache>();
-        ILogger<DistributedCacheService> log = sp.GetRequiredService<ILogger<DistributedCacheService>>();
-        IConnectionMultiplexer? multiplexer = sp.GetService<IConnectionMultiplexer>();
-        return new DistributedCacheService(cache, log, multiplexer);
-    });
-
-    #endregion
-
+    builder.Services.AddRepositories();
+    builder.Services.AddCaching(builder.Configuration, logger);
     builder.Services.AddScoped<IMongoDbMigrationService, MongoDbMigrationService>();
-
-    #region FluentValidation
-
-    builder.Services.AddFluentValidationAutoValidation();
-    builder.Services
-        .AddValidatorsFromAssemblyContaining<Exerciser.WebApi.Validators.FluentValidation.ImportExamDtoValidator>();
-
-    #endregion
-
-    #region Метрики
-
-    builder.Services.AddSingleton<ExerciserMetrics>();
-
-    #endregion
-
+    builder.Services.AddValidation();
+    builder.Services.AddExerciserMetrics();
     #endregion
 
     WebApplication app = builder.Build();

@@ -4,7 +4,7 @@ using System.Linq;
 using FluentValidation;
 
 using Exerciser.WebApi.DTOs;
-
+using Exerciser.WebApi.Models;
 namespace Exerciser.WebApi.Validators.FluentValidation;
 
 public class ImportExamDtoValidator : AbstractValidator<ImportExamDto>
@@ -64,10 +64,7 @@ public class ImportQuestionDtoValidator : AbstractValidator<ImportQuestionDto>
         #region Тип вопроса
 
         RuleFor(x => x.Type)
-            .NotEmpty().WithMessage("Тип вопроса не может быть пустым")
-            .Must(t => t == "SingleChoice" || t == "MultipleChoice" || t == "TextInput")
-            .WithMessage("Недопустимый тип вопроса. Допустимые: SingleChoice, MultipleChoice, TextInput");
-
+            .IsInEnum().WithMessage("Недопустимый тип вопроса. Допустимые: SingleChoice, MultipleChoice, TextInput");
         #endregion
 
         #region Валидация в зависимости от типа
@@ -75,7 +72,7 @@ public class ImportQuestionDtoValidator : AbstractValidator<ImportQuestionDto>
         RuleFor(x => x)
             .Custom((dto, context) =>
             {
-                if (dto.Type == "TextInput")
+                if (dto.Type == QuestionType.TextInput)
                 {
                     return;
                 }
@@ -108,7 +105,7 @@ public class ImportQuestionDtoValidator : AbstractValidator<ImportQuestionDto>
                     return;
                 }
 
-                if (dto.Type == "SingleChoice" && dto.CorrectAnswers.Count > 1)
+                if (dto.Type == QuestionType.SingleChoice && dto.CorrectAnswers.Count > 1)
                 {
                     context.AddFailure("Для типа SingleChoice допускается только один правильный ответ");
                 }

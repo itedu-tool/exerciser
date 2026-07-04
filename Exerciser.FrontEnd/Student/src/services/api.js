@@ -32,9 +32,8 @@ export default {
         return api.post('/attempts/start', {examId})
     },
 
-    finishAttempt(attemptId, totalScore, answers, finishedAt) {
+    finishAttempt(attemptId, answers, finishedAt) {
         return api.post(`/attempts/${attemptId}/finish`, {
-            totalScore,
             finishedAt,
             answers
         })
@@ -42,6 +41,10 @@ export default {
 
     getAttemptResult(attemptId) {
         return api.get(`/attempts/${attemptId}/result`)
+    },
+
+    getAttemptExam(attemptId) {
+        return api.get(`/attempts/${attemptId}`)
     },
 
     // Группы и студенты (для входа)

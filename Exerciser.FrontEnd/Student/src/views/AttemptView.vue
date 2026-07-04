@@ -98,63 +98,20 @@ function saveAnswer({questionId, answer}) {
     answers.value[questionId] = answer
 }
 
-function calculateScoreForQuestion(question, answer) {
-    const {type, correctAnswers} = question
-
-    if (!answer || (Array.isArray(answer) && answer.length === 0) || (typeof answer === 'string' && answer.trim() === '')) {
-        return 0
-    }
-
-    switch (type) {
-        case 'SingleChoice': {
-            return answer === correctAnswers[0] ? 1 : 0
-        }
-        case 'MultipleChoice': {
-            if (!Array.isArray(answer)) return 0
-            const selected = answer.filter(item => item && item.trim() !== '')
-            if (selected.length === 0) return 0
-            const correctSet = new Set(correctAnswers)
-            let correctSelected = 0
-            let incorrectSelected = 0
-            for (const val of selected) {
-                if (correctSet.has(val)) {
-                    correctSelected++
-                } else {
-                    incorrectSelected++
-                }
-            }
-            const score = correctSelected - incorrectSelected
-            return Math.max(0, score)
-        }
-        case 'TextInput': {
-            const userAnswer = typeof answer === 'string' ? answer.trim() : ''
-            if (userAnswer === '') return 0
-            const expected = correctAnswers[0]?.trim() || ''
-            return userAnswer === expected ? 3 : 0
-        }
-        default:
-            return 0
-    }
-}
-
 async function submitAttempt() {
     if (submitting.value) return
     submitting.value = true
     try {
         const answerList = []
-        let totalScore = 0
         for (const question of exam.value.questions) {
             const userAnswer = answers.value[question.id] ?? null
-            const score = calculateScoreForQuestion(question, userAnswer)
-            totalScore += score
             answerList.push({
                 questionId: question.id,
-                answer: userAnswer,
-                score: score
+                answer: userAnswer
             })
         }
         const finishedAt = new Date().toISOString()
-        await api.finishAttempt(attemptId, totalScore, answerList, finishedAt)
+        await api.finishAttempt(attemptId, answerList, finishedAt)
         sessionStorage.removeItem(`attempt_${attemptId}`)
         router.push(`/result/${attemptId}`)
     } catch (err) {

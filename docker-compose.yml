@@ -123,6 +123,46 @@ services:
     #   - ./certs/aspnetcore.pfx:/etc/ssl/certs/aspnetcore.pfx:ro
     #   - ./certs/aspnetcore-key.pem:/etc/ssl/certs/aspnetcore-key.pem:ro
 
+  student-frontend:
+    build:
+      context: .
+      dockerfile: Exerciser.FrontEnd/Student/Dockerfile
+    container_name: exerciser-student
+    restart: unless-stopped
+    ports:
+      - "${STUDENT_HOST_PORT:-5173}:5173"
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://webapi:8080/api/v1}
+    depends_on:
+      - webapi
+    networks:
+      - exerciser-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  admin-frontend:
+    build:
+      context: .
+      dockerfile: Exerciser.FrontEnd/Admin/Dockerfile
+    container_name: exerciser-admin
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_HOST_PORT:-5000}:5000"
+    environment:
+      API_BASE_URL: ${ADMIN_API_BASE_URL:-http://webapi:8080}
+    depends_on:
+      - webapi
+    networks:
+      - exerciser-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   mongodb_data:
     driver: local

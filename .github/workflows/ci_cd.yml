@@ -1,11 +1,13 @@
-name: Build and Push Docker Image on Tag
+name: Build and Push Docker Image
 
 on:
   push:
+    branches: [main, master]
     tags:
       - 'v*'
+  pull_request:
+    branches: [main, master]
   workflow_dispatch:
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -22,8 +24,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore Exerciser.WebApi.sln
-
+        run: dotnet restore
       - name: Run tests
         run: dotnet test Exerciser.WebApi.Tests/Exerciser.WebApi.Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx" --collect:"XPlat Code Coverage"
 

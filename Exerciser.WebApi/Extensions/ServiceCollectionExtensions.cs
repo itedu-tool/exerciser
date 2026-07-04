@@ -5,15 +5,22 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi;
+using Microsoft.Extensions.Logging;using Microsoft.Extensions.Options;using Microsoft.OpenApi;
 
 using MongoDB.Driver;
 
 using Exerciser.WebApi.Models;
+using Exerciser.WebApi.Repositories;
+using Exerciser.WebApi.Services;
+using Exerciser.WebApi.Metrics;
 
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
+using StackExchange.Redis;
 namespace Exerciser.WebApi.Extensions;
 
 /// <summary>Методы расширения для регистрации сервисов в DI контейнер.</summary>
@@ -136,8 +143,75 @@ public static class ServiceCollectionExtensions
 
             return services;
         }
-    }
 
+        /// <summary>Добавить репозитории.</summary>
+        public IServiceCollection AddRepositories()
+        {
+            services.AddScoped<IMongoDatabase>(sp =>
+            {
+                MongoDbSettings settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+                IMongoClient client = sp.GetRequiredService<IMongoClient>();
+                return client.GetDatabase(settings.DatabaseName ?? "exerciser_db");
+            });
+            services.AddScoped<IExamRepository>(sp =>
+            {
+                IMongoDatabase db = sp.GetRequiredService<IMongoDatabase>();
+                MongoDbSettings settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+                return new ExamRepository(db, settings.ExamsCollectionName ?? "Exams");
+            });
+            services.AddScoped<IGroupRepository, GroupRepository>();
+            services.AddScoped<ISessionRepository, SessionRepository>();
+            services.AddScoped<IAttemptRepository, AttemptRepository>();
+            return services;
+        }
+
+        /// <summary>Добавить кеширование (Redis или MemoryCache).</summary>
+        public IServiceCollection AddCaching(IConfiguration configuration, ILogger logger)
+        {
+            string? redisConnection = configuration["Redis:ConnectionString"];
+            if (!string.IsNullOrEmpty(redisConnection))
+            {
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = redisConnection;
+                    options.InstanceName = configuration["Redis:InstanceName"] ?? "Exerciser_";
+                });
+                IConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(redisConnection);
+                services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+                logger.LogInformation("Настроено кеширование Redis");
+            }
+            else
+            {
+                services.AddDistributedMemoryCache();
+                logger.LogInformation("Настроено кеширование MemoryCache (Redis недоступен)");
+            }
+
+            services.AddScoped<ICacheService>(sp =>
+            {
+                IDistributedCache cache = sp.GetRequiredService<IDistributedCache>();
+                ILogger<DistributedCacheService> log = sp.GetRequiredService<ILogger<DistributedCacheService>>();
+                IConnectionMultiplexer? multiplexer = sp.GetService<IConnectionMultiplexer>();
+                return new DistributedCacheService(cache, log, multiplexer);
+            });
+
+            return services;
+        }
+
+        /// <summary>Добавить FluentValidation.</summary>
+        public IServiceCollection AddValidation()
+        {
+            services.AddFluentValidationAutoValidation();
+            services
+                .AddValidatorsFromAssemblyContaining<Exerciser.WebApi.Validators.FluentValidation.ImportExamDtoValidator>();
+            return services;
+        }
+
+        /// <summary>Добавить метрики.</summary>
+        public IServiceCollection AddExerciserMetrics()        {
+            services.AddSingleton<ExerciserMetrics>();
+            return services;
+        }
+    }
     /// <summary>Получить массив CORS origins из строки.</summary>
     public static string[] ParseCorsOrigins(string? originsString)
     {
