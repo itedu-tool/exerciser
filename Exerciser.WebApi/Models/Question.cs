@@ -15,9 +15,8 @@ public record Question
     /// <summary>Текст вопроса.</summary>
     public required string Text { get; set; }
 
-    /// <summary>Тип вопроса: SingleChoice, MultipleChoice, TextInput.</summary>
-    public required string Type { get; set; }
-
+    /// <summary>Тип вопроса.</summary>
+    public required QuestionType Type { get; set; }
     /// <summary>Варианты ответов (для SingleChoice и MultipleChoice).</summary>
     public List<string> Options { get; set; } = [];
 

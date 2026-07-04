@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Exerciser.WebApi.Models;
+
 namespace Exerciser.WebApi.DTOs;
 
 /// <summary>DTO для детального отображения вопроса (с правильными ответами).</summary>
@@ -13,8 +15,7 @@ public record QuestionDetailsDto
     public required string Text { get; init; }
 
     /// <summary>Тип вопроса.</summary>
-    public required string Type { get; init; }
-
+    public required QuestionType Type { get; init; }
     /// <summary>Варианты ответов (для SingleChoice и MultipleChoice).</summary>
     public List<string> Options { get; init; } = [];
 

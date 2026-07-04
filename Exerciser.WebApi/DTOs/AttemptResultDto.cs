@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Exerciser.WebApi.Models;
+
 namespace Exerciser.WebApi.DTOs;
 
 /// <summary>Результат завершённой попытки для отображения студенту.</summary>
@@ -41,7 +43,7 @@ public record QuestionResultDto
     public required string Text { get; init; }
 
     /// <summary>Тип вопроса.</summary>
-    public required string Type { get; init; }
+    public required QuestionType Type { get; init; }
 
     /// <summary>Варианты ответов (если применимо).</summary>
     public List<string> Options { get; init; } = [];

@@ -12,6 +12,34 @@ namespace Exerciser.WebApi.Extensions;
 /// </summary>
 public static class MappingExtensions
 {
+    /// <summary>
+    /// Вычисляет максимально возможный балл для вопроса.
+    /// </summary>
+    public static int GetMaxScore(this Question question)
+    {
+        return question.Type switch
+        {
+            QuestionType.SingleChoice => 1,
+            QuestionType.MultipleChoice => question.CorrectAnswers.Count,
+            QuestionType.TextInput => 3,
+            _ => 0
+        };
+    }
+
+    /// <summary>
+    /// Вычисляет максимально возможный балл для снимка вопроса.
+    /// </summary>
+    public static int GetMaxScore(this QuestionSnapshot question)
+    {
+        return question.Type switch
+        {
+            QuestionType.SingleChoice => 1,
+            QuestionType.MultipleChoice => question.CorrectAnswers.Count,
+            QuestionType.TextInput => 3,
+            _ => 0
+        };
+    }
+
     public static Exam ToExam(this ImportExamDto dto)
     {
         return new Exam
@@ -40,10 +68,9 @@ public static class MappingExtensions
             Title = exam.Title,
             Description = exam.Description,
             QuestionsCount = exam.Questions.Count,
-            SingleChoiceCount = exam.Questions.Count(q => q.Type == "SingleChoice"),
-            MultipleChoiceCount = exam.Questions.Count(q => q.Type == "MultipleChoice"),
-            TextInputCount = exam.Questions.Count(q => q.Type == "TextInput"),
-            SingleChoiceToShow = exam.SingleChoiceToShow,
+            SingleChoiceCount = exam.Questions.Count(q => q.Type == QuestionType.SingleChoice),
+            MultipleChoiceCount = exam.Questions.Count(q => q.Type == QuestionType.MultipleChoice),
+            TextInputCount = exam.Questions.Count(q => q.Type == QuestionType.TextInput),            SingleChoiceToShow = exam.SingleChoiceToShow,
             MultipleChoiceToShow = exam.MultipleChoiceToShow,
             TextInputToShow = exam.TextInputToShow,
             CreatedAt = exam.CreatedAt

@@ -1,4 +1,4 @@
-/* global showMessage, clearMessage, showLoading, showEmpty, apiRequest, escapeHtml */
+/* global showMessage, clearMessage, showLoading, showEmpty, apiRequest, escapeHtml, getTypeIcon, getTypeLabel */
 
 console.log('[teacher.js] Скрипт загружен');
 
@@ -235,32 +235,6 @@ function renderExamDetails(exam) {
     }).join('')}
         </div>
     `;
-}
-
-function getTypeIcon(type) {
-    switch (type) {
-        case 'SingleChoice':
-            return '🔘';
-        case 'MultipleChoice':
-            return '☑️';
-        case 'TextInput':
-            return '✏️';
-        default:
-            return '❓';
-    }
-}
-
-function getTypeLabel(type) {
-    switch (type) {
-        case 'SingleChoice':
-            return 'Один вариант';
-        case 'MultipleChoice':
-            return 'Несколько вариантов';
-        case 'TextInput':
-            return 'Ввод текста';
-        default:
-            return 'Неизвестный тип';
-    }
 }
 
 loadExamsList();

@@ -1,4 +1,4 @@
-/* exported showMessage, clearMessage, showLoading, showEmpty, apiRequest, escapeHtml */
+/* exported showMessage, clearMessage, showLoading, showEmpty, apiRequest, escapeHtml, getTypeIcon, getTypeLabel */
 
 /**
  * Отображает сообщение в указанном контейнере.
@@ -84,9 +84,45 @@ async function apiRequest(endpoint, options = {}) {
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, (m) => {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
+        if (m === '&') return '&';
+        if (m === '<') return '<';
+        if (m === '>') return '>';
         return m;
     });
+}
+
+/**
+ * Возвращает emoji-иконку для типа вопроса.
+ * @param {string} type - Тип вопроса (SingleChoice, MultipleChoice, TextInput).
+ * @returns {string} - Emoji-иконка.
+ */
+function getTypeIcon(type) {
+    switch (type) {
+        case 'SingleChoice':
+            return '🔘';
+        case 'MultipleChoice':
+            return '☑️';
+        case 'TextInput':
+            return '✏️';
+        default:
+            return '❓';
+    }
+}
+
+/**
+ * Возвращает человекочитаемую метку типа вопроса.
+ * @param {string} type - Тип вопроса (SingleChoice, MultipleChoice, TextInput).
+ * @returns {string} - Метка на русском.
+ */
+function getTypeLabel(type) {
+    switch (type) {
+        case 'SingleChoice':
+            return 'Один вариант';
+        case 'MultipleChoice':
+            return 'Несколько вариантов';
+        case 'TextInput':
+            return 'Ввод текста';
+        default:
+            return 'Неизвестный тип';
+    }
 }

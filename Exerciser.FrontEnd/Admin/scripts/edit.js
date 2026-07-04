@@ -1,4 +1,4 @@
-/* global showMessage, clearMessage, apiRequest, escapeHtml */
+/* global showMessage, clearMessage, apiRequest, escapeHtml, getTypeIcon, getTypeLabel */
 
 console.log('[edit.js] Скрипт загружен');
 
@@ -366,31 +366,6 @@ function previewExam() {
     modal.show();
 }
 
-function getTypeIcon(type) {
-    switch (type) {
-        case 'SingleChoice':
-            return '🔘';
-        case 'MultipleChoice':
-            return '☑️';
-        case 'TextInput':
-            return '✏️';
-        default:
-            return '❓';
-    }
-}
-
-function getTypeLabel(type) {
-    switch (type) {
-        case 'SingleChoice':
-            return 'Один вариант';
-        case 'MultipleChoice':
-            return 'Несколько вариантов';
-        case 'TextInput':
-            return 'Ввод текста';
-        default:
-            return 'Неизвестный тип';
-    }
-}
 
 async function saveExam() {
     console.log('[edit.js] saveExam() начат');
