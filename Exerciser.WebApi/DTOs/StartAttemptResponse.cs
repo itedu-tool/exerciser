@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Exerciser.WebApi.Models;
+
 namespace Exerciser.WebApi.DTOs;
 
 /// <summary>Ответ при создании новой попытки.</summary>
@@ -29,7 +31,7 @@ public record ExamSnapshotDto
     public List<QuestionSnapshotDto> Questions { get; init; } = [];
 }
 
-/// <summary>Снимок вопроса для передачи клиенту.</summary>
+/// <summary>Снимок вопроса для передачи клиенту (без правильных ответов).</summary>
 public record QuestionSnapshotDto
 {
     /// <summary>Идентификатор вопроса.</summary>
@@ -39,11 +41,8 @@ public record QuestionSnapshotDto
     public required string Text { get; init; }
 
     /// <summary>Тип вопроса.</summary>
-    public required string Type { get; init; }
+    public required QuestionType Type { get; init; }
 
     /// <summary>Варианты ответов.</summary>
     public List<string> Options { get; init; } = [];
-
-    /// <summary>Правильные ответы.</summary>
-    public List<string> CorrectAnswers { get; init; } = [];
 }

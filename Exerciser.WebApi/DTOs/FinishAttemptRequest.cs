@@ -3,12 +3,9 @@ using System.Collections.Generic;
 
 namespace Exerciser.WebApi.DTOs;
 
-/// <summary>Запрос на завершение попытки.</summary>
+/// <summary>Запрос на завершение попытки (подсчёт баллов — на сервере).</summary>
 public record FinishAttemptRequest
 {
-    /// <summary>Итоговый балл.</summary>
-    public int TotalScore { get; init; }
-
     /// <summary>Время завершения (UTC).</summary>
     public DateTime FinishedAt { get; init; }
 
@@ -16,7 +13,7 @@ public record FinishAttemptRequest
     public List<AnswerSubmissionDto> Answers { get; init; } = [];
 }
 
-/// <summary>Ответ студента на один вопрос.</summary>
+/// <summary>Ответ студента на один вопрос (без баллов — сервер подсчитает).</summary>
 public record AnswerSubmissionDto
 {
     /// <summary>Идентификатор вопроса.</summary>
@@ -24,7 +21,4 @@ public record AnswerSubmissionDto
 
     /// <summary>Значение ответа (строка, массив строк, null).</summary>
     public object? Answer { get; init; }
-
-    /// <summary>Балл за этот ответ (вычислен на клиенте).</summary>
-    public int Score { get; init; }
 }

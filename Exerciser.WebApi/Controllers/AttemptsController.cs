@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
 using Exerciser.WebApi.DTOs;
+using Exerciser.WebApi.Extensions;
 using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Repositories;
 
 namespace Exerciser.WebApi.Controllers;
-
 [ApiController]
 [Route("api/v1/[controller]")]
 public class AttemptsController : ControllerBase
@@ -43,10 +43,47 @@ public class AttemptsController : ControllerBase
     }
 
     /// <summary>
+    /// Подсчитывает балл за ответ на вопрос.
+    /// SingleChoice — 1 балл за точное совпадение, MultipleChoice — правильные минус неправильные,
+    /// TextInput — 3 балла за точное совпадение.
+    /// </summary>
+    private static int CalculateScore(QuestionSnapshot question, object? answerValue)
+    {
+        if (answerValue == null) return 0;
+
+        return question.Type switch
+        {
+            QuestionType.SingleChoice => answerValue is string s && s == question.CorrectAnswers.FirstOrDefault() ? 1 : 0,
+            QuestionType.MultipleChoice => CalculateMultipleChoiceScore(question.CorrectAnswers, answerValue),
+            QuestionType.TextInput => answerValue is string ts
+                && string.Equals(ts.Trim(), question.CorrectAnswers.FirstOrDefault()?.Trim(), StringComparison.Ordinal)
+                ? 3 : 0,
+            _ => 0
+        };    }
+
+    private static int CalculateMultipleChoiceScore(List<string> correctAnswers, object? answerValue)
+    {
+        if (answerValue is not IEnumerable<object> selected || correctAnswers.Count == 0) return 0;
+
+        HashSet<string> selectedSet = selected
+            .Select(o => o?.ToString() ?? string.Empty)
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .ToHashSet();
+
+        if (selectedSet.Count == 0) return 0;
+
+        int correctSelected = selectedSet.Count(v => correctAnswers.Contains(v));
+        int incorrectSelected = selectedSet.Count - correctSelected;
+
+        return Math.Max(0, correctSelected - incorrectSelected);
+    }
+
+    private static int GetMaxScoreForQuestion(QuestionSnapshot q) => q.GetMaxScore();
+
+    /// <summary>
     /// Начать новую попытку прохождения экзамена (требуется X-Session-Id).
     /// </summary>
-    [HttpPost("start")]
-    public async Task<IActionResult> Start([FromBody] StartAttemptRequest request)
+    [HttpPost("start")]    public async Task<IActionResult> Start([FromBody] StartAttemptRequest request)
     {
         if (!TryGetSessionId(out Guid sessionId))
         {
@@ -71,10 +108,9 @@ public class AttemptsController : ControllerBase
             return BadRequest(new { error = "Unfinished attempt already exists" });
         }
 
-        List<Question> singleQuestions = exam.Questions.Where(q => q.Type == "SingleChoice").ToList();
-        List<Question> multipleQuestions = exam.Questions.Where(q => q.Type == "MultipleChoice").ToList();
-        List<Question> textQuestions = exam.Questions.Where(q => q.Type == "TextInput").ToList();
-
+        List<Question> singleQuestions = exam.Questions.Where(q => q.Type == QuestionType.SingleChoice).ToList();
+        List<Question> multipleQuestions = exam.Questions.Where(q => q.Type == QuestionType.MultipleChoice).ToList();
+        List<Question> textQuestions = exam.Questions.Where(q => q.Type == QuestionType.TextInput).ToList();
         int singleToTake = exam.SingleChoiceToShow > 0
             ? Math.Min(exam.SingleChoiceToShow, singleQuestions.Count)
             : singleQuestions.Count;
@@ -119,16 +155,15 @@ public class AttemptsController : ControllerBase
                 Id = q.Id,
                 Text = q.Text,
                 Type = q.Type,
-                Options = q.Options,
-                CorrectAnswers = q.CorrectAnswers
-            }).ToList()
-        };
+                Options = q.Options
+            }).ToList()        };
 
         return Ok(new StartAttemptResponse { AttemptId = attempt.Id, Exam = examDto });
     }
 
     /// <summary>
     /// Завершить попытку и сохранить ответы (требуется X-Session-Id).
+    /// Подсчёт баллов выполняется на сервере.
     /// </summary>
     [HttpPost("{id:guid}/finish")]
     public async Task<IActionResult> Finish(Guid id, [FromBody] FinishAttemptRequest request)
@@ -154,7 +189,13 @@ public class AttemptsController : ControllerBase
             return BadRequest(new { error = "Attempt already finished" });
         }
 
-        List<StoredAnswer> storedAnswers = request.Answers.Select(a =>
+        Dictionary<Guid, QuestionSnapshot> questionMap = attempt.Exam.Questions
+            .ToDictionary(q => q.Id);
+
+        List<StoredAnswer> storedAnswers = new();
+        int totalScore = 0;
+
+        foreach (AnswerSubmissionDto a in request.Answers)
         {
             object? answerValue = a.Answer switch
             {
@@ -165,22 +206,35 @@ public class AttemptsController : ControllerBase
                 JsonElement json => json.ToString(),
                 _ => a.Answer
             };
-            return new StoredAnswer { QuestionId = a.QuestionId, AnswerValue = answerValue, Score = a.Score };
-        }).ToList();
+
+            int score = 0;
+            if (questionMap.TryGetValue(a.QuestionId, out QuestionSnapshot? q))
+            {
+                score = CalculateScore(q, answerValue);
+            }
+
+            totalScore += score;
+            storedAnswers.Add(new StoredAnswer
+            {
+                QuestionId = a.QuestionId,
+                AnswerValue = answerValue,
+                Score = score
+            });
+        }
 
         attempt.Answers = storedAnswers;
         attempt.FinishedAt = request.FinishedAt;
-        attempt.TotalScore = request.TotalScore;
+        attempt.TotalScore = totalScore;
         await _attemptRepository.UpdateAsync(attempt);
 
-        return Ok(new { success = true });
+        return Ok(new { success = true, totalScore });
     }
-
     /// <summary>
-    /// Получить результат завершённой попытки (требуется X-Session-Id).
+    /// Получить данные незавершённой попытки (требуется X-Session-Id).
+    /// Возвращает снимок экзамена без правильных ответов.
     /// </summary>
-    [HttpGet("{id:guid}/result")]
-    public async Task<IActionResult> GetResult(Guid id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetAttempt(Guid id)
     {
         if (!TryGetSessionId(out Guid sessionId))
         {
@@ -198,17 +252,55 @@ public class AttemptsController : ControllerBase
             return BadRequest(new { error = "Access denied" });
         }
 
-        int maxScore = attempt.Exam.Questions.Sum(q =>
-            q.Type == "SingleChoice" ? 1 :
-            q.Type == "MultipleChoice" ? q.CorrectAnswers.Count :
-            3);
+        if (attempt.FinishedAt != null)
+        {
+            return BadRequest(new { error = "Attempt already finished" });
+        }
+
+        ExamSnapshotDto examDto = new()
+        {
+            Id = attempt.Exam.Id,
+            Title = attempt.Exam.Title,
+            Description = attempt.Exam.Description,
+            Questions = attempt.Exam.Questions.Select(q => new QuestionSnapshotDto
+            {
+                Id = q.Id,
+                Text = q.Text,
+                Type = q.Type,
+                Options = q.Options
+            }).ToList()
+        };
+
+        return Ok(new StartAttemptResponse { AttemptId = attempt.Id, Exam = examDto });
+    }
+
+    /// <summary>
+    /// Получить результат завершённой попытки (требуется X-Session-Id).
+    /// </summary>
+    [HttpGet("{id:guid}/result")]    public async Task<IActionResult> GetResult(Guid id)
+    {
+        if (!TryGetSessionId(out Guid sessionId))
+        {
+            return BadRequest(new { error = "X-Session-Id header required" });
+        }
+
+        Attempt? attempt = await _attemptRepository.GetByIdAsync(id);
+        if (attempt == null)
+        {
+            return NotFound(new { error = "Attempt not found" });
+        }
+
+        if (attempt.SessionId != sessionId)
+        {
+            return BadRequest(new { error = "Access denied" });
+        }
+
+        int maxScore = attempt.Exam.Questions.Sum(q => GetMaxScoreForQuestion(q));
 
         List<QuestionResultDto> questionResults = attempt.Exam.Questions.Select(q =>
         {
             StoredAnswer? stored = attempt.Answers.FirstOrDefault(a => a.QuestionId == q.Id);
-            int max = q.Type == "SingleChoice" ? 1 :
-                q.Type == "MultipleChoice" ? q.CorrectAnswers.Count : 3;
-            return new QuestionResultDto
+            int max = GetMaxScoreForQuestion(q);            return new QuestionResultDto
             {
                 Text = q.Text,
                 Type = q.Type,
