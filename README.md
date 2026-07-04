@@ -215,9 +215,27 @@ npm run format
 
 ### Запуск тестов
 
-На данный момент тесты отсутствуют. Планируется добавить unit-тесты для валидатора и интеграционные тесты с
-Testcontainers.
+Проект содержит **23 юнит-теста** для проверки критической бизнес-логики:
 
+```bash
+# Запуск всех юнит-тестов
+dotnet test Exerciser.WebApi.Tests --filter "FullyQualifiedName~Unit"
+
+# Запуск тестов контроллера попыток
+dotnet test Exerciser.WebApi.Tests --filter "FullyQualifiedName~AttemptsControllerTests"
+
+# Запуск тестов валидаторов
+dotnet test Exerciser.WebApi.Tests --filter "FullyQualifiedName~ValidatorTests"
+```
+
+**Покрытие тестами:**
+- `AttemptsController.Finish()` - серверный подсчёт баллов для всех типов вопросов
+- Валидация DTO (экзамены, группы)
+- Маппинг моделей (MappingExtensions)
+
+**Планируется добавить:**
+- Интеграционные тесты с Testcontainers (MongoDB, Redis)
+- Тесты middleware и сервисов
 ---
 
 ## 🐳 Docker и оркестрация
@@ -422,4 +440,4 @@ Email: starinin-andrey@ya.ru
 
 ---
 
-**Последнее обновление:** 2026-06-19
+**Последнее обновление:** 2026-07-04

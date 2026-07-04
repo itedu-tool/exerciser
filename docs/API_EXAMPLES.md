@@ -306,6 +306,7 @@ Content-Type: application/json
 **Ответ (200 OK):**
 
 ```json
+```json
 {
   "attemptId": "019eabf3-12fe-7542-8285-ccc4d5a260ef",
   "exam": {
@@ -317,15 +318,18 @@ Content-Type: application/json
         "id": "q1",
         "text": "Что такое CLR?",
         "type": "TextInput",
-        "options": [],
-        "correctAnswers": ["Common Language Runtime"]
+        "options": []
       }
     ]
   }
 }
 ```
 
+> **Важно:** Правильные ответы (`correctAnswers`) **не возвращаются** в ответе на начало попытки для предотвращения утечки ответов. Они будут показаны только после завершения попытки в результатах.```
+
 ### Завершение попытки
+
+> **Важно:** Баллы подсчитываются **на сервере**. Клиент отправляет только ответы без баллов.
 
 ```http
 POST /api/v1/attempts/019eabf3-12fe-7542-8285-ccc4d5a260ef/finish HTTP/1.1
@@ -334,14 +338,26 @@ X-Session-Id: 019eabf3-12fe-7542-8285-ccc4d5a260ee
 Content-Type: application/json
 
 {
-  "totalScore": 5,
   "finishedAt": "2026-06-15T12:00:00Z",
   "answers": [
     {
       "questionId": "q1",
-      "answer": "Common Language Runtime",
-      "score": 3
+      "answer": "Common Language Runtime"
     }
+  ]
+}
+```
+
+**Ответ (200 OK):**
+
+```json
+{
+  "success": true,
+  "totalScore": 3
+}
+```
+
+> **Примечание:** Сервер автоматически подсчитывает баллы на основе правильных ответов, сохранённых в базе данных. Клиент не может повлиять на подсчёт баллов.
   ]
 }
 ```
@@ -713,12 +729,11 @@ ATTEMPT_ID=$(curl -s -X POST http://localhost:8080/api/v1/attempts/start \
   -H "Content-Type: application/json" \
   -d "{\"examId\":\"$EXAM_ID\"}" | jq -r '.attemptId')
 
-# 4. Завершить попытку
+# 4. Завершить попытку (баллы подсчитываются сервером)
 curl -X POST http://localhost:8080/api/v1/attempts/$ATTEMPT_ID/finish \
   -H "X-Session-Id: $SESSION_ID" \
   -H "Content-Type: application/json" \
-  -d '{"totalScore":0,"finishedAt":"2026-06-15T12:00:00Z","answers":[]}'
-
+  -d '{"finishedAt":"2026-06-15T12:00:00Z","answers":[]}'
 # 5. Получить результат
 curl http://localhost:8080/api/v1/attempts/$ATTEMPT_ID/result \
   -H "X-Session-Id: $SESSION_ID"
@@ -726,6 +741,16 @@ curl http://localhost:8080/api/v1/attempts/$ATTEMPT_ID/result \
 
 ---
 
-**Версия:** 1.2.0  
-**Последнее обновление:** 2026-06-15  
+**Версия:** 1.3.0  
+**Последнее обновление:** 2026-07-04  
 **API Version:** v1
+
+## История изменений
+
+### v1.3.0 (2026-07-04)
+- **Безопасность:** Удалены `correctAnswers` из ответа на начало попытки (предотвращение утечки)
+- **Безопасность:** Серверный подсчёт баллов (клиент не отправляет `score` и `totalScore`)
+- **Тестирование:** Добавлены 23 юнит-теста для критической бизнес-логики
+
+### v1.2.0 (2026-06-15)
+- Первоначальная версия документации
