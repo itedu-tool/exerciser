@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using FluentValidation.TestHelper;
 
 using Exerciser.WebApi.DTOs;
+using Exerciser.WebApi.Models;
 using Exerciser.WebApi.Validators.FluentValidation;
 
 using Xunit;
-
 namespace Exerciser.WebApi.Tests.Unit.Validators;
 
 public class ImportExamDtoValidatorTests
@@ -59,11 +59,10 @@ public class ImportExamDtoValidatorTests
                 new()
                 {
                     Text = "",
-                    Type = "SingleChoice",
+                    Type = QuestionType.SingleChoice,
                     Options = new List<string> { "A", "B" },
                     CorrectAnswers = new List<string> { "A" }
-                }
-            }
+                }            }
         };
         TestValidationResult<ImportExamDto>? result = _validator.TestValidate(dto);
         result.ShouldHaveValidationErrorFor("Questions[0].Text");
@@ -80,11 +79,10 @@ public class ImportExamDtoValidatorTests
                 new()
                 {
                     Text = "Q1",
-                    Type = "SingleChoice",
+                    Type = QuestionType.SingleChoice,
                     Options = new List<string> { "A", "B" },
                     CorrectAnswers = new List<string> { "A", "B" }
-                }
-            }
+                }            }
         };
         TestValidationResult<ImportExamDto>? result = _validator.TestValidate(dto);
         result.ShouldHaveValidationErrorFor("Questions[0]");
@@ -102,11 +100,10 @@ public class ImportExamDtoValidatorTests
                 new()
                 {
                     Text = "Q1",
-                    Type = "SingleChoice",
+                    Type = QuestionType.SingleChoice,
                     Options = new List<string> { "A", "B" },
                     CorrectAnswers = new List<string> { "A" }
-                }
-            },
+                }            },
             SingleChoiceToShow = 1,
             MultipleChoiceToShow = 0,
             TextInputToShow = 0

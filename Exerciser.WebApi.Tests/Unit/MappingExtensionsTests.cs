@@ -24,9 +24,8 @@ public class MappingExtensionsTests
             [
                 new ImportQuestionDto
                 {
-                    Text = "Q1", Type = "SingleChoice", Options = ["A", "B"], CorrectAnswers = ["A"]
-                }
-            ]
+                    Text = "Q1", Type = QuestionType.SingleChoice, Options = ["A", "B"], CorrectAnswers = ["A"]
+                }            ]
         };
 
         Exam exam = dto.ToExam();
@@ -38,7 +37,7 @@ public class MappingExtensionsTests
         Assert.Equal(dto.TextInputToShow, exam.TextInputToShow);
         Assert.Single(exam.Questions);
         Assert.Equal("Q1", exam.Questions[0].Text);
-        Assert.Equal("SingleChoice", exam.Questions[0].Type);
+        Assert.Equal(QuestionType.SingleChoice, exam.Questions[0].Type);
         Assert.Equal(["A", "B"], exam.Questions[0].Options);
         Assert.Equal(["A"], exam.Questions[0].CorrectAnswers);
     }
@@ -57,9 +56,8 @@ public class MappingExtensionsTests
             TextInputToShow = 0,
             Questions =
             [
-                new Question { Text = "Single question", Type = "SingleChoice", Options = [], CorrectAnswers = [] },
-                new Question { Text = "Multiple question", Type = "MultipleChoice", Options = [], CorrectAnswers = [] }
-            ]
+                new Question { Text = "Single question", Type = QuestionType.SingleChoice, Options = [], CorrectAnswers = [] },
+                new Question { Text = "Multiple question", Type = QuestionType.MultipleChoice, Options = [], CorrectAnswers = [] }            ]
         };
 
         ExamSummaryDto dto = exam.ToSummaryDto();
