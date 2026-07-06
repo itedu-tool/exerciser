@@ -125,8 +125,8 @@ services:
 
   student-frontend:
     build:
-      context: .
-      dockerfile: Exerciser.FrontEnd/Student/Dockerfile
+      context: ./Exerciser.FrontEnd/Student
+      dockerfile: Dockerfile
     container_name: exerciser-student
     restart: unless-stopped
     ports:
@@ -145,8 +145,8 @@ services:
 
   admin-frontend:
     build:
-      context: .
-      dockerfile: Exerciser.FrontEnd/Admin/Dockerfile
+      context: ./Exerciser.FrontEnd/Admin
+      dockerfile: Dockerfile
     container_name: exerciser-admin
     restart: unless-stopped
     ports:
